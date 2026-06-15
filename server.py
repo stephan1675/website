@@ -13,7 +13,7 @@ import base64
 import random
 
 # Port selection
-PORT = 8000
+PORT = int(os.environ.get("PORT", 8000))
 
 # Global sessions dictionary to manage active console C++ games
 # format: { session_id: { 'proc': subprocess.Popen, 'stdout_queue': queue.Queue, 'reader_thread': Thread } }
