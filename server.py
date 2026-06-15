@@ -114,7 +114,43 @@ def generate_mock_turn(agent, topic, history):
     return random.choice(statements)
 
 # Background Thread loop to run the AI discussion simulation
+def generate_markdown_log(log_data):
+    md = f"# KI-Diskussionsprotokoll\n\n"
+    md += f"- **Thema:** {log_data['topic']}\n"
+    md += f"- **Session ID:** {log_data['session_id']}\n"
+    md += f"- **Startzeit:** {log_data['start_time']}\n"
+    md += f"- **Teilnehmer:**\n"
+    for agent in log_data['agents']:
+        md += f"  - {agent['name']} (Alter: {agent['age']}, Profil: {agent['profile']}, Tonalität: {agent['tone']}, Emoji: {agent['emoji']})\n"
+    md += "\n---\n\n"
+    md += "## Verlauf & Prompts\n\n"
+    
+    for turn in log_data['turns']:
+        md += f"### Beitrag {turn['turn_index']}: {turn['sender']} {turn['emoji']}\n"
+        md += f"- **Zeitstempel:** {turn['timestamp']}\n"
+        md += f"- **API-Modus:** {'Live API' if turn['is_live_api'] else 'Offline Simulation'}\n\n"
+        
+        if turn['system_prompt']:
+            md += "#### System Prompt:\n"
+            md += "```text\n"
+            md += turn['system_prompt'].strip() + "\n"
+            md += "```\n\n"
+            
+        if turn['user_prompt']:
+            md += "#### User Prompt:\n"
+            md += "```text\n"
+            md += turn['user_prompt'].strip() + "\n"
+            md += "```\n\n"
+            
+        md += "#### Antwort / Beitrag:\n"
+        md += f"> {turn['response_text'].strip()}\n\n"
+        md += "---\n\n"
+        
+    return md
+
+# Background Thread loop to run the AI discussion simulation
 def run_discussion_loop(session_id, env):
+    import datetime
     session = active_discussions[session_id]
     topic = session['topic']
     agents = session['agents']
@@ -126,6 +162,15 @@ def run_discussion_loop(session_id, env):
     
     history = []
     summaries = []
+    
+    # Session Log Data structure
+    log_data = {
+        "topic": topic,
+        "session_id": session_id,
+        "start_time": datetime.datetime.now().isoformat(),
+        "agents": agents,
+        "turns": []
+    }
     
     print(f"[AI-Session] Starte unbegrenzte Diskussionsrunde [{session_id}]. API Modus: {is_live_api}")
     
@@ -144,6 +189,8 @@ def run_discussion_loop(session_id, env):
         if stop_event.is_set():
             break
             
+        system_prompt = ""
+        user_prompt = ""
         response_text = ""
         
         if is_live_api:
@@ -195,7 +242,22 @@ def run_discussion_loop(session_id, env):
                 print(f"[AI-Session] BFH-API Fehler für {agent['name']}: {e}. Fallback auf Offline-Generator.")
                 response_text = generate_mock_turn(agent, topic, history)
         else:
-            # Local Mock fallback
+            # Local Mock fallback - generate simulated prompts for logging completeness
+            system_prompt = f"Du bist {agent['name']}, Alter: {agent['age']}.\n"
+            system_prompt += f"Profil: {agent['profile']}\n"
+            system_prompt += "Politische Grundeinstellung (nach Priorität geordnet):\n"
+            for i, stance in enumerate(agent['politicalStance']):
+                system_prompt += f"{i+1}. {stance}\n"
+            system_prompt += f"Dein Sprachstil: {agent['tone']}.\n"
+            system_prompt += f"Deine aktuelle Botschaft/Gesprächsziel: {agent['agenda']}.\n"
+            system_prompt += " (MOCK-MODUS - OFFLINE)"
+            
+            history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in history[-2:]])
+            user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
+            if history_str:
+                user_prompt += f"Bisheriger Verlauf:\n{history_str}\n\n"
+            user_prompt += "Antworte kurz und prägnant."
+            
             response_text = generate_mock_turn(agent, topic, history)
             
         # Save turn in history
@@ -210,6 +272,19 @@ def run_discussion_loop(session_id, env):
         # Put turn in queue for SSE stream
         q.put(turn_data)
         
+        # Save to session log
+        log_turn = {
+            "turn_index": turn_counter + 1,
+            "timestamp": datetime.datetime.now().isoformat(),
+            "sender": agent['name'],
+            "emoji": agent['emoji'],
+            "is_live_api": is_live_api,
+            "system_prompt": system_prompt,
+            "user_prompt": user_prompt,
+            "response_text": response_text
+        }
+        log_data["turns"].append(log_turn)
+        
         turn_counter += 1
         
         # Perform rolling summarization every 20 messages
@@ -218,9 +293,10 @@ def run_discussion_loop(session_id, env):
             last_20_turns = history[-20:]
             summary_text = ""
             
+            summary_system = "Du bist ein neutraler Protokollant. Fasse die folgende Debatte kurz und prägnant in 2-3 Sätzen zusammen. Konzentriere dich auf die Kernaussagen und Konfliktpunkte der Teilnehmer."
+            summary_user = "Bisherige Diskussion:\n" + "\n".join([f"{t['sender']}: {t['text']}" for t in last_20_turns])
+            
             if is_live_api:
-                summary_system = "Du bist ein neutraler Protokollant. Fasse die folgende Debatte kurz und prägnant in 2-3 Sätzen zusammen. Konzentriere dich auf die Kernaussagen und Konfliktpunkte der Teilnehmer."
-                summary_user = "Bisherige Diskussion:\n" + "\n".join([f"{t['sender']}: {t['text']}" for t in last_20_turns])
                 try:
                     summary_text = call_bfh_api(api_key, summary_system, summary_user)
                     print(f"[AI-Session] API Zusammenfassung generiert: {summary_text}")
@@ -228,6 +304,7 @@ def run_discussion_loop(session_id, env):
                     print(f"[AI-Session] BFH-API Fehler bei Zusammenfassung: {e}")
                     summary_text = f"Die KIs debattieren intensiv über '{topic}'. Die Standpunkte bleiben verhärtet."
             else:
+                summary_system += " (MOCK-MODUS - OFFLINE)"
                 summary_text = f"Die Teilnehmer führen eine intensive Debatte über '{topic}'. Die Redebeiträge konzentrieren sich auf die individuellen Agenden."
                 
             summaries.append(summary_text)
@@ -241,6 +318,19 @@ def run_discussion_loop(session_id, env):
             }
             q.put(sys_msg)
             
+            # Save summary to session log
+            log_summary = {
+                "turn_index": f"summary_{len(summaries)}",
+                "timestamp": datetime.datetime.now().isoformat(),
+                "sender": "System-Protokollant",
+                "emoji": "📝",
+                "is_live_api": is_live_api,
+                "system_prompt": summary_system,
+                "user_prompt": summary_user,
+                "response_text": summary_text
+            }
+            log_data["turns"].append(log_summary)
+            
         # Delay between speakers for natural reading pace
         time.sleep(3.5)
         
@@ -248,6 +338,30 @@ def run_discussion_loop(session_id, env):
     exit_data = {"type": "exit"}
     q.put(exit_data)
     print(f"[AI-Session] Diskussionsrunde [{session_id}] beendet.")
+    
+    # Save logs to server logs folder (logs/)
+    if log_data["turns"]:
+        try:
+            logs_dir = os.path.join(os.getcwd(), 'logs')
+            os.makedirs(logs_dir, exist_ok=True)
+            
+            # Create safe filename base using topic and session_id
+            safe_topic = "".join([c if c.isalnum() else "_" for c in topic]).lower()[:30].strip("_")
+            filename_base = f"debatte_{safe_topic}_{session_id[:8]}"
+            
+            # 1. Save structured JSON log
+            json_path = os.path.join(logs_dir, f"{filename_base}.json")
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(log_data, f, ensure_ascii=False, indent=2)
+                
+            # 2. Save human-readable Markdown log
+            md_path = os.path.join(logs_dir, f"{filename_base}.md")
+            with open(md_path, 'w', encoding='utf-8') as f:
+                f.write(generate_markdown_log(log_data))
+                
+            print(f"[AI-Session] Server-Logs erfolgreich gespeichert in {logs_dir} (JSON und MD)")
+        except Exception as e:
+            print(f"[AI-Session] Fehler beim Speichern der Server-Logs: {e}")
 
 # Background thread function to read C++ stdout process char-by-char
 def read_output(proc, q):
