@@ -385,7 +385,7 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 
                 # Load env variables (for BFH API key)
                 env = load_env()
-                api_key = env.get('BFH_API_KEY')
+                api_key = env.get('BFH_API_KEY') or os.environ.get('BFH_API_KEY')
                 
                 # Spawn background generator thread
                 loop_thread = threading.Thread(
