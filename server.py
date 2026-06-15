@@ -161,6 +161,11 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 print(f"[AI-Session] Discussion Stream getrennt für {session_id}: {e}")
             return
             
+        # 3. Ping Endpoint to wake up Render
+        elif parsed_url.path == '/api/ping':
+            self.send_success_response("pong")
+            return
+            
         else:
             super().do_GET()
 
