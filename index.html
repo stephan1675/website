@@ -33,7 +33,7 @@
       <!-- Welcome Banner -->
       <section class="welcome-banner glass-card-wide">
         <h1>Willkommen auf meinem Portal</h1>
-        <p>Entdecke meine Projekte und starte installierte Spiele direkt von diesem Control-Panel aus.</p>
+        <p>Entdecke meine Projekte und starte installierte Spiele oder Simulationen direkt von diesem Control-Panel aus.</p>
       </section>
 
       <!-- Action Cards Grid -->
@@ -49,6 +49,19 @@
           <button id="btn-view-projects" class="btn btn-primary">
             <span>Projekte ansehen</span>
             <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </section>
+
+        <!-- Card: KI-Diskussion -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-comments-dollar card-icon" style="color: var(--color-secondary);"></i>
+            <h3>KI-Diskussionsraum</h3>
+          </div>
+          <p class="card-description">Simuliere eine hitzige Debatte zwischen 2 bis 4 KIs mit vorgefertigten oder eigenen Custom-Personas.</p>
+          <button id="btn-go-to-discussion" class="btn btn-primary" style="background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border: none;">
+            <span>Diskussionsraum öffnen</span>
+            <i class="fa-solid fa-comments"></i>
           </button>
         </section>
 
@@ -129,7 +142,91 @@
     </main>
 
     <!-- ==========================================
-         3. AUTH SECTION (LOGIN / REGISTER)
+         3. AI DISCUSSION VIEW (NEW FEATURE)
+         ========================================== -->
+    <main id="ai-discussion-view" class="dashboard-container hidden">
+      <header class="dash-header">
+        <div class="dash-logo">Diskurs.</div>
+        <button id="btn-discussion-back" class="btn-logout" style="border-color: var(--glass-border); color: var(--color-text-primary); background: rgba(255,255,255,0.05)">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Zurück</span>
+        </button>
+      </header>
+
+      <!-- Setup Window -->
+      <section id="discussion-setup" class="glass-card-wide" style="text-align: left; padding: 2.5rem;">
+        <h2 style="margin-bottom: 1.5rem; text-align: center;">KI-Diskussionsraum konfigurieren</h2>
+        
+        <form id="discussion-setup-form">
+          <div class="form-row-two">
+            <div class="form-group">
+              <label for="disc-topic">Übergeordnetes Thema / Leitfrage</label>
+              <input type="text" id="disc-topic" class="form-control" style="padding-left: 1.25rem;" placeholder="z.B. Werden KIs Programmierer ersetzen?" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="disc-agent-count">Anzahl der KIs</label>
+              <select id="disc-agent-count" class="form-control" style="padding-left: 1.25rem;">
+                <option value="2">2 KIs</option>
+                <option value="3">3 KIs</option>
+                <option value="4">4 KIs</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic Container for selecting and configuring AI Agents -->
+          <div id="disc-agents-configs" class="agents-setup-grid">
+            <!-- Dynamically injected config panels for Agent 1 to 4 will appear here -->
+          </div>
+
+          <div style="text-align: center; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="width: auto; padding: 1rem 3rem;">
+              <span>Diskussion starten</span>
+              <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Chatroom View (Hidden initially) -->
+      <section id="discussion-chat" class="glass-card-wide hidden" style="padding: 1.5rem; display: flex; flex-direction: column; height: 75vh; min-height: 500px;">
+        <!-- Chat Header -->
+        <div class="chat-header-bar">
+          <div class="chat-info">
+            <span class="chat-status"><i class="fa-solid fa-circle-play" style="color: var(--color-success); margin-right: 0.5rem;"></i>Live Debatte</span>
+            <h3 id="chat-topic-display">Thema</h3>
+          </div>
+          <div class="chat-controls">
+            <button id="btn-chat-toggle" class="btn-logout" style="color: var(--color-warning); border-color: rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.05);">
+              <i class="fa-solid fa-pause"></i>
+              <span>Pause</span>
+            </button>
+            <button id="btn-chat-close" class="btn-logout">
+              <i class="fa-solid fa-stop"></i>
+              <span>Beenden</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Viewport -->
+        <div id="discussion-messages" class="chat-messages-container">
+          <!-- Chat bubbles will appear here dynamically -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="chat-typing-indicator" class="chat-typing-row hidden">
+          <div class="typing-avatar" id="typing-avatar-icon">🤖</div>
+          <div class="typing-bubble">
+            <span id="typing-persona-name" style="font-weight: 600; margin-right: 0.5rem;">AI</span> schreibt
+            <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==========================================
+         4. AUTH SECTION (LOGIN / REGISTER)
          ========================================== -->
     <section id="auth-section" class="glass-card hidden">
       
@@ -235,7 +332,7 @@
     </section>
 
     <!-- ==========================================
-         4. MEMBER DASHBOARD SECTION (SECURE)
+         5. MEMBER DASHBOARD SECTION (SECURE)
          ========================================== -->
     <main id="dashboard-section" class="dashboard-container hidden">
       
@@ -321,7 +418,7 @@
   </div>
 
   <!-- ==========================================
-       5. WEB-TERMINAL MODAL (C++ GAME)
+       6. WEB-TERMINAL MODAL (C++ GAME)
        ========================================== -->
   <div id="terminal-modal" class="terminal-overlay hidden">
     <div class="terminal-card">
