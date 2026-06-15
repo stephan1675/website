@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Portal - Home & Dashboard</title>
+  <!-- Meta tags for SEO & best practices -->
+  <meta name="description" content="Ein hochmodernes und sicheres lokales Portal mit Anmelde- und Registrierungsfunktionen.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- FontAwesome Icons for modern visuals -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- ==========================================
+         1. HOME VIEW (PUBLIC LANDING PAGE)
+         ========================================== -->
+    <main id="home-view" class="dashboard-container">
+      <!-- Header -->
+      <header class="dash-header">
+        <div class="dash-logo">Portal.</div>
+        <div id="home-auth-status" class="dash-user-profile">
+          <!-- Will be filled by JS dynamically -->
+        </div>
+      </header>
+
+      <!-- Welcome Banner -->
+      <section class="welcome-banner glass-card-wide">
+        <h1>Willkommen auf meinem Portal</h1>
+        <p>Entdecke meine Projekte und starte installierte Spiele direkt von diesem Control-Panel aus.</p>
+      </section>
+
+      <!-- Action Cards Grid -->
+      <div class="dash-grid">
+        
+        <!-- Card: Projects -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-code card-icon"></i>
+            <h3>Projekt-Galerie</h3>
+          </div>
+          <p class="card-description">Schau dir meine aktuellen Programmierarbeiten, Webseiten und Software-Projekte an.</p>
+          <button id="btn-view-projects" class="btn btn-primary">
+            <span>Projekte ansehen</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </section>
+
+        <!-- Card: Python Shooter -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-brands fa-python card-icon" style="color: #ffd43b;"></i>
+            <h3>Python Shooter</h3>
+          </div>
+          <p class="card-description">Starte das in Python und der Ursina-Engine entwickelte 3D Shooter-Spiel.</p>
+          <button id="btn-run-python" class="btn btn-primary" style="background: linear-gradient(135deg, #306998, #ffd43b); border: none;">
+            <span>Spiel starten</span>
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </section>
+
+        <!-- Card: C++ Spiel -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-cubes card-icon" style="color: #00599c;"></i>
+            <h3>C++ Spiel</h3>
+          </div>
+          <p class="card-description">Führe das kompilierte C++ Spiel direkt aus dem Ordner "c++ spiel" aus.</p>
+          <button id="btn-run-cpp" class="btn btn-primary" style="background: linear-gradient(135deg, #00599c, #0891b2); border: none;">
+            <span>Spiel starten</span>
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </section>
+
+      </div>
+    </main>
+    
+    <!-- ==========================================
+         2. PROJECTS VIEW (PUBLIC GALLERY)
+         ========================================= -->
+    <main id="projects-view" class="dashboard-container hidden">
+      <header class="dash-header">
+        <div class="dash-logo">Projekte.</div>
+        <button id="btn-projects-back" class="btn-logout" style="border-color: var(--glass-border); color: var(--color-text-primary); background: rgba(255,255,255,0.05)">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Zurück</span>
+        </button>
+      </header>
+
+      <div class="dash-grid">
+        
+        <!-- Project 1 -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-earth-americas card-icon" style="color: var(--color-secondary);"></i>
+            <h3>Dieses Portal</h3>
+          </div>
+          <p class="card-description">Eine responsive Web-App mit Login-System, Session-Management und einer Python-Brücke zur lokalen Programmausführung.</p>
+          <span class="project-tag">HTML5 / CSS3 / Vanilla JS</span>
+        </section>
+
+        <!-- Project Placeholder 2 -->
+        <section class="dash-card project-placeholder">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-folder-plus card-icon" style="color: var(--color-text-muted);"></i>
+            <h3>Neues Projekt</h3>
+          </div>
+          <p class="card-description">Dieser Platzhalter steht bereit für deine zukünftigen Projekte, Skripte und Applikationen.</p>
+          <span class="project-tag tag-placeholder">In Planung</span>
+        </section>
+
+        <!-- Project Placeholder 3 -->
+        <section class="dash-card project-placeholder">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-folder-plus card-icon" style="color: var(--color-text-muted);"></i>
+            <h3>Neues Projekt</h3>
+          </div>
+          <p class="card-description">Dieser Platzhalter steht bereit für deine zukünftigen Projekte, Skripte und Applikationen.</p>
+          <span class="project-tag tag-placeholder">In Planung</span>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- ==========================================
+         3. AUTH SECTION (LOGIN / REGISTER)
+         ========================================== -->
+    <section id="auth-section" class="glass-card hidden">
+      
+      <!-- Back to Home Button -->
+      <button id="btn-auth-back" class="back-floating-btn" aria-label="Zurück zur Startseite">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+
+      <!-- Login View -->
+      <div id="login-view">
+        <div class="auth-header">
+          <div class="logo">Portal.</div>
+          <p>Melden Sie sich an, um fortzufahren</p>
+        </div>
+        
+        <form id="login-form" autocomplete="on">
+          <div class="form-group">
+            <label for="login-email">E-Mail-Adresse</label>
+            <div class="input-wrapper">
+              <input type="email" id="login-email" class="form-control" placeholder="name@beispiel.com" required>
+              <i class="fa-regular fa-envelope input-icon"></i>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="login-password">Passwort</label>
+            <div class="input-wrapper">
+              <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+              <i class="fa-solid fa-lock input-icon"></i>
+              <button type="button" class="password-toggle" aria-label="Passwort anzeigen">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">
+            <span>Anmelden</span>
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          <span>Noch kein Konto? </span>
+          <a href="#" id="go-to-register">Jetzt registrieren</a>
+        </div>
+      </div>
+      
+      <!-- Register View (Hidden initially) -->
+      <div id="register-view" class="hidden">
+        <div class="auth-header">
+          <div class="logo">Erstellen.</div>
+          <p>Erstellen Sie ein kostenloses Konto</p>
+        </div>
+        
+        <form id="register-form" autocomplete="off">
+          <div class="form-group">
+            <label for="register-username">Benutzername</label>
+            <div class="input-wrapper">
+              <input type="text" id="register-username" class="form-control" placeholder="max_mustermann" required>
+              <i class="fa-regular fa-user input-icon"></i>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="register-email">E-Mail-Adresse</label>
+            <div class="input-wrapper">
+              <input type="email" id="register-email" class="form-control" placeholder="name@beispiel.com" required>
+              <i class="fa-regular fa-envelope input-icon"></i>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="register-password">Passwort</label>
+            <div class="input-wrapper">
+              <input type="password" id="register-password" class="form-control" placeholder="Mind. 8 Zeichen" required>
+              <i class="fa-solid fa-lock input-icon"></i>
+              <button type="button" class="password-toggle" aria-label="Passwort anzeigen">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+            
+            <!-- Password Strength Indicator -->
+            <div class="strength-container">
+              <div class="strength-bar-wrapper">
+                <div id="strength-bar" class="strength-bar"></div>
+              </div>
+              <span id="strength-text" class="strength-text">Passwortstärke</span>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">
+            <span>Konto erstellen</span>
+            <i class="fa-solid fa-user-plus"></i>
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          <span>Bereits registriert? </span>
+          <a href="#" id="go-to-login">Hier einloggen</a>
+        </div>
+      </div>
+      
+    </section>
+
+    <!-- ==========================================
+         4. MEMBER DASHBOARD SECTION (SECURE)
+         ========================================== -->
+    <main id="dashboard-section" class="dashboard-container hidden">
+      
+      <!-- Dashboard Header -->
+      <header class="dash-header">
+        <div class="dash-logo">Portal.</div>
+        <div class="dash-user-profile">
+          <button id="btn-dash-back" class="btn-logout" style="border-color: var(--glass-border); color: var(--color-text-primary); background: rgba(255,255,255,0.05); margin-right: 1rem;">
+            <i class="fa-solid fa-house"></i>
+            <span>Startseite</span>
+          </button>
+          
+          <div id="user-avatar" class="user-avatar">U</div>
+          <div class="user-info">
+            <span id="display-username" class="user-name">Benutzername</span>
+            <span id="display-email" class="user-email">email@beispiel.com</span>
+          </div>
+          
+          <button id="logout-btn" class="btn-logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Abmelden</span>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Dashboard Grid -->
+      <div class="dash-grid">
+        
+        <!-- Card 1: Account Stats -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-chart-simple card-icon"></i>
+            <h3>Konto-Aktivität</h3>
+          </div>
+          <div class="stats-list">
+            <div class="stat-item">
+              <span class="stat-label">Mitglied seit</span>
+              <span id="stat-created" class="stat-value">--.--.----</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Logins insgesamt</span>
+              <span id="stat-logins" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Sitzungsstatus</span>
+              <span class="stat-value" style="color: var(--color-success);">Aktiv</span>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Card 2: Quick Notes Widget -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-regular fa-note-sticky card-icon"></i>
+            <h3>Schnelle Notizen</h3>
+          </div>
+          <div class="notes-container">
+            <textarea id="quick-notes" class="notes-textarea" placeholder="Schreibe hier etwas auf... Deine Notizen werden automatisch in deinem Browser gespeichert!"></textarea>
+            <button id="save-note-btn" class="btn-save-note">
+              <i class="fa-regular fa-floppy-disk"></i>
+              <span>Speichern</span>
+            </button>
+          </div>
+        </section>
+        
+        <!-- Card 3: Info & Documentation -->
+        <section class="dash-card">
+          <div class="card-title-wrapper">
+            <i class="fa-solid fa-circle-info card-icon"></i>
+            <h3>Über diese App</h3>
+          </div>
+          <div class="welcome-card-content">
+            <p>Willkommen in deinem persönlichen Bereich! Diese Website läuft vollständig im Browser als <span class="welcome-highlight">Single Page Application</span>.</p>
+            <p>Da kein Backend-Server vorhanden ist, werden alle Daten mithilfe der <span class="welcome-highlight">HTML5 LocalStorage API</span> verschlüsselt simuliert auf deinem Computer hinterlegt.</p>
+            <p>Du kannst dich abmelden, die Seite aktualisieren oder den Browser schließen – deine Daten bleiben erhalten, solange du den Browserverlauf nicht löschst.</p>
+          </div>
+        </section>
+        
+      </div>
+      
+    </main>
+
+  </div>
+
+  <!-- ==========================================
+       5. WEB-TERMINAL MODAL (C++ GAME)
+       ========================================== -->
+  <div id="terminal-modal" class="terminal-overlay hidden">
+    <div class="terminal-card">
+      <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">Console Connection - C++ Spiel</span>
+        <button id="btn-close-terminal" class="terminal-close-btn" aria-label="Schließen">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="terminal-content">
+        <pre id="terminal-output" class="terminal-output">Verbinde zum Prozess...</pre>
+        <div class="terminal-prompt-line">
+          <span class="terminal-prompt">&gt;</span>
+          <input type="text" id="terminal-input-field" class="terminal-input" placeholder="Befehl hier eingeben..." autofocus autocomplete="off">
+          <button id="btn-send-input" class="terminal-send-btn" aria-label="Senden">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- JavaScript logic -->
+  <script src="app.js"></script>
+</body>
+</html>
