@@ -614,6 +614,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const btnChatToggle = document.getElementById('btn-chat-toggle');
   const btnChatClose = document.getElementById('btn-chat-close');
+  const chatUserInputPanel = document.getElementById('chat-user-input-panel');
+  const chatUserInputField = document.getElementById('chat-user-input-field');
+  const btnChatSendUserInput = document.getElementById('btn-chat-send-user-input');
 
   // Save Modal Elements
   const saveDiscussionModal = document.getElementById('save-discussion-modal');
@@ -722,6 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="musk">Elon Musk (Preset)</option>
             <option value="xi">Xi Jinping (Preset)</option>
             <option value="schweiz">Schweizer Bundespräsident (Preset)</option>
+            <option value="user_me">Ich (Benutzer)</option>
             ${customOptions}
             <option value="new_custom" style="color: var(--color-secondary); font-weight: bold;">+ Neue Persona erstellen...</option>
           </select>
@@ -919,6 +923,18 @@ document.addEventListener('DOMContentLoaded', () => {
               localStorage.setItem('customPersonas', JSON.stringify(customPersonasToSave));
             }
           }
+        } else if (selection === 'user_me') {
+          agentObj = {
+            name: "Ich",
+            emoji: "👤",
+            isUser: true,
+            age: "30",
+            profile: "Ich selbst, der sich aktiv in die Diskussion einbringt.",
+            politicalStance: ["Meine Meinung", "Freiheit", "Hinterfragen"],
+            agenda: "Meine Meinung einbringen",
+            tone: "neutral",
+            docFileName: ""
+          };
         } else if (selection.startsWith('custom_')) {
           // Load from localStorage
           const savedIdx = parseInt(selection.split('_')[1]);
@@ -967,6 +983,9 @@ document.addEventListener('DOMContentLoaded', () => {
       discussionMessageBuffer = [];
       currentDiscussionTurns = [];
       
+      chatUserInputPanel.classList.add('hidden');
+      chatUserInputField.value = '';
+      
       btnChatToggle.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pause</span>';
       
       // Start EventSource stream for turns
@@ -988,10 +1007,31 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error(e);
         }
       });
+
+      // User input required event
+      discussionEventSource.addEventListener('user_input_required', (event) => {
+        chatTypingIndicator.classList.add('hidden'); // Hide typing
+        
+        try {
+          const parsed = JSON.parse(event.data);
+          // Show user input panel
+          chatUserInputPanel.classList.remove('hidden');
+          chatUserInputField.value = '';
+          chatUserInputField.disabled = false;
+          btnChatSendUserInput.disabled = false;
+          chatUserInputField.focus();
+          
+          // Auto scroll to input panel
+          discussionMessages.scrollTop = discussionMessages.scrollHeight;
+        } catch (e) {
+          console.error(e);
+        }
+      });
       
       // Message event
       discussionEventSource.onmessage = (event) => {
         chatTypingIndicator.classList.add('hidden'); // Hide typing
+        chatUserInputPanel.classList.add('hidden');
         
         try {
           const turn = JSON.parse(event.data);
@@ -1135,6 +1175,8 @@ document.addEventListener('DOMContentLoaded', () => {
     discussionSetup.classList.remove('hidden');
     
     chatTypingIndicator.classList.add('hidden');
+    chatUserInputPanel.classList.add('hidden');
+    chatUserInputField.value = '';
     discussionMessageBuffer = [];
     currentDiscussionTurns = [];
     showToast('Debatte beendet.', 'info');
@@ -1195,6 +1237,50 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+
+  // Submit user keyboard contribution
+  async function submitUserInput() {
+    const text = chatUserInputField.value.trim();
+    if (!text) return;
+    if (!activeDiscussionSessionId) return;
+    
+    chatUserInputField.disabled = true;
+    btnChatSendUserInput.disabled = true;
+    
+    try {
+      const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+      const response = await fetch(`${baseUrl}/api/discussion/input`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: activeDiscussionSessionId,
+          text: text
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Fehler beim Senden.');
+      }
+      
+      chatUserInputPanel.classList.add('hidden');
+      chatUserInputField.value = '';
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Senden fehlgeschlagen.', 'error');
+      chatUserInputField.disabled = false;
+      btnChatSendUserInput.disabled = false;
+    }
+  }
+
+  btnChatSendUserInput.addEventListener('click', submitUserInput);
+  chatUserInputField.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      submitUserInput();
+    }
+  });
 
   // Modal Button Handlers
   btnSaveDiscYes.addEventListener('click', () => {
