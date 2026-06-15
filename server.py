@@ -9,59 +9,246 @@ import queue
 import uuid
 import time
 import urllib.parse
+import base64
+import random
 
 # Port selection
 PORT = 8000
 
-# Global sessions dictionary to manage active console games
+# Global sessions dictionary to manage active console C++ games
 # format: { session_id: { 'proc': subprocess.Popen, 'stdout_queue': queue.Queue, 'reader_thread': Thread } }
 active_sessions = {}
 
-# Background thread function to continuously read process stdout char-by-char
+# Global active AI discussion sessions
+# format: { session_id: { 'topic': str, 'agents': list, 'turns_queue': queue.Queue, 'stop_event': threading.Event, 'thread': Thread } }
+active_discussions = {}
+
+# Helper to load environmental variables manually from .env file
+def load_env():
+    env = {}
+    env_path = os.path.join(os.getcwd(), '.env')
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        if '=' in line:
+                            key, val = line.split('=', 1)
+                            env[key.strip()] = val.strip().strip('"').strip("'")
+        except Exception as e:
+            print(f"[Launcher] Fehler beim Einlesen von .env: {e}")
+    return env
+
+# BFH API Direct Requester using standard libraries (OpenAI API compliant)
+def call_bfh_api(api_key, system_prompt, user_prompt):
+    payload = {
+        "model": "gpt-oss:120b",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.7
+    }
+    
+    req = urllib.parse.urlparse('https://inference.mlmp.ti.bfh.ch/api/v1/chat/completions')
+    req_url = 'https://inference.mlmp.ti.bfh.ch/api/v1/chat/completions'
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
+    
+    request = urllib.request.Request(
+        req_url,
+        data=json.dumps(payload).encode('utf-8'),
+        headers=headers,
+        method='POST'
+    )
+    
+    # 15 seconds timeout
+    with urllib.request.urlopen(request, timeout=15) as response:
+        res_data = json.loads(response.read().decode('utf-8'))
+        return res_data['choices'][0]['message']['content'].strip()
+
+# Local Offline Fallback debate generator
+def generate_mock_turn(agent, topic, history):
+    name = agent['name']
+    agenda = agent['agenda']
+    tone = agent['tone']
+    prio1 = agent['politicalStance'][0] if agent['politicalStance'] else "Konsens"
+    
+    # Selection of funny offline statements
+    if "trump" in name.lower():
+        statements = [
+            f"Das ist eine absolute Katastrophe! Das Thema '{topic}' wird von meinen Gegnern komplett falsch angegangen. Sie haben keine Ahnung, es ist Fake News! Wenn ich wieder an der Macht bin, machen wir das tremendous. Mein Ziel ist ganz klar: {agenda}!",
+            f"Niemand weiß mehr über '{topic}' als ich. Glaubt mir. Meine politische Priorität liegt auf: {prio1}. Und für diese Runde will ich durchsetzen: {agenda}. We will make it great again!",
+            f"Haben Sie gehört, was die anderen gerade gesagt haben? Total schwach. Bezüglich '{topic}' sage ich euch: Wir brauchen Stärke. Mein Ziel heute ist {agenda}, und das setzen wir um!"
+        ]
+    elif "musk" in name.lower() or "elon" in name.lower():
+        statements = [
+            f"Wenn man das Thema '{topic}' aus First Principles analysiert, müssen wir die Effizienz massiv steigern. Wir müssen zum Mars, das ist die einzige langfristige Option für das Bewusstsein. Meine Prio ist {prio1}. Für diese Debatte will ich erreichen: {agenda}. Let's make the future exciting!",
+            f"Die Physik lügt nicht. Bezüglich '{topic}' müssen wir radikal neu denken. Mein Ziel heute lautet: {agenda}. Das passt auch zu meiner Einstellung: {prio1}. X (früher Twitter) wird das unterstützen.",
+            f"Das ist ein extrem schweres Problem. Aber mit genug Automatisierung lösen wir '{topic}'. Meine Botschaft für heute: {agenda}. Wir müssen die Simulationsgeschwindigkeit erhöhen!"
+        ]
+    elif "xi" in name.lower() or "jinping" in name.lower():
+        statements = [
+            f"Die harmonische Entwicklung bezüglich des Themas '{topic}' erfordert Disziplin, Stabilität und langfristige strategische Planung. China wird seinen friedlichen Aufstieg fortsetzen. Unsere Priorität liegt auf: {prio1}. In diesem Dialog ist unsere Botschaft ganz klar: {agenda}.",
+            f"Bezüglich '{topic}' müssen alle Beteiligten die Multipolarität anerkennen. Unsere Grundeinstellung ist {prio1}. Wir werden unsere Botschaft '{agenda}' konsequent verfolgen.",
+            f"Die wirtschaftliche Stärke Chinas wird die Zukunft von '{topic}' bestimmen. Meine Botschaft für diese Runde lautet: {agenda}. Dies sichert die gemeinsame Zukunft."
+        ]
+    elif "bundespräsident" in name.lower() or "schweiz" in name.lower() or "viola" in name.lower() or "amherd" in name.lower() or "bayer" in name.lower():
+        statements = [
+            f"Grüezi. Bezüglich des Themas '{topic}' müssen wir einen typisch schweizerischen Kompromiss finden. Wir müssen alle Akteure an einen Tisch bringen. Die Priorität der Eidgenossenschaft liegt auf: {prio1}. Mein Ziel für diesen Diskurs ist: {agenda}. Danke für das Gespräch.",
+            f"Die Neutralität der Schweiz erlaubt es uns, eine vermittelnde Rolle bei '{topic}' einzunehmen. Prio 1 für uns: {prio1}. In diesem Gespräch will ich vor allem das erreichen: {agenda}.",
+            f"Das Bundesratskollegium vertritt eine klare Haltung. Bei '{topic}' müssen wir Schritt für Schritt vorgehen. Meine Priorität ist: {prio1}. Heute vertreten wir die Botschaft: {agenda}."
+        ]
+    else:
+        # Default Custom Persona response builder
+        statements = [
+            f"Als {name} vertrete ich eine ganz klare Meinung zu '{topic}'. Meine oberste Priorität ist: {prio1}. Mein Hauptanliegen in dieser Runde lautet: {agenda}. Ich stehe für einen {tone}en Diskurs.",
+            f"Bezüglich '{topic}' müssen wir mein primäres Ziel beachten: {agenda}. Das entspricht auch meiner politischen Einstellung ({prio1}). Ich werde dies weiterhin {tone} vertreten.",
+            f"Ich habe die Beiträge der Vorredner aufmerksam verfolgt. Aber für mich steht fest: Um '{topic}' zu lösen, müssen wir meine Botschaft durchsetzen: {agenda}."
+        ]
+        
+    return random.choice(statements)
+
+# Background Thread loop to run the AI discussion simulation
+def run_discussion_loop(session_id, env):
+    session = active_discussions[session_id]
+    topic = session['topic']
+    agents = session['agents']
+    q = session['turns_queue']
+    stop_event = session['stop_event']
+    
+    api_key = env.get('BFH_API_KEY')
+    is_live_api = api_key and not api_key.startswith('sk-xxx')
+    
+    history = []
+    
+    print(f"[AI-Session] Starte Diskussionsrunde [{session_id}]. API Modus: {is_live_api}")
+    
+    # 4 discussion rounds
+    total_rounds = 3
+    for round_idx in range(total_rounds):
+        if stop_event.is_set():
+            break
+            
+        for agent_idx, agent in enumerate(agents):
+            if stop_event.is_set():
+                break
+                
+            # Notify frontend which agent starts "typing"
+            typing_data = {"type": "typing", "sender": agent['name'], "emoji": agent['emoji']}
+            q.put(typing_data)
+            
+            # Simulate thinking time (2 seconds)
+            time.sleep(2)
+            
+            if stop_event.is_set():
+                break
+                
+            response_text = ""
+            
+            if is_live_api:
+                # 1. Read document content if associated
+                doc_content = ""
+                if agent.get('docFileName'):
+                    doc_path = os.path.join(os.getcwd(), 'personas_documents', agent['docFileName'])
+                    if os.path.exists(doc_path):
+                        try:
+                            with open(doc_path, 'r', encoding='utf-8', errors='ignore') as f:
+                                doc_content = f.read()
+                        except Exception as e:
+                            print(f"[AI-Session] Fehler beim Lesen des Dokuments für {agent['name']}: {e}")
+                
+                # 2. Build BFH OpenAI System prompt
+                system_prompt = f"Du bist {agent['name']}, Alter: {agent['age']}.\n"
+                system_prompt += f"Profil: {agent['profile']}\n"
+                system_prompt += "Politische Grundeinstellung (nach Priorität geordnet):\n"
+                for i, stance in enumerate(agent['politicalStance']):
+                    system_prompt += f"{i+1}. {stance}\n"
+                system_prompt += f"Dein Sprachstil: {agent['tone']}. Antworte unbedingt in dieser Tonalität!\n"
+                system_prompt += f"Deine aktuelle Botschaft/Gesprächsziel: {agent['agenda']}. Versuche aktiv, dieses Ziel in deinen Beiträgen durchzusetzen!\n"
+                
+                if doc_content:
+                    system_prompt += f"\nNutze das folgende Hintergrundwissen aus deinen Dokumenten:\n=== WISSENSBASIS ===\n{doc_content}\n==================\n"
+                
+                # 3. Build User Prompt with Chat History
+                history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in history[-6:]])
+                user_prompt = f"Thema der Diskussion: '{topic}'\n"
+                if history_str:
+                    user_prompt += f"Bisheriger Verlauf:\n{history_str}\n"
+                user_prompt += f"Antworte jetzt als {agent['name']} kurz und prägnant (maximal 3-4 Sätze) auf die Runde. Reagiere auf die anderen und verfolge deine Agenda!"
+                
+                try:
+                    response_text = call_bfh_api(api_key, system_prompt, user_prompt)
+                except Exception as e:
+                    print(f"[AI-Session] BFH-API Fehler für {agent['name']}: {e}. Fallback auf Offline-Generator.")
+                    response_text = generate_mock_turn(agent, topic, history)
+            else:
+                # Local Mock fallback
+                response_text = generate_mock_turn(agent, topic, history)
+                
+            # Save turn in history
+            turn_data = {
+                "type": "message",
+                "sender": agent['name'],
+                "text": response_text,
+                "emoji": agent['emoji']
+            }
+            history.append(turn_data)
+            
+            # Put turn in queue for SSE stream
+            q.put(turn_data)
+            
+            # Delay between speakers for natural reading pace
+            time.sleep(3.5)
+            
+    # Send exit notification when debate completes
+    exit_data = {"type": "exit"}
+    q.put(exit_data)
+    print(f"[AI-Session] Diskussionsrunde [{session_id}] beendet.")
+
+# Background thread function to read C++ stdout process char-by-char
 def read_output(proc, q):
     try:
         while True:
-            # Read 1 character at a time (blocks until output is ready)
             char = proc.stdout.read(1)
             if not char:
                 break
             q.put(char)
-    except Exception as e:
-        print(f"[Launcher] Fehler beim Lesen von stdout: {e}")
+    except:
+        pass
     finally:
         try:
             proc.stdout.close()
         except:
             pass
 
-# Concurrent Multithreaded HTTP Server to handle SSE streams in parallel
+# Concurrent Multithreaded HTTP Server
 class ThreadingHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     daemon_threads = True
 
 class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
     
-    # Custom GET override for Server-Sent Events (SSE) Stream
+    # Custom GET overrides
     def do_GET(self):
         parsed_url = urllib.parse.urlparse(self.path)
         query_params = urllib.parse.parse_qs(parsed_url.query)
         
-        # Check if the requested path is the terminal output stream
+        # 1. SSE Endpoint for C++ console stream
         if parsed_url.path == '/api/terminal/stream':
             session_id = query_params.get('id', [None])[0]
-            
             if not session_id or session_id not in active_sessions:
                 self.send_response(404)
-                self.send_header('Content-Type', 'text/plain')
-                self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                self.wfile.write(b"Session nicht gefunden.")
                 return
             
             session = active_sessions[session_id]
             q = session['stdout_queue']
             proc = session['proc']
             
-            # Send SSE Protocol Headers
             self.send_response(200)
             self.send_header('Content-Type', 'text/event-stream')
             self.send_header('Cache-Control', 'no-cache')
@@ -69,43 +256,74 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             
-            print(f"[Launcher] SSE Stream-Verbindung hergestellt für Session [{session_id}]")
-            
             try:
                 while True:
-                    # Collect all characters currently in the queue
                     chars = ""
                     while not q.empty():
                         chars += q.get_nowait()
-                    
                     if chars:
-                        # Send text data chunk in JSON format
                         event_data = json.dumps({"text": chars})
                         self.wfile.write(f"data: {event_data}\n\n".encode('utf-8'))
                         self.wfile.flush()
-                    
-                    # If the process has ended and all outputs have been read, close the connection
                     if proc.poll() is not None and q.empty():
                         self.wfile.write(b"event: exit\ndata: {}\n\n")
                         self.wfile.flush()
-                        print(f"[Launcher] Session [{session_id}] beendet (Prozess beendet).")
                         break
-                    
-                    # Yield CPU time to prevent 100% core usage
                     time.sleep(0.03)
-                    
             except Exception as e:
-                # Connection reset is normal if user closes/refreshes page
-                print(f"[Launcher] SSE Stream getrennt für Session [{session_id}]: {e}")
+                print(f"[Launcher] C++ Terminal Stream getrennt für {session_id}: {e}")
+            return
+            
+        # 2. SSE Endpoint for AI Discussion room stream
+        elif parsed_url.path == '/api/discussion/stream':
+            session_id = query_params.get('id', [None])[0]
+            if not session_id or session_id not in active_discussions:
+                self.send_response(404)
+                self.end_headers()
+                return
+                
+            session = active_discussions[session_id]
+            q = session['turns_queue']
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/event-stream')
+            self.send_header('Cache-Control', 'no-cache')
+            self.send_header('Connection', 'keep-alive')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            try:
+                while True:
+                    # Retrieve turns from queue
+                    turns = []
+                    while not q.empty():
+                        turns.append(q.get_nowait())
+                        
+                    for turn in turns:
+                        if turn['type'] == 'exit':
+                            self.wfile.write(b"event: exit\ndata: {}\n\n")
+                            self.wfile.flush()
+                            return
+                        elif turn['type'] == 'typing':
+                            # Trigger "typing" indicator event on browser
+                            self.wfile.write(f"event: typing\ndata: {json.dumps(turn)}\n\n".encode('utf-8'))
+                            self.wfile.flush()
+                        else:
+                            # Send standard text turn
+                            self.wfile.write(f"data: {json.dumps(turn)}\n\n".encode('utf-8'))
+                            self.wfile.flush()
+                    
+                    time.sleep(0.1)
+            except Exception as e:
+                print(f"[AI-Session] Discussion Stream getrennt für {session_id}: {e}")
             return
             
         else:
-            # Serve static files normally using standard handler
             super().do_GET()
 
-    # Custom POST request handler
+    # Custom POST overrides
     def do_POST(self):
-        # 1. Endpoint for launching Python shooter game (Runs on server desktop)
+        # 1. Python Shooter
         if self.path == '/api/run-python':
             try:
                 game_dir = os.path.join(os.getcwd(), 'python shooter')
@@ -121,13 +339,11 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 python_exe = sys.executable if sys.executable else 'python'
                 print(f"[Launcher] Starte Python-Spiel: {python_exe} main.py in {game_dir}")
                 subprocess.Popen([python_exe, 'main.py'], cwd=game_dir)
-                
                 self.send_success_response("Python-Spiel wird gestartet...")
             except Exception as e:
-                print(f"[Launcher] Fehler beim Starten des Python-Spiels: {str(e)}")
-                self.send_error_response(500, f"Systemfehler beim Starten des Python-Spiels: {str(e)}")
+                self.send_error_response(500, str(e))
                 
-        # 2. Endpoint for launching C++ game (Spawns piped console process)
+        # 2. C++ Game
         elif self.path == '/api/run-cpp':
             try:
                 cpp_dir = os.path.join(os.getcwd(), 'c++ spiel')
@@ -135,36 +351,29 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_error_response(404, "Der Ordner 'c++ spiel' wurde nicht gefunden.")
                     return
                 
-                # Scan for .exe files
                 exe_files = [f for f in os.listdir(cpp_dir) if f.endswith('.exe')]
                 selected_exe = None
                 run_wsl = False
                 
                 if not exe_files:
-                    # Fallback check: Check if a.out exists (compiled in WSL)
                     a_out_path = os.path.join(cpp_dir, 'a.out')
                     if os.path.exists(a_out_path):
                         selected_exe = 'a.out'
                         run_wsl = True
                     else:
-                        print("[Launcher] Fehler: Keine ausführbare Datei (.exe oder a.out) im Ordner 'c++ spiel' gefunden.")
                         self.send_error_response(400, "Keine kompilierten Spieldateien (.exe oder a.out) im Ordner 'c++ spiel' gefunden.")
                         return
                 else:
                     selected_exe = exe_files[0]
                 
-                # Generate a unique session ID
                 session_id = str(uuid.uuid4())
-                
-                # Set up terminal launch commands
                 if run_wsl:
                     cmd = ['wsl', './a.out']
                 else:
                     cmd = [os.path.join(cpp_dir, selected_exe)]
                 
-                print(f"[Launcher] Neue C++ Spiel-Session [{session_id}] gestartet: {cmd} in {cpp_dir}")
+                print(f"[Launcher] C++ Spiel [{session_id}] gestartet: {cmd}")
                 
-                # Spawn process with piped inputs and outputs (unbuffered text mode)
                 proc = subprocess.Popen(
                     cmd,
                     cwd=cpp_dir,
@@ -175,20 +384,16 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     bufsize=0
                 )
                 
-                # Spawn background reader thread
                 stdout_queue = queue.Queue()
                 reader_thread = threading.Thread(target=read_output, args=(proc, stdout_queue), daemon=True)
                 reader_thread.start()
                 
-                # Save session state
                 active_sessions[session_id] = {
                     'proc': proc,
                     'stdout_queue': stdout_queue,
-                    'reader_thread': reader_thread,
-                    'exe_name': selected_exe
+                    'reader_thread': reader_thread
                 }
                 
-                # Return session token
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -200,12 +405,10 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     "session_id": session_id
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
-                
             except Exception as e:
-                print(f"[Launcher] Fehler beim Starten des C++-Spiels: {str(e)}")
-                self.send_error_response(500, f"Systemfehler beim Starten des C++-Spiels: {str(e)}")
+                self.send_error_response(500, str(e))
                 
-        # 3. Endpoint for writing keyboard inputs to C++ stdin
+        # 3. C++ Terminal input
         elif self.path == '/api/terminal/input':
             try:
                 content_length = int(self.headers['Content-Length'])
@@ -222,7 +425,6 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 session = active_sessions[session_id]
                 proc = session['proc']
                 
-                # If process is still running, write the input and flush
                 if proc.poll() is None:
                     proc.stdin.write(user_input + "\n")
                     proc.stdin.flush()
@@ -230,16 +432,14 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 else:
                     self.send_error_response(400, "Spiel wurde bereits beendet.")
             except Exception as e:
-                print(f"[Launcher] Fehler bei Terminal-Eingabe: {str(e)}")
                 self.send_error_response(500, str(e))
                 
-        # 4. Endpoint to terminate active C++ game session
+        # 4. C++ Terminal close
         elif self.path == '/api/terminal/close':
             try:
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length).decode('utf-8')
                 data = json.loads(post_data)
-                
                 session_id = data.get('id')
                 
                 if not session_id or session_id not in active_sessions:
@@ -249,20 +449,144 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 session = active_sessions[session_id]
                 proc = session['proc']
                 
-                # Terminate C++ process if still running
                 if proc.poll() is None:
-                    print(f"[Launcher] Beende C++ Spiel-Session [{session_id}] vorzeitig...")
                     proc.terminate()
                     try:
-                        proc.wait(timeout=1.5)
+                        proc.wait(timeout=1.0)
                     except subprocess.TimeoutExpired:
                         proc.kill()
                 
-                # Remove session from dictionary
                 del active_sessions[session_id]
                 self.send_success_response("Session geschlossen.")
             except Exception as e:
-                print(f"[Launcher] Fehler beim Schließen der Session: {str(e)}")
+                self.send_error_response(500, str(e))
+                
+        # 5. [NEW] Upload document for custom AI Personas (JSON Base64 upload)
+        elif self.path == '/api/discussion/upload':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                filename = data.get('filename')
+                content = data.get('content') # Base64 string
+                
+                if not filename or not content:
+                    self.send_error_response(400, "Fehlender Dateiname oder Dateiinhalt.")
+                    return
+                
+                # Create storage folder if not present
+                docs_dir = os.path.join(os.getcwd(), 'personas_documents')
+                os.makedirs(docs_dir, exist_ok=True)
+                
+                # Clean up filename to prevent path traversal
+                safe_filename = os.path.basename(filename)
+                file_path = os.path.join(docs_dir, safe_filename)
+                
+                # Split off data uri metadata if present
+                if ',' in content:
+                    content = content.split(',', 1)[1]
+                
+                file_bytes = base64.b64decode(content)
+                
+                # Save file
+                with open(file_path, 'wb') as f:
+                    f.write(file_bytes)
+                
+                print(f"[Launcher] Dokument erfolgreich hochgeladen: {safe_filename} in {docs_dir}")
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                response = {
+                    "status": "success",
+                    "message": f"Datei '{safe_filename}' erfolgreich hochgeladen.",
+                    "filename": safe_filename
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                
+            except Exception as e:
+                print(f"[Launcher] Upload-Fehler: {e}")
+                self.send_error_response(500, f"Upload-Fehler: {str(e)}")
+
+        # 6. [NEW] Start AI discussion session
+        elif self.path == '/api/discussion/start':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                topic = data.get('topic')
+                agents = data.get('agents', [])
+                
+                if not topic or not agents:
+                    self.send_error_response(400, "Thema und KIs müssen angegeben werden.")
+                    return
+                
+                # Generate debate session ID
+                session_id = str(uuid.uuid4())
+                turns_queue = queue.Queue()
+                stop_event = threading.Event()
+                
+                # Create session state
+                active_discussions[session_id] = {
+                    'topic': topic,
+                    'agents': agents,
+                    'turns_queue': turns_queue,
+                    'stop_event': stop_event
+                }
+                
+                # Load env variables (for BFH API key)
+                env = load_env()
+                
+                # Spawn background generator thread
+                loop_thread = threading.Thread(
+                    target=run_discussion_loop, 
+                    args=(session_id, env), 
+                    daemon=True
+                )
+                loop_thread.start()
+                
+                active_discussions[session_id]['thread'] = loop_thread
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                response = {
+                    "status": "success",
+                    "message": "KI-Diskussion erfolgreich initialisiert.",
+                    "session_id": session_id
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                
+            except Exception as e:
+                print(f"[Launcher] Fehler beim Starten der Diskussion: {e}")
+                self.send_error_response(500, f"Start-Fehler: {str(e)}")
+
+        # 7. [NEW] Terminate active AI discussion
+        elif self.path == '/api/discussion/close':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                session_id = data.get('id')
+                
+                if not session_id or session_id not in active_discussions:
+                    self.send_error_response(404, "Session nicht gefunden.")
+                    return
+                
+                session = active_discussions[session_id]
+                # Trigger thread termination
+                session['stop_event'].set()
+                
+                del active_discussions[session_id]
+                print(f"[AI-Session] Session [{session_id}] vorzeitig beendet.")
+                self.send_success_response("Diskussionsrunde geschlossen.")
+            except Exception as e:
                 self.send_error_response(500, str(e))
                 
         else:
@@ -294,7 +618,7 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
         }
         self.wfile.write(json.dumps(response).encode('utf-8'))
 
-    # Overriding OPTIONS for CORS support
+    # Overriding OPTIONS for CORS
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -310,7 +634,6 @@ if __name__ == '__main__':
     socketserver.TCPServer.allow_reuse_address = True
     
     try:
-        # Launching with ThreadingHTTPServer for concurrent client streaming and input handling
         with ThreadingHTTPServer(("", PORT), LauncherHTTPHandler) as httpd:
             print("==========================================================")
             print(f"🚀 Lokaler Webserver (Multithreaded) läuft unter:")
