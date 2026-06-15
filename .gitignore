@@ -12,6 +12,7 @@ __pycache__/
 
 # Temporary folders
 personas_documents/
+logs/
 
 # AI Coding assistant logs & history
 .aider*
