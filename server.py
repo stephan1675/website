@@ -125,86 +125,125 @@ def run_discussion_loop(session_id, env):
     is_live_api = api_key and not api_key.startswith('sk-xxx')
     
     history = []
+    summaries = []
     
-    print(f"[AI-Session] Starte Diskussionsrunde [{session_id}]. API Modus: {is_live_api}")
+    print(f"[AI-Session] Starte unbegrenzte Diskussionsrunde [{session_id}]. API Modus: {is_live_api}")
     
-    # 4 discussion rounds
-    total_rounds = 3
-    for round_idx in range(total_rounds):
+    turn_counter = 0
+    while not stop_event.is_set():
+        # Select agent round robin
+        agent = agents[turn_counter % len(agents)]
+        
+        # Notify frontend which agent starts "typing"
+        typing_data = {"type": "typing", "sender": agent['name'], "emoji": agent['emoji']}
+        q.put(typing_data)
+        
+        # Simulate thinking time (2 seconds)
+        time.sleep(2)
+        
         if stop_event.is_set():
             break
             
-        for agent_idx, agent in enumerate(agents):
-            if stop_event.is_set():
-                break
-                
-            # Notify frontend which agent starts "typing"
-            typing_data = {"type": "typing", "sender": agent['name'], "emoji": agent['emoji']}
-            q.put(typing_data)
+        response_text = ""
+        
+        if is_live_api:
+            # 1. Read document content if associated
+            doc_content = ""
+            if agent.get('docFileName'):
+                doc_path = os.path.join(os.getcwd(), 'personas_documents', agent['docFileName'])
+                if os.path.exists(doc_path):
+                    try:
+                        with open(doc_path, 'r', encoding='utf-8', errors='ignore') as f:
+                            doc_content = f.read()
+                    except Exception as e:
+                        print(f"[AI-Session] Fehler beim Lesen des Dokuments für {agent['name']}: {e}")
             
-            # Simulate thinking time (2 seconds)
-            time.sleep(2)
+            # 2. Build BFH OpenAI System prompt
+            system_prompt = f"Du bist {agent['name']}, Alter: {agent['age']}.\n"
+            system_prompt += f"Profil: {agent['profile']}\n"
+            system_prompt += "Politische Grundeinstellung (nach Priorität geordnet):\n"
+            for i, stance in enumerate(agent['politicalStance']):
+                system_prompt += f"{i+1}. {stance}\n"
+            system_prompt += f"Dein Sprachstil: {agent['tone']}. Antworte unbedingt in dieser Tonalität!\n"
+            system_prompt += f"Deine aktuelle Botschaft/Gesprächsziel: {agent['agenda']}. Versuche aktiv, dieses Ziel in deinen Beiträgen durchzusetzen!\n"
             
-            if stop_event.is_set():
-                break
+            if doc_content:
+                system_prompt += f"\nNutze das folgende Hintergrundwissen aus deinen Dokumenten:\n=== WISSENSBASIS ===\n{doc_content}\n==================\n"
+            
+            # 3. Build User Prompt with summaries and recent history (up to last 20 messages)
+            context = ""
+            if summaries:
+                context += "Bisherige Zusammenfassungen der Debatte:\n"
+                for idx, summ in enumerate(summaries):
+                    context += f"- Teil {idx+1}: {summ}\n"
+                context += "\n"
                 
-            response_text = ""
+            # Filter turns since the last summary (each summary covers 20 turns)
+            recent_turns = history[len(summaries) * 20:]
+            history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in recent_turns])
+            
+            user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
+            if context:
+                user_prompt += context
+            if history_str:
+                user_prompt += f"Bisheriger Verlauf der aktuellen Runde:\n{history_str}\n\n"
+            user_prompt += f"Antworte jetzt als {agent['name']} kurz und prägnant (maximal 3-4 Sätze) auf die Runde. Reagiere auf die anderen und verfolge deine Agenda!"
+            
+            try:
+                response_text = call_bfh_api(api_key, system_prompt, user_prompt)
+            except Exception as e:
+                print(f"[AI-Session] BFH-API Fehler für {agent['name']}: {e}. Fallback auf Offline-Generator.")
+                response_text = generate_mock_turn(agent, topic, history)
+        else:
+            # Local Mock fallback
+            response_text = generate_mock_turn(agent, topic, history)
+            
+        # Save turn in history
+        turn_data = {
+            "type": "message",
+            "sender": agent['name'],
+            "text": response_text,
+            "emoji": agent['emoji']
+        }
+        history.append(turn_data)
+        
+        # Put turn in queue for SSE stream
+        q.put(turn_data)
+        
+        turn_counter += 1
+        
+        # Perform rolling summarization every 20 messages
+        if len(history) % 20 == 0:
+            print(f"[AI-Session] Erreiche {len(history)} Beiträge. Generiere Zusammenfassung...")
+            last_20_turns = history[-20:]
+            summary_text = ""
             
             if is_live_api:
-                # 1. Read document content if associated
-                doc_content = ""
-                if agent.get('docFileName'):
-                    doc_path = os.path.join(os.getcwd(), 'personas_documents', agent['docFileName'])
-                    if os.path.exists(doc_path):
-                        try:
-                            with open(doc_path, 'r', encoding='utf-8', errors='ignore') as f:
-                                doc_content = f.read()
-                        except Exception as e:
-                            print(f"[AI-Session] Fehler beim Lesen des Dokuments für {agent['name']}: {e}")
-                
-                # 2. Build BFH OpenAI System prompt
-                system_prompt = f"Du bist {agent['name']}, Alter: {agent['age']}.\n"
-                system_prompt += f"Profil: {agent['profile']}\n"
-                system_prompt += "Politische Grundeinstellung (nach Priorität geordnet):\n"
-                for i, stance in enumerate(agent['politicalStance']):
-                    system_prompt += f"{i+1}. {stance}\n"
-                system_prompt += f"Dein Sprachstil: {agent['tone']}. Antworte unbedingt in dieser Tonalität!\n"
-                system_prompt += f"Deine aktuelle Botschaft/Gesprächsziel: {agent['agenda']}. Versuche aktiv, dieses Ziel in deinen Beiträgen durchzusetzen!\n"
-                
-                if doc_content:
-                    system_prompt += f"\nNutze das folgende Hintergrundwissen aus deinen Dokumenten:\n=== WISSENSBASIS ===\n{doc_content}\n==================\n"
-                
-                # 3. Build User Prompt with Chat History
-                history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in history[-6:]])
-                user_prompt = f"Thema der Diskussion: '{topic}'\n"
-                if history_str:
-                    user_prompt += f"Bisheriger Verlauf:\n{history_str}\n"
-                user_prompt += f"Antworte jetzt als {agent['name']} kurz und prägnant (maximal 3-4 Sätze) auf die Runde. Reagiere auf die anderen und verfolge deine Agenda!"
-                
+                summary_system = "Du bist ein neutraler Protokollant. Fasse die folgende Debatte kurz und prägnant in 2-3 Sätzen zusammen. Konzentriere dich auf die Kernaussagen und Konfliktpunkte der Teilnehmer."
+                summary_user = "Bisherige Diskussion:\n" + "\n".join([f"{t['sender']}: {t['text']}" for t in last_20_turns])
                 try:
-                    response_text = call_bfh_api(api_key, system_prompt, user_prompt)
+                    summary_text = call_bfh_api(api_key, summary_system, summary_user)
+                    print(f"[AI-Session] API Zusammenfassung generiert: {summary_text}")
                 except Exception as e:
-                    print(f"[AI-Session] BFH-API Fehler für {agent['name']}: {e}. Fallback auf Offline-Generator.")
-                    response_text = generate_mock_turn(agent, topic, history)
+                    print(f"[AI-Session] BFH-API Fehler bei Zusammenfassung: {e}")
+                    summary_text = f"Die KIs debattieren intensiv über '{topic}'. Die Standpunkte bleiben verhärtet."
             else:
-                # Local Mock fallback
-                response_text = generate_mock_turn(agent, topic, history)
+                summary_text = f"Die Teilnehmer führen eine intensive Debatte über '{topic}'. Die Redebeiträge konzentrieren sich auf die individuellen Agenden."
                 
-            # Save turn in history
-            turn_data = {
+            summaries.append(summary_text)
+            
+            # Send the summary as a system message so the user sees it in the chat
+            sys_msg = {
                 "type": "message",
-                "sender": agent['name'],
-                "text": response_text,
-                "emoji": agent['emoji']
+                "sender": "System-Protokollant",
+                "text": f"📝 [Zusammenfassung Teil {len(summaries)}]: {summary_text}",
+                "emoji": "📝"
             }
-            history.append(turn_data)
+            q.put(sys_msg)
             
-            # Put turn in queue for SSE stream
-            q.put(turn_data)
-            
-            # Delay between speakers for natural reading pace
-            time.sleep(3.5)
-            
+        # Delay between speakers for natural reading pace
+        time.sleep(3.5)
+        
     # Send exit notification when debate completes
     exit_data = {"type": "exit"}
     q.put(exit_data)
