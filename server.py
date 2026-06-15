@@ -147,6 +147,10 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                             # Trigger "typing" indicator event on browser
                             self.wfile.write(f"event: typing\ndata: {json.dumps(turn)}\n\n".encode('utf-8'))
                             self.wfile.flush()
+                        elif turn['type'] == 'user_input_required':
+                            # Trigger "user_input_required" event on browser
+                            self.wfile.write(f"event: user_input_required\ndata: {json.dumps(turn)}\n\n".encode('utf-8'))
+                            self.wfile.flush()
                         else:
                             # Send standard text turn
                             self.wfile.write(f"data: {json.dumps(turn)}\n\n".encode('utf-8'))
@@ -367,6 +371,7 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 # Generate debate session ID
                 session_id = str(uuid.uuid4())
                 turns_queue = queue.Queue()
+                user_input_queue = queue.Queue()
                 stop_event = threading.Event()
                 
                 # Create session state
@@ -374,6 +379,7 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     'topic': topic,
                     'agents': agents,
                     'turns_queue': turns_queue,
+                    'user_input_queue': user_input_queue,
                     'stop_event': stop_event
                 }
                 
@@ -384,7 +390,7 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 # Spawn background generator thread
                 loop_thread = threading.Thread(
                     target=run_discussion_loop, 
-                    args=(session_id, topic, agents, turns_queue, stop_event, api_key), 
+                    args=(session_id, topic, agents, turns_queue, stop_event, api_key, user_input_queue), 
                     daemon=True
                 )
                 loop_thread.start()
@@ -428,6 +434,29 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_success_response("Diskussionsrunde geschlossen.")
             except Exception as e:
                 self.send_error_response(500, str(e))
+                
+        # 8. [NEW] Submit user text contribution
+        elif self.path == '/api/discussion/input':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                session_id = data.get('id')
+                text = data.get('text', '').strip()
+                
+                if not session_id or session_id not in active_discussions:
+                    self.send_error_response(404, "Sitzung nicht gefunden oder abgelaufen.")
+                    return
+                if not text:
+                    self.send_error_response(400, "Beitrag darf nicht leer sein.")
+                    return
+                    
+                session = active_discussions[session_id]
+                session['user_input_queue'].put(text)
+                self.send_success_response("Eingabe empfangen.")
+            except Exception as e:
+                self.send_error_response(500, f"Fehler bei Eingabeübertragung: {str(e)}")
                 
         else:
             self.send_error_response(404, "Endpunkt nicht gefunden.")
