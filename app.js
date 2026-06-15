@@ -615,11 +615,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnChatToggle = document.getElementById('btn-chat-toggle');
   const btnChatClose = document.getElementById('btn-chat-close');
 
+  // Save Modal Elements
+  const saveDiscussionModal = document.getElementById('save-discussion-modal');
+  const btnSaveDiscYes = document.getElementById('btn-save-disc-yes');
+  const btnSaveDiscNo = document.getElementById('btn-save-disc-no');
+
   // State
   let activeDiscussionSessionId = null;
   let discussionEventSource = null;
   let discussionIsPaused = false;
   let discussionMessageBuffer = [];
+  let currentDiscussionTurns = []; // Stores all messages for text file export
   let currentSessionAgents = [];
 
   // Preset Personas
@@ -959,6 +965,7 @@ document.addEventListener('DOMContentLoaded', () => {
       activeDiscussionSessionId = startData.session_id;
       discussionIsPaused = false;
       discussionMessageBuffer = [];
+      currentDiscussionTurns = [];
       
       btnChatToggle.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pause</span>';
       
@@ -988,6 +995,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
           const turn = JSON.parse(event.data);
+          currentDiscussionTurns.push(turn); // Track all turns
           
           if (discussionIsPaused) {
             // Buffer message
@@ -1114,10 +1122,79 @@ document.addEventListener('DOMContentLoaded', () => {
     
     chatTypingIndicator.classList.add('hidden');
     discussionMessageBuffer = [];
+    currentDiscussionTurns = [];
     showToast('Debatte beendet.', 'info');
   }
 
-  btnChatClose.addEventListener('click', closeDiscussionSession);
+  // Triggered when clicking "Beenden" (Stop) button
+  function handleStopDiscussion() {
+    if (currentDiscussionTurns.length > 0) {
+      // Pause discussion stream to avoid interface movement while confirming
+      if (!discussionIsPaused) {
+        discussionIsPaused = true;
+        btnChatToggle.innerHTML = '<i class="fa-solid fa-play"></i><span>Fortsetzen</span>';
+      }
+      // Show save confirmation modal
+      saveDiscussionModal.classList.remove('hidden');
+    } else {
+      closeDiscussionSession();
+    }
+  }
+
+  // Generate txt content and download it
+  function downloadDiscussionTranscript() {
+    if (currentDiscussionTurns.length === 0) return;
+    
+    let txt = `==================================================\n`;
+    txt += `KI-DEBATTE - GESPRÄCHSPROTOKOLL\n`;
+    txt += `Thema: ${discTopic.value || 'Unbekanntes Thema'}\n`;
+    txt += `Datum: ${new Date().toLocaleString('de-CH')}\n`;
+    txt += `Teilnehmer:\n`;
+    currentSessionAgents.forEach(a => {
+      txt += `  - ${a.name} (Alter: ${a.age}, Profil: ${a.profile})\n`;
+    });
+    txt += `==================================================\n\n`;
+    
+    currentDiscussionTurns.forEach(turn => {
+      if (turn.sender === 'System-Protokollant') {
+        txt += `\n[${turn.sender}]:\n${turn.text}\n\n`;
+      } else {
+        txt += `[${turn.sender}]: ${turn.text}\n`;
+      }
+    });
+    
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    
+    const safeTopic = (discTopic.value || 'debatte')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]/g, '_')
+      .substring(0, 30);
+    const timestamp = new Date().toISOString().slice(0, 10);
+    a.download = `ki_debatte_${safeTopic}_${timestamp}.txt`;
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Modal Button Handlers
+  btnSaveDiscYes.addEventListener('click', () => {
+    saveDiscussionModal.classList.add('hidden');
+    downloadDiscussionTranscript();
+    closeDiscussionSession();
+  });
+
+  btnSaveDiscNo.addEventListener('click', () => {
+    saveDiscussionModal.classList.add('hidden');
+    closeDiscussionSession();
+  });
+
+  btnChatClose.addEventListener('click', handleStopDiscussion);
 
 
   // --- Initial Setup on Page Load ---
