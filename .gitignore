@@ -1,0 +1,23 @@
+# Gitignore for Portal Project
+
+# Environments & Secrets
+.env
+api_key.txt
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary folders
+personas_documents/
+
+# AI Coding assistant logs & history
+.aider*
+.gemini*
+
+# Operating System files
+Thumbs.db
+EHthumbs.db
+Desktop.ini
