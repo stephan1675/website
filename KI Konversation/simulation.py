@@ -541,8 +541,8 @@ def build_agent_system_prompt(agent, doc_content):
     prompt += "Schreibe deine Gedanken nach folgendem Schema auf:\n"
     prompt += "1. **Trigger-Check:** Wurde einer meiner \"identityThreats\" berührt? Wenn ja, wie reagiere ich (Defensiv/Aggressiv)? Hat mich jemand gelobt?\n"
     prompt += "2. **State-Update:** Wie ist mein aktueller emotionaler Zustand? (Steigt Aggression? Sinkt Kooperation?)\n"
-    prompt += "3. **Goal-Selection:** Welches Ziel aus \"conversationGoals\" verfolge ich bei DIESER spezifischen Antwort (z.B. Dominanz, Ablenkung, Glaubwürdigkeit zerstören)?\n"
-    prompt += "4. **Logic & Avoidance:** Welches \"preferredArgument\" nutze ich? Verstoße ich gegen \"forbiddenBehaviors\" (Achtung: Niemals entschuldigen, niemals Schwäche zeigen!)?\n"
+    prompt += "3. **Goal-Selection:** Welches Ziel aus \"conversationGoals\" verfolge ich bei DIESER spezifischen Antwort?\n"
+    prompt += "4. **Logic & Avoidance:** Welches \"preferredArgument\" nutze ich? Verstoße ich gegen \"forbiddenBehaviors\" ?\n"
     prompt += "5. **Output-Drafting:** Lege Vokabular, Satzstruktur (\"speechPattern\") und passende \"catchphrases\" fest.\n\n"
     
     prompt += "# FORMATAUFLAGEN FÜR DIE AUSGABE\n"
@@ -553,12 +553,18 @@ def build_agent_system_prompt(agent, doc_content):
     
     return prompt
 
-def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key):
+def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_input_queue=None):
     is_live_api = api_key and not api_key.startswith('sk-xxx')
     
     # 1. Upgrade simple agents list to rich agent models
     rich_agents = []
     for agent in agents:
+        if agent.get('isUser'):
+            rich_agent = map_custom_persona_to_rich(agent)
+            rich_agent['isUser'] = True
+            rich_agents.append(rich_agent)
+            continue
+            
         name_lower = agent.get('name', '').lower()
         if 'trump' in name_lower:
             rich_agent = get_rich_trump()
@@ -598,12 +604,15 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key):
     while not stop_event.is_set():
         agent = rich_agents[turn_counter % len(rich_agents)]
         
-        # Notify frontend which agent starts "typing"
-        typing_data = {"type": "typing", "sender": agent['name'], "emoji": agent['emoji']}
-        q.put(typing_data)
+        is_user = agent.get('isUser', False)
         
-        # Simulate thinking time (2 seconds)
-        time.sleep(2)
+        if not is_user:
+            # Notify frontend which agent starts "typing"
+            typing_data = {"type": "typing", "sender": agent['name'], "emoji": agent['emoji']}
+            q.put(typing_data)
+            
+            # Simulate thinking time (2 seconds)
+            time.sleep(2)
         
         if stop_event.is_set():
             break
@@ -612,109 +621,135 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key):
         user_prompt = ""
         response_text = ""
         
-        # 2. Dynamic Status Injection (Attack detection & memory updates)
-        is_attacked = False
-        last_turn = history[-1] if history else None
-        
-        if last_turn:
-            last_text = last_turn['text'].lower()
-            name_parts = [part.lower() for part in agent['identity']['name'].split()]
-            # Check if name is mentioned in the last speaker's output
-            mentioned = any(part in last_text for part in name_parts if len(part) > 3)
-            
-            attacks_keywords = ["fake", "falsch", "schwach", "katastrophe", "lüge", "unsinn", "dumm", "inkompetent", "verloren", "illegal", "scheitern", "arm", "wertlos", "schuld", "disaster", "ripping", "bad", "unwissend"]
-            has_attack_word = any(word in last_text for word in attacks_keywords)
-            
-            if mentioned and has_attack_word:
-                is_attacked = True
-                
-        # Apply emotional state adjustments
-        base_state = agent['psychology'].get('base_emotionalState', {"confidence": 0.8, "aggression": 0.4, "defensiveness": 0.4})
-        
-        if is_attacked:
-            agent['psychology']['emotionalState'] = {
-                "confidence": min(1.0, base_state.get('confidence', 0.8) + 0.1),
-                "aggression": 0.9,
-                "defensiveness": 0.9,
-                "status": "whenAttacked"
+        if is_user:
+            # Send 'user_input_required' event via SSE queue
+            req_data = {
+                "type": "user_input_required",
+                "sender": agent['name'],
+                "emoji": agent['emoji']
             }
-            # Add to memory of attacks
-            if agent['strategy'].get('memoryBehavior', {}).get('remembersPersonalAttacks'):
-                if 'memory' not in agent['strategy']:
-                    agent['strategy']['memory'] = { "grudges": [] }
-                attacker = last_turn['sender']
-                if attacker not in agent['strategy']['memory']['grudges']:
-                    agent['strategy']['memory']['grudges'].append(attacker)
-        else:
-            # Revert to base state, or keep grudge state elevated if last speaker is in grudges list
-            agent['psychology']['emotionalState'] = dict(base_state)
-            last_sender = last_turn['sender'] if last_turn else None
-            if last_sender and last_sender in agent['strategy'].get('memory', {}).get('grudges', []):
-                agent['psychology']['emotionalState']['defensiveness'] = min(1.0, base_state.get('defensiveness', 0.4) + 0.2)
-                agent['psychology']['emotionalState']['aggression'] = min(1.0, base_state.get('aggression', 0.4) + 0.2)
-                agent['psychology']['emotionalState']['status'] = f"hostile_towards_{last_sender}"
-                
-        if is_live_api:
-            # Read document content if associated
-            doc_content = ""
-            if agent.get('docFileName'):
-                doc_path = os.path.join(os.getcwd(), 'personas_documents', agent['docFileName'])
-                if os.path.exists(doc_path):
+            q.put(req_data)
+            
+            # Wait for user input from the user_input_queue, while checking for stop
+            user_message = None
+            if user_input_queue is not None:
+                while not stop_event.is_set():
                     try:
-                        with open(doc_path, 'r', encoding='utf-8', errors='ignore') as f:
-                            doc_content = f.read()
-                    except Exception as e:
-                        print(f"[AI-Session] Fehler beim Lesen des Dokuments für {agent['name']}: {e}")
+                        user_message = user_input_queue.get(timeout=0.5)
+                        break
+                    except queue.Empty:
+                        continue
             
-            # Build BFH OpenAI System prompt
-            system_prompt = build_agent_system_prompt(agent, doc_content)
-            
-            # Build User Prompt with summaries and recent history (up to last 20 messages)
-            context = ""
-            if summaries:
-                context += "Bisherige Zusammenfassungen der Debatte:\n"
-                for idx, summ in enumerate(summaries):
-                    context += f"- Teil {idx+1}: {summ}\n"
-                context += "\n"
+            if stop_event.is_set() or user_message is None:
+                break
                 
-            recent_turns = history[len(summaries) * 20:]
-            history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in recent_turns])
-            
-            user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
-            if context:
-                user_prompt += context
-            if history_str:
-                user_prompt += f"Bisheriger Verlauf der aktuellen Runde:\n{history_str}\n\n"
-            user_prompt += f"Antworte jetzt als {agent['name']} kurz und prägnant (maximal 3-4 Sätze) auf die Runde. Reagiere auf die anderen und verfolge deine Agenda!"
-            
-            try:
-                response_text = call_bfh_api(api_key, system_prompt, user_prompt)
-            except Exception as e:
-                print(f"[AI-Session] BFH-API Fehler für {agent['name']}: {e}. Fallback auf Offline-Generator.")
-                response_text = generate_mock_turn(agent, topic, history)
+            response_text = user_message
+            system_prompt = "[Benutzereingabe]"
+            user_prompt = f"Der Benutzer schreibt: {user_message}"
         else:
-            # Local Mock fallback - generate simulated prompts for logging completeness
-            system_prompt = build_agent_system_prompt(agent, "")
+            # 2. Dynamic Status Injection (Attack detection & memory updates)
+            is_attacked = False
+            last_turn = history[-1] if history else None
             
-            history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in history[-2:]])
-            user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
-            if history_str:
-                user_prompt += f"Bisheriger Verlauf:\n{history_str}\n\n"
-            user_prompt += "Antworte kurz und prägnant."
+            if last_turn:
+                last_text = last_turn['text'].lower()
+                name_parts = [part.lower() for part in agent['identity']['name'].split()]
+                # Check if name is mentioned in the last speaker's output
+                mentioned = any(part in last_text for part in name_parts if len(part) > 3)
+                
+                attacks_keywords = ["fake", "falsch", "schwach", "katastrophe", "lüge", "unsinn", "dumm", "inkompetent", "verloren", "illegal", "scheitern", "arm", "wertlos", "schuld", "disaster", "ripping", "bad", "unwissend"]
+                has_attack_word = any(word in last_text for word in attacks_keywords)
+                
+                if mentioned and has_attack_word:
+                    is_attacked = True
+                    
+            # Apply emotional state adjustments
+            base_state = agent['psychology'].get('base_emotionalState', {"confidence": 0.8, "aggression": 0.4, "defensiveness": 0.4})
             
-            # Mock statements with simulated CoT thought
-            mock_statement = generate_mock_turn(agent, topic, history)
-            agg = agent['psychology']['emotionalState'].get('aggression', 0.4)
-            defens = agent['psychology']['emotionalState'].get('defensiveness', 0.4)
-            goal = agent['strategy']['conversationGoals']['public_debate'][0]
-            
-            response_text = f"<thought>\n"
-            response_text += f"1. Trigger-Check: Suche nach verbalen Angriffen auf {agent['name']}. Aggression={agg:.1f}, Defensiv={defens:.1f}.\n"
-            response_text += f"2. State-Update: emotionalState angepasst auf Basis des Verlaufs.\n"
-            response_text += f"3. Goal-Selection: Wähle strategisches Ziel: '{goal}'.\n"
-            response_text += f"4. Logic & Avoidance: Vermeide logische Fallen. Konzentriere dich auf Agenda.\n"
-            response_text += f"5. Output-Drafting: Tonalität ist {agent['communicationStyle']['tone']}. Nutze passende Catchphrases.\n"
-            response_text += f"</thought>\n{mock_statement}"
+            if is_attacked:
+                agent['psychology']['emotionalState'] = {
+                    "confidence": min(1.0, base_state.get('confidence', 0.8) + 0.1),
+                    "aggression": 0.9,
+                    "defensiveness": 0.9,
+                    "status": "whenAttacked"
+                }
+                # Add to memory of attacks
+                if agent['strategy'].get('memoryBehavior', {}).get('remembersPersonalAttacks'):
+                    if 'memory' not in agent['strategy']:
+                        agent['strategy']['memory'] = { "grudges": [] }
+                    attacker = last_turn['sender']
+                    if attacker not in agent['strategy']['memory']['grudges']:
+                        agent['strategy']['memory']['grudges'].append(attacker)
+            else:
+                # Revert to base state, or keep grudge state elevated if last speaker is in grudges list
+                agent['psychology']['emotionalState'] = dict(base_state)
+                last_sender = last_turn['sender'] if last_turn else None
+                if last_sender and last_sender in agent['strategy'].get('memory', {}).get('grudges', []):
+                    agent['psychology']['emotionalState']['defensiveness'] = min(1.0, base_state.get('defensiveness', 0.4) + 0.2)
+                    agent['psychology']['emotionalState']['aggression'] = min(1.0, base_state.get('aggression', 0.4) + 0.2)
+                    agent['psychology']['emotionalState']['status'] = f"hostile_towards_{last_sender}"
+                    
+            if is_live_api:
+                # Read document content if associated
+                doc_content = ""
+                if agent.get('docFileName'):
+                    doc_path = os.path.join(os.getcwd(), 'personas_documents', agent['docFileName'])
+                    if os.path.exists(doc_path):
+                        try:
+                            with open(doc_path, 'r', encoding='utf-8', errors='ignore') as f:
+                                doc_content = f.read()
+                        except Exception as e:
+                            print(f"[AI-Session] Fehler beim Lesen des Dokuments für {agent['name']}: {e}")
+                
+                # Build BFH OpenAI System prompt
+                system_prompt = build_agent_system_prompt(agent, doc_content)
+                
+                # Build User Prompt with summaries and recent history (up to last 20 messages)
+                context = ""
+                if summaries:
+                    context += "Bisherige Zusammenfassungen der Debatte:\n"
+                    for idx, summ in enumerate(summaries):
+                        context += f"- Teil {idx+1}: {summ}\n"
+                    context += "\n"
+                    
+                recent_turns = history[len(summaries) * 20:]
+                history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in recent_turns])
+                
+                user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
+                if context:
+                    user_prompt += context
+                if history_str:
+                    user_prompt += f"Bisheriger Verlauf der aktuellen Runde:\n{history_str}\n\n"
+                user_prompt += f"Antworte jetzt als {agent['name']} kurz und prägnant (maximal 3-4 Sätze) auf die Runde. Reagiere auf die anderen und verfolge deine Agenda!"
+                
+                try:
+                    response_text = call_bfh_api(api_key, system_prompt, user_prompt)
+                except Exception as e:
+                    print(f"[AI-Session] BFH-API Fehler für {agent['name']}: {e}. Fallback auf Offline-Generator.")
+                    response_text = generate_mock_turn(agent, topic, history)
+            else:
+                # Local Mock fallback - generate simulated prompts for logging completeness
+                system_prompt = build_agent_system_prompt(agent, "")
+                
+                history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in history[-2:]])
+                user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
+                if history_str:
+                    user_prompt += f"Bisheriger Verlauf:\n{history_str}\n\n"
+                user_prompt += "Antworte kurz und prägnant."
+                
+                # Mock statements with simulated CoT thought
+                mock_statement = generate_mock_turn(agent, topic, history)
+                agg = agent['psychology']['emotionalState'].get('aggression', 0.4)
+                defens = agent['psychology']['emotionalState'].get('defensiveness', 0.4)
+                goal = agent['strategy']['conversationGoals']['public_debate'][0]
+                
+                response_text = f"<thought>\n"
+                response_text += f"1. Trigger-Check: Suche nach verbalen Angriffen auf {agent['name']}. Aggression={agg:.1f}, Defensiv={defens:.1f}.\n"
+                response_text += f"2. State-Update: emotionalState angepasst auf Basis des Verlaufs.\n"
+                response_text += f"3. Goal-Selection: Wähle strategisches Ziel: '{goal}'.\n"
+                response_text += f"4. Logic & Avoidance: Vermeide logische Fallen. Konzentriere dich auf Agenda.\n"
+                response_text += f"5. Output-Drafting: Tonalität ist {agent['communicationStyle']['tone']}. Nutze passende Catchphrases.\n"
+                response_text += f"</thought>\n{mock_statement}"
             
         # 3. Parse and split <thought> block from visible text output
         thought_content = ""
