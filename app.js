@@ -1,14 +1,14 @@
 /* Core JS Logic for Premium Portal */
 
 document.addEventListener('DOMContentLoaded', () => {
-  
+
   // --- Deployment Backend Configuration ---
-  const BACKEND_URL = 'https://dein-debatten-backend.onrender.com'; // Hier deine Render-URL eintragen!
+  const BACKEND_URL = 'https://riverbed-subpanel-volumes.ngrok-free.dev'; // Hier deine Render-URL eintragen!
 
   function getApiBaseUrl() {
-    if (window.location.hostname === 'localhost' || 
-        window.location.hostname === '127.0.0.1' || 
-        window.location.protocol === 'file:') {
+    if (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.protocol === 'file:') {
       return 'http://localhost:8000';
     }
     return BACKEND_URL;
@@ -25,42 +25,42 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // --- DOM Element References ---
-  
+
   // Views
   const homeView = document.getElementById('home-view');
   const projectsView = document.getElementById('projects-view');
   const authSection = document.getElementById('auth-section');
   const dashboardSection = document.getElementById('dashboard-section');
-  
+
   const loginView = document.getElementById('login-view');
   const registerView = document.getElementById('register-view');
-  
+
   // Forms & Inputs
   const loginForm = document.getElementById('login-form');
   const loginEmail = document.getElementById('login-email');
   const loginPassword = document.getElementById('login-password');
-  
+
   const registerForm = document.getElementById('register-form');
   const registerUsername = document.getElementById('register-username');
   const registerEmail = document.getElementById('register-email');
   const registerPassword = document.getElementById('register-password');
   const strengthBar = document.getElementById('strength-bar');
   const strengthText = document.getElementById('strength-text');
-  
+
   // Buttons & Navigation
   const homeAuthStatus = document.getElementById('home-auth-status');
-  
+
   const btnViewProjects = document.getElementById('btn-view-projects');
   const btnProjectsBack = document.getElementById('btn-projects-back');
   const btnAuthBack = document.getElementById('btn-auth-back');
   const btnDashBack = document.getElementById('btn-dash-back');
-  
+
   const goToRegisterBtn = document.getElementById('go-to-register');
   const goToLoginBtn = document.getElementById('go-to-login');
-  
+
   const btnRunPython = document.getElementById('btn-run-python');
   const btnRunCpp = document.getElementById('btn-run-cpp');
-  
+
   // Dashboard details
   const displayUsername = document.getElementById('display-username');
   const displayEmail = document.getElementById('display-email');
@@ -70,9 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickNotes = document.getElementById('quick-notes');
   const saveNoteBtn = document.getElementById('save-note-btn');
   const logoutBtn = document.getElementById('logout-btn');
-  
+
   const toastContainer = document.getElementById('toast-container');
-  
+
   // Track active view
   let currentActiveView = homeView;
 
@@ -84,22 +84,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Router / View Switcher ---
   function navigateToView(targetView) {
     if (currentActiveView === targetView) return;
-    
+
     // Add fade-out transition to the current view
     currentActiveView.classList.add('fade-out');
-    
+
     setTimeout(() => {
       // Hide current view
       currentActiveView.classList.add('hidden');
       currentActiveView.classList.remove('fade-out');
-      
+
       // Show target view
       targetView.classList.remove('hidden');
       targetView.classList.add('fade-in');
-      
+
       // Set new active view
       currentActiveView = targetView;
-      
+
       setTimeout(() => {
         targetView.classList.remove('fade-in');
       }, 400);
@@ -116,15 +116,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateHomeAuthStatus() {
     const activeSessionEmail = localStorage.getItem('currentUserSession');
     homeAuthStatus.innerHTML = ''; // Clear status area
-    
+
     if (activeSessionEmail) {
       const users = JSON.parse(localStorage.getItem('users'));
       const user = users.find(u => u.email === activeSessionEmail);
-      
+
       if (user) {
         // Logged-in state
         const letter = user.username.charAt(0).toUpperCase();
-        
+
         homeAuthStatus.innerHTML = `
           <div class="user-avatar" style="width: 35px; height: 35px; font-size: 0.9rem;">${letter}</div>
           <div class="user-info" style="display: block; margin-right: 0.5rem;">
@@ -138,19 +138,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
           </button>
         `;
-        
+
         // Add events to dynamic buttons
         document.getElementById('home-to-dash-btn').addEventListener('click', () => {
           showDashboard(user);
         });
-        
+
         document.getElementById('home-logout-btn').addEventListener('click', () => {
           performLogout();
         });
         return;
       }
     }
-    
+
     // Logged-out state
     homeAuthStatus.innerHTML = `
       <button id="home-login-btn" class="btn btn-primary" style="padding: 0.55rem 1.1rem; font-size: 0.85rem; width: auto;">
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <span>Mitgliederbereich</span>
       </button>
     `;
-    
+
     document.getElementById('home-login-btn').addEventListener('click', () => {
       // Show login view inside auth card
       loginView.classList.remove('hidden');
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const input = button.previousElementSibling;
       const icon = button.querySelector('i');
-      
+
       if (input.type === 'password') {
         input.type = 'text';
         icon.classList.remove('fa-eye');
@@ -190,13 +190,13 @@ document.addEventListener('DOMContentLoaded', () => {
   registerPassword.addEventListener('input', () => {
     const password = registerPassword.value;
     let strength = 0;
-    
+
     if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) strength++;
-    
+
     strengthBar.className = 'strength-bar';
-    
+
     if (password.length === 0) {
       strengthText.textContent = 'Passwortstärke';
       strengthText.style.color = 'var(--color-text-muted)';
@@ -219,19 +219,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    
+
     let iconClass = 'fa-solid fa-circle-check';
     if (type === 'error') iconClass = 'fa-solid fa-circle-xmark';
     if (type === 'warning') iconClass = 'fa-solid fa-triangle-exclamation';
     if (type === 'info') iconClass = 'fa-solid fa-circle-info';
-    
+
     toast.innerHTML = `
       <i class="${iconClass} toast-icon"></i>
       <span class="toast-message">${message}</span>
     `;
-    
+
     toastContainer.appendChild(toast);
-    
+
     setTimeout(() => {
       toast.classList.add('toast-exit');
       toast.addEventListener('animationend', () => {
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function switchAuthSubView(showSub, hideSub) {
     loginView.classList.add('fade-out');
     registerView.classList.add('fade-out');
-    
+
     setTimeout(() => {
       hideSub.classList.add('hidden');
       showSub.classList.remove('hidden');
@@ -274,14 +274,14 @@ document.addEventListener('DOMContentLoaded', () => {
     displayUsername.textContent = user.username;
     displayEmail.textContent = user.email;
     userAvatar.textContent = user.username.charAt(0).toUpperCase();
-    
+
     // Populate activity statistics
     statCreated.textContent = user.createdAt;
     statLogins.textContent = user.loginCount;
-    
+
     // Load note
     quickNotes.value = user.notes || '';
-    
+
     // Direct navigate
     navigateToView(dashboardSection);
   }
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function runGame(endpoint) {
     // If the site is opened via file://, send the request to the absolute URL of the local server
     const targetUrl = window.location.protocol === 'file:' ? `http://localhost:8000${endpoint}` : endpoint;
-    
+
     // Fetch API Call
     fetch(targetUrl, {
       method: 'POST',
@@ -298,25 +298,25 @@ document.addEventListener('DOMContentLoaded', () => {
         'Content-Type': 'application/json'
       }
     })
-    .then(response => {
-      return response.json().then(data => {
-        if (!response.ok) {
-          throw new Error(data.message || 'Server-Fehler aufgetreten.');
+      .then(response => {
+        return response.json().then(data => {
+          if (!response.ok) {
+            throw new Error(data.message || 'Server-Fehler aufgetreten.');
+          }
+          return data;
+        });
+      })
+      .then(data => {
+        showToast(data.message, 'success');
+      })
+      .catch(error => {
+        console.error("[Launcher] Fehler:", error);
+        if (window.location.protocol === 'file:') {
+          showToast('Verbindung zum lokalen Server fehlgeschlagen. Bitte stelle sicher, dass "server.py" gestartet ist.', 'warning');
+        } else {
+          showToast(error.message || 'Verbindung zum Server fehlgeschlagen. Läuft "server.py"?', 'error');
         }
-        return data;
       });
-    })
-    .then(data => {
-      showToast(data.message, 'success');
-    })
-    .catch(error => {
-      console.error("[Launcher] Fehler:", error);
-      if (window.location.protocol === 'file:') {
-        showToast('Verbindung zum lokalen Server fehlgeschlagen. Bitte stelle sicher, dass "server.py" gestartet ist.', 'warning');
-      } else {
-        showToast(error.message || 'Verbindung zum Server fehlgeschlagen. Läuft "server.py"?', 'error');
-      }
-    });
   }
 
   // Game click listeners
@@ -338,13 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Launch terminal session
   btnRunCpp.addEventListener('click', () => {
     const baseUrl = getApiBaseUrl();
-    
+
     // Clear display, open modal and focus input
     terminalOutput.textContent = "Verbindung wird hergestellt...\n";
     terminalModal.classList.remove('hidden');
     terminalInputField.value = '';
     terminalInputField.focus();
-    
+
     showToast('Starte C++ Terminal-Session...', 'info');
 
     // 1. Request C++ execution process from server
@@ -354,91 +354,91 @@ document.addEventListener('DOMContentLoaded', () => {
         'Content-Type': 'application/json'
       }
     })
-    .then(response => {
-      return response.json().then(data => {
-        if (!response.ok) {
-          throw new Error(data.message || 'Server-Fehler aufgetreten.');
-        }
-        return data;
-      });
-    })
-    .then(data => {
-      activeTerminalSessionId = data.session_id;
-      terminalOutput.textContent = `🚀 Session [${activeTerminalSessionId.substring(0, 8)}] verbunden.\n\n`;
-      showToast(data.message, 'success');
+      .then(response => {
+        return response.json().then(data => {
+          if (!response.ok) {
+            throw new Error(data.message || 'Server-Fehler aufgetreten.');
+          }
+          return data;
+        });
+      })
+      .then(data => {
+        activeTerminalSessionId = data.session_id;
+        terminalOutput.textContent = `🚀 Session [${activeTerminalSessionId.substring(0, 8)}] verbunden.\n\n`;
+        showToast(data.message, 'success');
 
-      // 2. Open EventSource for stdout stream
-      terminalEventSource = new EventSource(`${baseUrl}/api/terminal/stream?id=${activeTerminalSessionId}`);
-      
-      // Receive stdout messages
-      terminalEventSource.onmessage = (event) => {
-        try {
-          const parsed = JSON.parse(event.data);
-          if (parsed.text) {
-            let text = parsed.text;
-            
-            // 1. Detect ANSI Screen Clear sequences (\x1b[2J or \x1b[H)
-            if (text.includes('\x1b[2J') || text.includes('\x1b[H') || 
+        // 2. Open EventSource for stdout stream
+        terminalEventSource = new EventSource(`${baseUrl}/api/terminal/stream?id=${activeTerminalSessionId}`);
+
+        // Receive stdout messages
+        terminalEventSource.onmessage = (event) => {
+          try {
+            const parsed = JSON.parse(event.data);
+            if (parsed.text) {
+              let text = parsed.text;
+
+              // 1. Detect ANSI Screen Clear sequences (\x1b[2J or \x1b[H)
+              if (text.includes('\x1b[2J') || text.includes('\x1b[H') ||
                 text.includes('\u001b[2J') || text.includes('\u001b[H') ||
                 text.includes('\x1b[3J')) {
-              terminalOutput.textContent = '';
+                terminalOutput.textContent = '';
+              }
+
+              // 2. Strip all raw ANSI escape control codes (like colors or positioning) to clean output
+              text = text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+              text = text.replace(/\u001b\[[0-9;]*[a-zA-Z]/g, '');
+
+              terminalOutput.textContent += text;
+
+              // Scroll to bottom
+              terminalOutput.scrollTop = terminalOutput.scrollHeight;
             }
-            
-            // 2. Strip all raw ANSI escape control codes (like colors or positioning) to clean output
-            text = text.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
-            text = text.replace(/\u001b\[[0-9;]*[a-zA-Z]/g, '');
-            
-            terminalOutput.textContent += text;
-            
-            // Scroll to bottom
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+          } catch (e) {
+            console.error("[Terminal] SSE Parsing-Fehler:", e);
           }
-        } catch (e) {
-          console.error("[Terminal] SSE Parsing-Fehler:", e);
-        }
-      };
+        };
 
-      // Process exited normally
-      terminalEventSource.addEventListener('exit', () => {
-        terminalOutput.textContent += "\n\n---------------------------------------\n[Spielprozess beendet. Drücke X zum Schließen]";
-        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-        if (terminalEventSource) terminalEventSource.close();
-        activeTerminalSessionId = null;
-        showToast("Spiel erfolgreich beendet.", "info");
-      });
-
-      // Connection errors
-      terminalEventSource.onerror = (err) => {
-        console.error("[Terminal] SSE Verbindungsfehler:", err);
-        if (activeTerminalSessionId) {
-          terminalOutput.textContent += "\n\n[Verbindung zum Terminal-Stream verloren]";
+        // Process exited normally
+        terminalEventSource.addEventListener('exit', () => {
+          terminalOutput.textContent += "\n\n---------------------------------------\n[Spielprozess beendet. Drücke X zum Schließen]";
           terminalOutput.scrollTop = terminalOutput.scrollHeight;
           if (terminalEventSource) terminalEventSource.close();
+          activeTerminalSessionId = null;
+          showToast("Spiel erfolgreich beendet.", "info");
+        });
+
+        // Connection errors
+        terminalEventSource.onerror = (err) => {
+          console.error("[Terminal] SSE Verbindungsfehler:", err);
+          if (activeTerminalSessionId) {
+            terminalOutput.textContent += "\n\n[Verbindung zum Terminal-Stream verloren]";
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            if (terminalEventSource) terminalEventSource.close();
+          }
+        };
+      })
+      .catch(error => {
+        console.error("[Terminal] Startfehler:", error);
+        terminalModal.classList.add('hidden');
+        if (window.location.protocol === 'file:') {
+          showToast('Verbindung zum lokalen Server fehlgeschlagen. Bitte stelle sicher, dass "server.py" gestartet ist.', 'warning');
+        } else {
+          showToast(error.message || 'C++ Spiel konnte nicht gestartet werden.', 'error');
         }
-      };
-    })
-    .catch(error => {
-      console.error("[Terminal] Startfehler:", error);
-      terminalModal.classList.add('hidden');
-      if (window.location.protocol === 'file:') {
-        showToast('Verbindung zum lokalen Server fehlgeschlagen. Bitte stelle sicher, dass "server.py" gestartet ist.', 'warning');
-      } else {
-        showToast(error.message || 'C++ Spiel konnte nicht gestartet werden.', 'error');
-      }
-    });
+      });
   });
 
   // Send input to the C++ stdin stream
   function sendTerminalInput() {
     if (!activeTerminalSessionId) return;
-    
+
     const text = terminalInputField.value;
     terminalInputField.value = '';
-    
+
     // Append your command locally so it shows on screen
     terminalOutput.textContent += text + "\n";
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
-    
+
     const baseUrl = getApiBaseUrl();
 
     fetch(`${baseUrl}/api/terminal/input`, {
@@ -451,11 +451,11 @@ document.addEventListener('DOMContentLoaded', () => {
         input: text
       })
     })
-    .catch(err => {
-      console.error("[Terminal] Fehler beim Senden der Eingabe:", err);
-      terminalOutput.textContent += `\n[Systemfehler: Eingabe "${text}" konnte nicht gesendet werden]\n`;
-      terminalOutput.scrollTop = terminalOutput.scrollHeight;
-    });
+      .catch(err => {
+        console.error("[Terminal] Fehler beim Senden der Eingabe:", err);
+        terminalOutput.textContent += `\n[Systemfehler: Eingabe "${text}" konnte nicht gesendet werden]\n`;
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+      });
   }
 
   // Bind enter key on input field
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeTerminalSession() {
     if (activeTerminalSessionId) {
       const baseUrl = getApiBaseUrl();
-      
+
       // Notify server to clean up subprocess
       fetch(`${baseUrl}/api/terminal/close`, {
         method: 'POST',
@@ -488,15 +488,15 @@ document.addEventListener('DOMContentLoaded', () => {
           id: activeTerminalSessionId
         })
       });
-      
+
       activeTerminalSessionId = null;
     }
-    
+
     if (terminalEventSource) {
       terminalEventSource.close();
       terminalEventSource = null;
     }
-    
+
     terminalModal.classList.add('hidden');
     showToast('Terminal-Sitzung geschlossen.', 'info');
   }
@@ -516,11 +516,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Registration Form Handler ---
   registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     const username = registerUsername.value.trim();
     const email = registerEmail.value.trim().toLowerCase();
     const password = registerPassword.value;
-    
+
     if (username.length < 3) {
       showToast('Benutzername muss mindestens 3 Zeichen lang sein.', 'error');
       return;
@@ -529,9 +529,9 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Passwort muss mindestens 8 Zeichen lang sein.', 'error');
       return;
     }
-    
+
     const users = JSON.parse(localStorage.getItem('users'));
-    
+
     // Validations
     if (users.some(u => u.email === email)) {
       showToast('Diese E-Mail-Adresse ist bereits registriert!', 'error');
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Dieser Benutzername ist bereits vergeben!', 'error');
       return;
     }
-    
+
     // Save record
     const newUser = {
       username: username,
@@ -551,18 +551,18 @@ document.addEventListener('DOMContentLoaded', () => {
       loginCount: 0,
       notes: ''
     };
-    
+
     users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
-    
+
     showToast('Konto erfolgreich erstellt! Du kannst dich jetzt anmelden.', 'success');
     registerForm.reset();
-    
+
     // Reset strength bar
     strengthBar.className = 'strength-bar';
     strengthText.textContent = 'Passwortstärke';
     strengthText.style.color = 'var(--color-text-muted)';
-    
+
     // Redirect to login form
     switchAuthSubView(loginView, registerView);
   });
@@ -570,28 +570,28 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Login Form Handler ---
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     const email = loginEmail.value.trim().toLowerCase();
     const password = loginPassword.value;
-    
+
     const users = JSON.parse(localStorage.getItem('users'));
     const userIndex = users.findIndex(u => u.email === email);
-    
+
     if (userIndex === -1 || users[userIndex].passwordHash !== mockHash(password)) {
       showToast('Ungültige E-Mail-Adresse oder falsches Passwort.', 'error');
       return;
     }
-    
+
     const user = users[userIndex];
     user.loginCount = (user.loginCount || 0) + 1;
     users[userIndex] = user;
-    
+
     localStorage.setItem('users', JSON.stringify(users));
     localStorage.setItem('currentUserSession', email);
-    
+
     showToast(`Willkommen zurück, ${user.username}!`, 'success');
     loginForm.reset();
-    
+
     updateHomeAuthStatus();
     showDashboard(user);
   });
@@ -600,10 +600,10 @@ document.addEventListener('DOMContentLoaded', () => {
   saveNoteBtn.addEventListener('click', () => {
     const currentEmail = localStorage.getItem('currentUserSession');
     if (!currentEmail) return;
-    
+
     const users = JSON.parse(localStorage.getItem('users'));
     const userIndex = users.findIndex(u => u.email === currentEmail);
-    
+
     if (userIndex !== -1) {
       users[userIndex].notes = quickNotes.value;
       localStorage.setItem('users', JSON.stringify(users));
@@ -619,13 +619,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const aiDiscussionView = document.getElementById('ai-discussion-view');
   const btnGoToDiscussion = document.getElementById('btn-go-to-discussion');
   const btnDiscussionBack = document.getElementById('btn-discussion-back');
-  
+
   const discussionSetup = document.getElementById('discussion-setup');
   const discussionSetupForm = document.getElementById('discussion-setup-form');
   const discTopic = document.getElementById('disc-topic');
   const discAgentCount = document.getElementById('disc-agent-count');
   const discAgentsConfigs = document.getElementById('disc-agents-configs');
-  
+
   // Chat UI
   const discussionChat = document.getElementById('discussion-chat');
   const chatTopicDisplay = document.getElementById('chat-topic-display');
@@ -633,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatTypingIndicator = document.getElementById('chat-typing-indicator');
   const typingAvatarIcon = document.getElementById('typing-avatar-icon');
   const typingPersonaName = document.getElementById('typing-persona-name');
-  
+
   const btnChatToggle = document.getElementById('btn-chat-toggle');
   const btnChatClose = document.getElementById('btn-chat-close');
   const chatUserInputPanel = document.getElementById('chat-user-input-panel');
@@ -723,14 +723,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderAgentsSetup() {
     discAgentsConfigs.innerHTML = '';
     const count = parseInt(discAgentCount.value);
-    
+
     // Load saved custom personas from localStorage
     const customPersonas = JSON.parse(localStorage.getItem('customPersonas') || '[]');
 
     for (let i = 1; i <= count; i++) {
       const card = document.createElement('div');
       card.className = 'agent-config-card';
-      
+
       // Build options dropdown list
       let customOptions = '';
       customPersonas.forEach((p, idx) => {
@@ -811,15 +811,15 @@ document.addEventListener('DOMContentLoaded', () => {
           </label>
         </div>
       `;
-      
+
       discAgentsConfigs.appendChild(card);
-      
+
       // Bind dropdown change triggers
       const dropdown = card.querySelector('.select-agent-persona');
       const customForm = card.querySelector('.custom-persona-form');
       const fileInput = card.querySelector('.cust-file-input');
       const fileNameDisplay = card.querySelector(`.id-file-name-display-${i}`);
-      
+
       dropdown.addEventListener('change', () => {
         if (dropdown.value === 'new_custom') {
           customForm.classList.remove('hidden');
@@ -827,7 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
           customForm.classList.add('hidden');
         }
       });
-      
+
       fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
           fileNameDisplay.textContent = `Ausgewählt: ${fileInput.files[0].name}`;
@@ -852,7 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function uploadDocument(file) {
     const baseUrl = getApiBaseUrl();
     const base64Data = await readFileAsBase64(file);
-    
+
     const response = await fetch(`${baseUrl}/api/discussion/upload`, {
       method: 'POST',
       headers: {
@@ -863,12 +863,12 @@ document.addEventListener('DOMContentLoaded', () => {
         content: base64Data
       })
     });
-    
+
     if (!response.ok) {
       const err = await response.json();
       throw new Error(err.message || 'Upload fehlgeschlagen');
     }
-    
+
     const data = await response.json();
     return data.filename;
   }
@@ -876,25 +876,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // Submit setup and start discussion
   discussionSetupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const topic = discTopic.value.trim();
     const agentCount = parseInt(discAgentCount.value);
     const agentConfigs = discAgentsConfigs.querySelectorAll('.agent-config-card');
-    
+
     showToast('Bereite KI-Teilnehmer vor...', 'info');
-    
+
     const agents = [];
     const customPersonasToSave = JSON.parse(localStorage.getItem('customPersonas') || '[]');
-    
+
     try {
       // Loop through selected configurations
       for (let i = 0; i < agentCount; i++) {
         const card = agentConfigs[i];
         const selector = card.querySelector('.select-agent-persona');
         const selection = selector.value;
-        
+
         let agentObj = null;
-        
+
         if (selection === 'new_custom') {
           // Validate and extract custom fields
           const name = card.querySelector('.cust-name').value.trim();
@@ -904,15 +904,15 @@ document.addEventListener('DOMContentLoaded', () => {
           const agenda = card.querySelector('.cust-agenda').value.trim();
           const tone = card.querySelector('.cust-tone').value;
           const saveCheckbox = card.querySelector('.cust-save-checkbox').checked;
-          
+
           const prio1 = card.querySelector('.cust-prio-1').value.trim() || 'Harmonie';
           const prio2 = card.querySelector('.cust-prio-2').value.trim() || 'Wohlstand';
           const prio3 = card.querySelector('.cust-prio-3').value.trim() || 'Freiheit';
-          
+
           if (!name || !profile || !agenda) {
-            throw new Error(`Teilnehmer ${i+1}: Bitte Name, Profil und Agenda ausfüllen.`);
+            throw new Error(`Teilnehmer ${i + 1}: Bitte Name, Profil und Agenda ausfüllen.`);
           }
-          
+
           // Handle file upload if present
           let docFileName = '';
           const fileInput = card.querySelector('.cust-file-input');
@@ -925,7 +925,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(`Lade Dokument für ${name} hoch...`, 'info');
             docFileName = await uploadDocument(file);
           }
-          
+
           agentObj = {
             name: name,
             age: age,
@@ -936,7 +936,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emoji: emoji,
             docFileName: docFileName
           };
-          
+
           // Save custom persona to localStorage if selected
           if (saveCheckbox) {
             const alreadyExists = customPersonasToSave.some(p => p.name.toLowerCase() === name.toLowerCase());
@@ -966,23 +966,23 @@ document.addEventListener('DOMContentLoaded', () => {
           // Load preset
           agentObj = PRESET_PERSONAS[selection];
         }
-        
+
         agents.push(agentObj);
       }
-      
+
       // Save current session agents for bubble alignment later
       currentSessionAgents = agents;
-      
+
       // Clear viewport and switch view
       discussionMessages.innerHTML = '';
       chatTopicDisplay.textContent = topic;
-      
+
       discussionSetup.classList.add('hidden');
       discussionChat.classList.remove('hidden');
-      
+
       // Request discussion start from python server
       const baseUrl = getApiBaseUrl();
-      
+
       const startResponse = await fetch(`${baseUrl}/api/discussion/start`, {
         method: 'POST',
         headers: {
@@ -993,36 +993,36 @@ document.addEventListener('DOMContentLoaded', () => {
           agents: agents
         })
       });
-      
+
       if (!startResponse.ok) {
         const err = await startResponse.json();
         throw new Error(err.message || 'Diskussionsstart fehlgeschlagen.');
       }
-      
+
       const startData = await startResponse.json();
       activeDiscussionSessionId = startData.session_id;
       discussionIsPaused = false;
       discussionMessageBuffer = [];
       currentDiscussionTurns = [];
-      
+
       chatUserInputPanel.classList.add('hidden');
       chatUserInputField.value = '';
-      
+
       btnChatToggle.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pause</span>';
-      
+
       // Start EventSource stream for turns
       discussionEventSource = new EventSource(`${baseUrl}/api/discussion/stream?id=${activeDiscussionSessionId}`);
-      
+
       // Typing indicator event
       discussionEventSource.addEventListener('typing', (event) => {
         if (discussionIsPaused) return;
-        
+
         try {
           const parsed = JSON.parse(event.data);
           typingAvatarIcon.textContent = parsed.emoji;
           typingPersonaName.textContent = parsed.sender;
           chatTypingIndicator.classList.remove('hidden');
-          
+
           // Auto scroll to typing indicator
           discussionMessages.scrollTop = discussionMessages.scrollHeight;
         } catch (e) {
@@ -1033,7 +1033,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // User input required event
       discussionEventSource.addEventListener('user_input_required', (event) => {
         chatTypingIndicator.classList.add('hidden'); // Hide typing
-        
+
         try {
           const parsed = JSON.parse(event.data);
           // Show user input panel
@@ -1042,23 +1042,23 @@ document.addEventListener('DOMContentLoaded', () => {
           chatUserInputField.disabled = false;
           btnChatSendUserInput.disabled = false;
           chatUserInputField.focus();
-          
+
           // Auto scroll to input panel
           discussionMessages.scrollTop = discussionMessages.scrollHeight;
         } catch (e) {
           console.error(e);
         }
       });
-      
+
       // Message event
       discussionEventSource.onmessage = (event) => {
         chatTypingIndicator.classList.add('hidden'); // Hide typing
         chatUserInputPanel.classList.add('hidden');
-        
+
         try {
           const turn = JSON.parse(event.data);
           currentDiscussionTurns.push(turn); // Track all turns
-          
+
           if (discussionIsPaused) {
             // Buffer message
             discussionMessageBuffer.push(turn);
@@ -1069,21 +1069,21 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error(e);
         }
       };
-      
+
       // Completed normally
       discussionEventSource.addEventListener('exit', () => {
         chatTypingIndicator.classList.add('hidden');
-        
+
         const endDivider = document.createElement('div');
         endDivider.style.textAlign = 'center';
         endDivider.style.color = 'var(--color-text-muted)';
         endDivider.style.margin = '1.5rem 0';
         endDivider.style.fontSize = '0.85rem';
         endDivider.innerHTML = `----------------- <i class="fa-solid fa-flag-checkered" style="margin: 0 0.5rem;"></i> Debatte abgeschlossen -----------------`;
-        
+
         discussionMessages.appendChild(endDivider);
         discussionMessages.scrollTop = discussionMessages.scrollHeight;
-        
+
         if (discussionEventSource) {
           discussionEventSource.close();
           discussionEventSource = null;
@@ -1091,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeDiscussionSessionId = null;
         showToast('Debatte abgeschlossen.', 'info');
       });
-      
+
       // Connect error
       discussionEventSource.onerror = () => {
         if (activeDiscussionSessionId) {
@@ -1103,11 +1103,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       };
-      
+
     } catch (err) {
       console.error(err);
       showToast(err.message || 'Fehler beim Starten der Diskussion.', 'error');
-      
+
       // Return to setup
       discussionChat.classList.add('hidden');
       discussionSetup.classList.remove('hidden');
@@ -1117,13 +1117,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Render chat bubble dynamically
   function renderChatBubble(turn) {
     const bubbleRow = document.createElement('div');
-    
+
     // Find index of agent in active session list to determine alignment (1 & 3 Left, 2 & 4 Right)
     const agentIdx = currentSessionAgents.findIndex(a => a.name === turn.sender);
     const alignment = (agentIdx % 2 === 0) ? 'left' : 'right';
-    
+
     bubbleRow.className = `chat-bubble-row ${alignment}`;
-    
+
     // Build thought block if available (premium collapsible details)
     let thoughtHtml = '';
     if (turn.thought) {
@@ -1134,7 +1134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </details>
       `;
     }
-    
+
     bubbleRow.innerHTML = `
       <div class="chat-avatar">${turn.emoji}</div>
       <div class="chat-bubble-content" style="max-width: 80%;">
@@ -1145,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
     `;
-    
+
     discussionMessages.appendChild(bubbleRow);
     discussionMessages.scrollTop = discussionMessages.scrollHeight;
   }
@@ -1153,16 +1153,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Toggle Pause/Resume
   btnChatToggle.addEventListener('click', () => {
     if (!activeDiscussionSessionId) return;
-    
+
     discussionIsPaused = !discussionIsPaused;
-    
+
     if (discussionIsPaused) {
       btnChatToggle.innerHTML = '<i class="fa-solid fa-play"></i><span>Fortsetzen</span>';
       showToast('Debatte pausiert.', 'warning');
     } else {
       btnChatToggle.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pause</span>';
       showToast('Debatte fortgesetzt.', 'success');
-      
+
       // Flush buffered messages
       discussionMessageBuffer.forEach(turn => renderChatBubble(turn));
       discussionMessageBuffer = [];
@@ -1174,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeDiscussionSession() {
     if (activeDiscussionSessionId) {
       const baseUrl = getApiBaseUrl();
-      
+
       fetch(`${baseUrl}/api/discussion/close`, {
         method: 'POST',
         headers: {
@@ -1184,18 +1184,18 @@ document.addEventListener('DOMContentLoaded', () => {
           id: activeDiscussionSessionId
         })
       });
-      
+
       activeDiscussionSessionId = null;
     }
-    
+
     if (discussionEventSource) {
       discussionEventSource.close();
       discussionEventSource = null;
     }
-    
+
     discussionChat.classList.add('hidden');
     discussionSetup.classList.remove('hidden');
-    
+
     chatTypingIndicator.classList.add('hidden');
     chatUserInputPanel.classList.add('hidden');
     chatUserInputField.value = '';
@@ -1222,7 +1222,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Generate txt content and download it
   function downloadDiscussionTranscript() {
     if (currentDiscussionTurns.length === 0) return;
-    
+
     let txt = `==================================================\n`;
     txt += `KI-DEBATTE - GESPRÄCHSPROTOKOLL\n`;
     txt += `Thema: ${discTopic.value || 'Unbekanntes Thema'}\n`;
@@ -1232,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', () => {
       txt += `  - ${a.name} (Alter: ${a.age}, Profil: ${a.profile})\n`;
     });
     txt += `==================================================\n\n`;
-    
+
     currentDiscussionTurns.forEach(turn => {
       if (turn.sender === 'System-Protokollant') {
         txt += `\n[${turn.sender}]:\n${turn.text}\n\n`;
@@ -1240,12 +1240,12 @@ document.addEventListener('DOMContentLoaded', () => {
         txt += `[${turn.sender}]: ${turn.text}\n`;
       }
     });
-    
+
     const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    
+
     const safeTopic = (discTopic.value || 'debatte')
       .toLowerCase()
       .trim()
@@ -1253,7 +1253,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .substring(0, 30);
     const timestamp = new Date().toISOString().slice(0, 10);
     a.download = `ki_debatte_${safeTopic}_${timestamp}.txt`;
-    
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1265,10 +1265,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const text = chatUserInputField.value.trim();
     if (!text) return;
     if (!activeDiscussionSessionId) return;
-    
+
     chatUserInputField.disabled = true;
     btnChatSendUserInput.disabled = true;
-    
+
     try {
       const baseUrl = getApiBaseUrl();
       const response = await fetch(`${baseUrl}/api/discussion/input`, {
@@ -1281,12 +1281,12 @@ document.addEventListener('DOMContentLoaded', () => {
           text: text
         })
       });
-      
+
       if (!response.ok) {
         const err = await response.json();
         throw new Error(err.message || 'Fehler beim Senden.');
       }
-      
+
       chatUserInputPanel.classList.add('hidden');
       chatUserInputField.value = '';
     } catch (err) {
@@ -1321,6 +1321,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Initial Setup on Page Load ---
   updateHomeAuthStatus();
-  
+
 });
 
