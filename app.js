@@ -1062,11 +1062,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     bubbleRow.className = `chat-bubble-row ${alignment}`;
     
+    // Build thought block if available (premium collapsible details)
+    let thoughtHtml = '';
+    if (turn.thought) {
+      thoughtHtml = `
+        <details class="chat-thought-details" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--color-text-muted); cursor: pointer; display: block; width: 100%;">
+          <summary style="outline: none; user-select: none; font-weight: 500; font-family: var(--font-body); display: flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-brain" style="color: var(--color-primary);"></i>Denkprozess anzeigen</summary>
+          <div style="background: rgba(255, 255, 255, 0.02); border-left: 2px solid var(--color-primary); padding: 0.6rem 0.8rem; margin-top: 0.35rem; border-radius: var(--border-radius-sm); white-space: pre-wrap; font-family: var(--font-body); line-height: 1.5; color: var(--color-text-secondary); text-align: left;">${turn.thought}</div>
+        </details>
+      `;
+    }
+    
     bubbleRow.innerHTML = `
       <div class="chat-avatar">${turn.emoji}</div>
-      <div class="chat-bubble-content">
+      <div class="chat-bubble-content" style="max-width: 80%;">
         <span class="chat-sender-name">${turn.sender}</span>
-        <div class="chat-bubble">${turn.text}</div>
+        <div class="chat-bubble" style="display: flex; flex-direction: column;">
+          <div>${turn.text}</div>
+          ${thoughtHtml}
+        </div>
       </div>
     `;
     
