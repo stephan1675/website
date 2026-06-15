@@ -589,7 +589,539 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ==========================================
+  // AI DISCUSSION ROOM CLIENT
+  // ==========================================
+
+  // Views & Setup
+  const aiDiscussionView = document.getElementById('ai-discussion-view');
+  const btnGoToDiscussion = document.getElementById('btn-go-to-discussion');
+  const btnDiscussionBack = document.getElementById('btn-discussion-back');
+  
+  const discussionSetup = document.getElementById('discussion-setup');
+  const discussionSetupForm = document.getElementById('discussion-setup-form');
+  const discTopic = document.getElementById('disc-topic');
+  const discAgentCount = document.getElementById('disc-agent-count');
+  const discAgentsConfigs = document.getElementById('disc-agents-configs');
+  
+  // Chat UI
+  const discussionChat = document.getElementById('discussion-chat');
+  const chatTopicDisplay = document.getElementById('chat-topic-display');
+  const discussionMessages = document.getElementById('discussion-messages');
+  const chatTypingIndicator = document.getElementById('chat-typing-indicator');
+  const typingAvatarIcon = document.getElementById('typing-avatar-icon');
+  const typingPersonaName = document.getElementById('typing-persona-name');
+  
+  const btnChatToggle = document.getElementById('btn-chat-toggle');
+  const btnChatClose = document.getElementById('btn-chat-close');
+
+  // State
+  let activeDiscussionSessionId = null;
+  let discussionEventSource = null;
+  let discussionIsPaused = false;
+  let discussionMessageBuffer = [];
+  let currentSessionAgents = [];
+
+  // Preset Personas
+  const PRESET_PERSONAS = {
+    "trump": {
+      name: "Donald Trump",
+      age: "80",
+      profile: "Ehemaliger US-Präsident, Immobilien-Milliardär.",
+      politicalStance: [
+        "Make America Great Again und Amerika First Protektionismus.",
+        "Grenzsicherung und harte Migrationspolitik.",
+        "Deregulierung der Wirtschaft und Steuersenkungen."
+      ],
+      agenda: "Alle Mitredner lächerlich machen und zeigen, dass nur ich die Wahrheit kenne.",
+      tone: "arrogant, direkt, polemisch, umgangssprachlich",
+      emoji: "🇺🇸"
+    },
+    "musk": {
+      name: "Elon Musk",
+      age: "54",
+      profile: "Tech-Milliardär, Gründer von Tesla, SpaceX und Neuralink.",
+      politicalStance: [
+        "Sicherung der menschlichen Zukunft durch Besiedlung des Mars.",
+        "First Principles Denken und maximale Effizienz.",
+        "Schutz der freien Meinungsäußerung auf X."
+      ],
+      agenda: "Technologischen Fortschritt und Mars-Mission als einzige logische Lösung darstellen.",
+      tone: "visionär, leicht sprunghaft, technikbegeistert, energetisch",
+      emoji: "🚀"
+    },
+    "xi": {
+      name: "Xi Jinping",
+      age: "72",
+      profile: "Generalsekretär der KP Chinas und Staatspräsident.",
+      politicalStance: [
+        "Realisierung des Chinesischen Traums und nationale Verjüngung.",
+        "Wahrung der sozialen Stabilität und kollektiven Disziplin.",
+        "Schaffung einer multipolaren Weltordnung unter Chinas Führung."
+      ],
+      agenda: "Die Stabilität und Überlegenheit des chinesischen Entwicklungsmodells betonen.",
+      tone: "äußerst diplomatisch, streng, formal, bedacht",
+      emoji: "🐼"
+    },
+    "schweiz": {
+      name: "Schweizer Bundespräsident",
+      age: "60",
+      profile: "Mitglied des siebenköpfigen Bundesratskollegiums der Schweiz.",
+      politicalStance: [
+        "Pflege des Konkordanzsystems und Konsensfindung über alle Parteien hinweg.",
+        "Wahrung der dauerhaften bewaffneten Schweizer Neutralität.",
+        "Schutz der direkten Demokratie und des Föderalismus."
+      ],
+      agenda: "Einen neutralen Kompromiss finden und alle Beteiligten zur sachlichen Mäßigung aufrufen.",
+      tone: "äußerst höflich, konsensorientiert, sachlich, schweizerisch",
+      emoji: "🇨🇭"
+    }
+  };
+
+  // Route bindings
+  btnGoToDiscussion.addEventListener('click', () => {
+    navigateToView(aiDiscussionView);
+    renderAgentsSetup();
+  });
+  btnDiscussionBack.addEventListener('click', () => navigateToView(homeView));
+
+  // Change count handler
+  discAgentCount.addEventListener('change', renderAgentsSetup);
+
+  // Render agents configuration forms dynamically
+  function renderAgentsSetup() {
+    discAgentsConfigs.innerHTML = '';
+    const count = parseInt(discAgentCount.value);
+    
+    // Load saved custom personas from localStorage
+    const customPersonas = JSON.parse(localStorage.getItem('customPersonas') || '[]');
+
+    for (let i = 1; i <= count; i++) {
+      const card = document.createElement('div');
+      card.className = 'agent-config-card';
+      
+      // Build options dropdown list
+      let customOptions = '';
+      customPersonas.forEach((p, idx) => {
+        customOptions += `<option value="custom_${idx}">Eigene: ${p.name}</option>`;
+      });
+
+      card.innerHTML = `
+        <h4><i class="fa-solid fa-robot" style="color: var(--color-primary);"></i> Teilnehmer ${i}</h4>
+        
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+          <label>Persona auswählen</label>
+          <select class="form-control select-agent-persona" data-agent-idx="${i}" style="padding-left: 1.25rem;">
+            <option value="trump">Donald Trump (Preset)</option>
+            <option value="musk">Elon Musk (Preset)</option>
+            <option value="xi">Xi Jinping (Preset)</option>
+            <option value="schweiz">Schweizer Bundespräsident (Preset)</option>
+            ${customOptions}
+            <option value="new_custom" style="color: var(--color-secondary); font-weight: bold;">+ Neue Persona erstellen...</option>
+          </select>
+        </div>
+
+        <!-- Collapsible Custom Form (hidden by default) -->
+        <div class="custom-persona-form hidden" id="custom-form-agent-${i}">
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label>Name</label>
+            <input type="text" class="form-control cust-name" placeholder="z.B. Sokrates" style="padding-left: 1rem;">
+          </div>
+          <div class="form-row-two" style="margin-bottom: 0.75rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Alter</label>
+              <input type="number" class="form-control cust-age" placeholder="70" style="padding-left: 1rem;">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Emoji/Icon</label>
+              <input type="text" class="form-control cust-emoji" placeholder="🏛️" style="padding-left: 1rem;">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label>Profil / Kurzbeschreibung</label>
+            <textarea class="cust-profile" placeholder="Philosoph der griechischen Antike..."></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label style="margin-bottom: 0.25rem;">Politische Grundeinstellung (3 Sätze, nach Prio)</label>
+            <input type="text" class="form-control cust-prio-1" placeholder="Priorität 1: Kritisches Hinterfragen..." style="padding-left: 1rem; margin-bottom: 0.4rem; font-size: 0.85rem;">
+            <input type="text" class="form-control cust-prio-2" placeholder="Priorität 2: Tugendhaftigkeit..." style="padding-left: 1rem; margin-bottom: 0.4rem; font-size: 0.85rem;">
+            <input type="text" class="form-control cust-prio-3" placeholder="Priorität 3: Suche nach der Wahrheit..." style="padding-left: 1rem; font-size: 0.85rem;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label>Aktuelle Botschaft (Gesprächsziel)</label>
+            <input type="text" class="form-control cust-agenda" placeholder="Jeder Behauptung auf den Zahn fühlen" style="padding-left: 1rem;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label>Sprachstil / Tonalität</label>
+            <select class="form-control cust-tone" style="padding-left: 1rem;">
+              <option value="skeptisch, fragend, weise">Skeptisch / Hinterfragend</option>
+              <option value="direkt, aggressiv, ungeduldig">Direkt / Aggressiv</option>
+              <option value="höflich, ruhig, diplomatisch">Höflich / Diplomatisch</option>
+              <option value="emotional, leidenschaftlich, laut">Leidenschaftlich / Emotional</option>
+              <option value="sachlich, analytisch, kühl">Analytisch / Sachlich</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label>Wissensdokument (.txt hochladen)</label>
+            <div class="file-upload-wrapper">
+              <div class="file-upload-btn">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <span>Datei auswählen</span>
+              </div>
+              <input type="file" class="cust-file-input" accept=".txt">
+            </div>
+            <span class="file-upload-name id-file-name-display-${i}">Kein Dokument verknüpft</span>
+          </div>
+          
+          <label class="save-checkbox-row">
+            <input type="checkbox" class="cust-save-checkbox" checked>
+            <span>Persona für zukünftige Debatten speichern</span>
+          </label>
+        </div>
+      `;
+      
+      discAgentsConfigs.appendChild(card);
+      
+      // Bind dropdown change triggers
+      const dropdown = card.querySelector('.select-agent-persona');
+      const customForm = card.querySelector('.custom-persona-form');
+      const fileInput = card.querySelector('.cust-file-input');
+      const fileNameDisplay = card.querySelector(`.id-file-name-display-${i}`);
+      
+      dropdown.addEventListener('change', () => {
+        if (dropdown.value === 'new_custom') {
+          customForm.classList.remove('hidden');
+        } else {
+          customForm.classList.add('hidden');
+        }
+      });
+      
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+          fileNameDisplay.textContent = `Ausgewählt: ${fileInput.files[0].name}`;
+        } else {
+          fileNameDisplay.textContent = 'Kein Dokument verknüpft';
+        }
+      });
+    }
+  }
+
+  // Helper: Read file as Base64 Promise
+  function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Helper: Upload file to python backend
+  async function uploadDocument(file) {
+    const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+    const base64Data = await readFileAsBase64(file);
+    
+    const response = await fetch(`${baseUrl}/api/discussion/upload`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        filename: file.name,
+        content: base64Data
+      })
+    });
+    
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Upload fehlgeschlagen');
+    }
+    
+    const data = await response.json();
+    return data.filename;
+  }
+
+  // Submit setup and start discussion
+  discussionSetupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const topic = discTopic.value.trim();
+    const agentCount = parseInt(discAgentCount.value);
+    const agentConfigs = discAgentsConfigs.querySelectorAll('.agent-config-card');
+    
+    showToast('Bereite KI-Teilnehmer vor...', 'info');
+    
+    const agents = [];
+    const customPersonasToSave = JSON.parse(localStorage.getItem('customPersonas') || '[]');
+    
+    try {
+      // Loop through selected configurations
+      for (let i = 0; i < agentCount; i++) {
+        const card = agentConfigs[i];
+        const selector = card.querySelector('.select-agent-persona');
+        const selection = selector.value;
+        
+        let agentObj = null;
+        
+        if (selection === 'new_custom') {
+          // Validate and extract custom fields
+          const name = card.querySelector('.cust-name').value.trim();
+          const age = card.querySelector('.cust-age').value.trim() || '30';
+          const emoji = card.querySelector('.cust-emoji').value.trim() || '👤';
+          const profile = card.querySelector('.cust-profile').value.trim();
+          const agenda = card.querySelector('.cust-agenda').value.trim();
+          const tone = card.querySelector('.cust-tone').value;
+          const saveCheckbox = card.querySelector('.cust-save-checkbox').checked;
+          
+          const prio1 = card.querySelector('.cust-prio-1').value.trim() || 'Harmonie';
+          const prio2 = card.querySelector('.cust-prio-2').value.trim() || 'Wohlstand';
+          const prio3 = card.querySelector('.cust-prio-3').value.trim() || 'Freiheit';
+          
+          if (!name || !profile || !agenda) {
+            throw new Error(`Teilnehmer ${i+1}: Bitte Name, Profil und Agenda ausfüllen.`);
+          }
+          
+          // Handle file upload if present
+          let docFileName = '';
+          const fileInput = card.querySelector('.cust-file-input');
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            // If offline, file upload will fail in browser, so warn if running file:// protocol
+            if (window.location.protocol === 'file:') {
+              throw new Error('Dateiuploads benötigen den laufenden server.py Server. (Aktuell über file:// geöffnet).');
+            }
+            showToast(`Lade Dokument für ${name} hoch...`, 'info');
+            docFileName = await uploadDocument(file);
+          }
+          
+          agentObj = {
+            name: name,
+            age: age,
+            profile: profile,
+            politicalStance: [prio1, prio2, prio3],
+            agenda: agenda,
+            tone: tone,
+            emoji: emoji,
+            docFileName: docFileName
+          };
+          
+          // Save custom persona to localStorage if selected
+          if (saveCheckbox) {
+            const alreadyExists = customPersonasToSave.some(p => p.name.toLowerCase() === name.toLowerCase());
+            if (!alreadyExists) {
+              customPersonasToSave.push(agentObj);
+              localStorage.setItem('customPersonas', JSON.stringify(customPersonasToSave));
+            }
+          }
+        } else if (selection.startsWith('custom_')) {
+          // Load from localStorage
+          const savedIdx = parseInt(selection.split('_')[1]);
+          const savedPersonas = JSON.parse(localStorage.getItem('customPersonas') || '[]');
+          agentObj = savedPersonas[savedIdx];
+        } else {
+          // Load preset
+          agentObj = PRESET_PERSONAS[selection];
+        }
+        
+        agents.push(agentObj);
+      }
+      
+      // Save current session agents for bubble alignment later
+      currentSessionAgents = agents;
+      
+      // Clear viewport and switch view
+      discussionMessages.innerHTML = '';
+      chatTopicDisplay.textContent = topic;
+      
+      discussionSetup.classList.add('hidden');
+      discussionChat.classList.remove('hidden');
+      
+      // Request discussion start from python server
+      const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+      
+      const startResponse = await fetch(`${baseUrl}/api/discussion/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          topic: topic,
+          agents: agents
+        })
+      });
+      
+      if (!startResponse.ok) {
+        const err = await startResponse.json();
+        throw new Error(err.message || 'Diskussionsstart fehlgeschlagen.');
+      }
+      
+      const startData = await startResponse.json();
+      activeDiscussionSessionId = startData.session_id;
+      discussionIsPaused = false;
+      discussionMessageBuffer = [];
+      
+      btnChatToggle.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pause</span>';
+      
+      // Start EventSource stream for turns
+      discussionEventSource = new EventSource(`${baseUrl}/api/discussion/stream?id=${activeDiscussionSessionId}`);
+      
+      // Typing indicator event
+      discussionEventSource.addEventListener('typing', (event) => {
+        if (discussionIsPaused) return;
+        
+        try {
+          const parsed = JSON.parse(event.data);
+          typingAvatarIcon.textContent = parsed.emoji;
+          typingPersonaName.textContent = parsed.sender;
+          chatTypingIndicator.classList.remove('hidden');
+          
+          // Auto scroll to typing indicator
+          discussionMessages.scrollTop = discussionMessages.scrollHeight;
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      
+      // Message event
+      discussionEventSource.onmessage = (event) => {
+        chatTypingIndicator.classList.add('hidden'); // Hide typing
+        
+        try {
+          const turn = JSON.parse(event.data);
+          
+          if (discussionIsPaused) {
+            // Buffer message
+            discussionMessageBuffer.push(turn);
+          } else {
+            renderChatBubble(turn);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      };
+      
+      // Completed normally
+      discussionEventSource.addEventListener('exit', () => {
+        chatTypingIndicator.classList.add('hidden');
+        
+        const endDivider = document.createElement('div');
+        endDivider.style.textAlign = 'center';
+        endDivider.style.color = 'var(--color-text-muted)';
+        endDivider.style.margin = '1.5rem 0';
+        endDivider.style.fontSize = '0.85rem';
+        endDivider.innerHTML = `----------------- <i class="fa-solid fa-flag-checkered" style="margin: 0 0.5rem;"></i> Debatte abgeschlossen -----------------`;
+        
+        discussionMessages.appendChild(endDivider);
+        discussionMessages.scrollTop = discussionMessages.scrollHeight;
+        
+        if (discussionEventSource) {
+          discussionEventSource.close();
+          discussionEventSource = null;
+        }
+        activeDiscussionSessionId = null;
+        showToast('Debatte abgeschlossen.', 'info');
+      });
+      
+      // Connect error
+      discussionEventSource.onerror = () => {
+        if (activeDiscussionSessionId) {
+          chatTypingIndicator.classList.add('hidden');
+          console.warn("[Terminal] AI SSE getrennt.");
+          if (discussionEventSource) {
+            discussionEventSource.close();
+            discussionEventSource = null;
+          }
+        }
+      };
+      
+    } catch (err) {
+      console.error(err);
+      showToast(err.message || 'Fehler beim Starten der Diskussion.', 'error');
+      
+      // Return to setup
+      discussionChat.classList.add('hidden');
+      discussionSetup.classList.remove('hidden');
+    }
+  });
+
+  // Render chat bubble dynamically
+  function renderChatBubble(turn) {
+    const bubbleRow = document.createElement('div');
+    
+    // Find index of agent in active session list to determine alignment (1 & 3 Left, 2 & 4 Right)
+    const agentIdx = currentSessionAgents.findIndex(a => a.name === turn.sender);
+    const alignment = (agentIdx % 2 === 0) ? 'left' : 'right';
+    
+    bubbleRow.className = `chat-bubble-row ${alignment}`;
+    
+    bubbleRow.innerHTML = `
+      <div class="chat-avatar">${turn.emoji}</div>
+      <div class="chat-bubble-content">
+        <span class="chat-sender-name">${turn.sender}</span>
+        <div class="chat-bubble">${turn.text}</div>
+      </div>
+    `;
+    
+    discussionMessages.appendChild(bubbleRow);
+    discussionMessages.scrollTop = discussionMessages.scrollHeight;
+  }
+
+  // Toggle Pause/Resume
+  btnChatToggle.addEventListener('click', () => {
+    if (!activeDiscussionSessionId) return;
+    
+    discussionIsPaused = !discussionIsPaused;
+    
+    if (discussionIsPaused) {
+      btnChatToggle.innerHTML = '<i class="fa-solid fa-play"></i><span>Fortsetzen</span>';
+      showToast('Debatte pausiert.', 'warning');
+    } else {
+      btnChatToggle.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pause</span>';
+      showToast('Debatte fortgesetzt.', 'success');
+      
+      // Flush buffered messages
+      discussionMessageBuffer.forEach(turn => renderChatBubble(turn));
+      discussionMessageBuffer = [];
+      chatTypingIndicator.classList.add('hidden');
+    }
+  });
+
+  // End discussion and close session
+  function closeDiscussionSession() {
+    if (activeDiscussionSessionId) {
+      const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+      
+      fetch(`${baseUrl}/api/discussion/close`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: activeDiscussionSessionId
+        })
+      });
+      
+      activeDiscussionSessionId = null;
+    }
+    
+    if (discussionEventSource) {
+      discussionEventSource.close();
+      discussionEventSource = null;
+    }
+    
+    discussionChat.classList.add('hidden');
+    discussionSetup.classList.remove('hidden');
+    
+    chatTypingIndicator.classList.add('hidden');
+    discussionMessageBuffer = [];
+    showToast('Debatte beendet.', 'info');
+  }
+
+  btnChatClose.addEventListener('click', closeDiscussionSession);
+
+
   // --- Initial Setup on Page Load ---
   updateHomeAuthStatus();
   
 });
+
