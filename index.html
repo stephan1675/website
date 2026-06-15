@@ -444,6 +444,37 @@
     </div>
   </div>
 
+  <!-- Save Discussion Confirmation Modal -->
+  <div id="save-discussion-modal" class="terminal-overlay hidden">
+    <div class="terminal-card" style="max-width: 500px; height: auto; min-height: auto; background: var(--bg-mesh-2); border: 1px solid var(--glass-border); border-radius: var(--border-radius-md); box-shadow: var(--glass-shadow);">
+      <div class="terminal-header" style="background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0.9rem 1.5rem;">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title" style="color: var(--color-text-primary); font-family: var(--font-heading); font-weight: 500; font-size: 0.95rem; margin-left: 0.5rem;">Diskussion speichern</span>
+      </div>
+      <div class="terminal-content" style="padding: 2.5rem 2rem; text-align: center; display: flex; flex-direction: column; gap: 1.5rem; background: radial-gradient(circle at top, rgba(99, 102, 241, 0.05), transparent 70%);">
+        <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); display: flex; justify-content: center; align-items: center; margin: 0 auto 0.5rem auto;">
+          <i class="fa-solid fa-file-arrow-down" style="font-size: 2.2rem; color: var(--color-primary);"></i>
+        </div>
+        <div>
+          <h4 style="color: var(--color-text-primary); font-family: var(--font-heading); font-size: 1.2rem; margin: 0 0 0.5rem 0; font-weight: 600;">Diskussion beenden?</h4>
+          <p style="color: var(--color-text-secondary); font-family: var(--font-body); font-size: 0.95rem; margin: 0; line-height: 1.6;">
+            Möchten Sie den Verlauf der KI-Diskussion als <strong>.txt-Datei</strong> herunterladen, bevor die Sitzung beendet wird?
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 0.5rem;">
+          <button id="btn-save-disc-yes" class="btn btn-primary" style="padding: 0.7rem 1.5rem; font-family: var(--font-body); font-weight: 500; font-size: 0.9rem; border-radius: var(--border-radius-sm);">
+            <i class="fa-solid fa-download" style="margin-right: 0.5rem;"></i>Ja, speichern
+          </button>
+          <button id="btn-save-disc-no" class="btn btn-secondary" style="padding: 0.7rem 1.5rem; font-family: var(--font-body); font-weight: 500; font-size: 0.9rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); color: var(--color-text-primary); border-radius: var(--border-radius-sm); transition: all 0.2s;">
+            Nein, verwerfen
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
