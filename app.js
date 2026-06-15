@@ -2,6 +2,28 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   
+  // --- Deployment Backend Configuration ---
+  const BACKEND_URL = 'https://dein-debatten-backend.onrender.com'; // Hier deine Render-URL eintragen!
+
+  function getApiBaseUrl() {
+    if (window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1' || 
+        window.location.protocol === 'file:') {
+      return 'http://localhost:8000';
+    }
+    return BACKEND_URL;
+  }
+
+  // Immediate wakeup ping to the Render backend
+  (function wakeupBackend() {
+    const pingUrl = getApiBaseUrl();
+    console.log("[Wakeup] Pinging backend at:", pingUrl);
+    fetch(`${pingUrl}/api/ping`)
+      .then(r => r.json())
+      .then(data => console.log("[Wakeup] Backend is awake:", data))
+      .catch(err => console.warn("[Wakeup] Backend ping sent (waking up...):", err));
+  })();
+
   // --- DOM Element References ---
   
   // Views
@@ -315,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Launch terminal session
   btnRunCpp.addEventListener('click', () => {
-    const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+    const baseUrl = getApiBaseUrl();
     
     // Clear display, open modal and focus input
     terminalOutput.textContent = "Verbindung wird hergestellt...\n";
@@ -417,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
     terminalOutput.textContent += text + "\n";
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
     
-    const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+    const baseUrl = getApiBaseUrl();
 
     fetch(`${baseUrl}/api/terminal/input`, {
       method: 'POST',
@@ -454,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close terminal session and kill subprocess
   function closeTerminalSession() {
     if (activeTerminalSessionId) {
-      const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+      const baseUrl = getApiBaseUrl();
       
       // Notify server to clean up subprocess
       fetch(`${baseUrl}/api/terminal/close`, {
@@ -828,7 +850,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helper: Upload file to python backend
   async function uploadDocument(file) {
-    const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+    const baseUrl = getApiBaseUrl();
     const base64Data = await readFileAsBase64(file);
     
     const response = await fetch(`${baseUrl}/api/discussion/upload`, {
@@ -959,7 +981,7 @@ document.addEventListener('DOMContentLoaded', () => {
       discussionChat.classList.remove('hidden');
       
       // Request discussion start from python server
-      const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+      const baseUrl = getApiBaseUrl();
       
       const startResponse = await fetch(`${baseUrl}/api/discussion/start`, {
         method: 'POST',
@@ -1151,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // End discussion and close session
   function closeDiscussionSession() {
     if (activeDiscussionSessionId) {
-      const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+      const baseUrl = getApiBaseUrl();
       
       fetch(`${baseUrl}/api/discussion/close`, {
         method: 'POST',
@@ -1248,7 +1270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnChatSendUserInput.disabled = true;
     
     try {
-      const baseUrl = window.location.protocol === 'file:' ? 'http://localhost:8000' : '';
+      const baseUrl = getApiBaseUrl();
       const response = await fetch(`${baseUrl}/api/discussion/input`, {
         method: 'POST',
         headers: {
