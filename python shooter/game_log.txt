@@ -1,0 +1,1356 @@
+
+--- Spielstart: 2026-04-19 16:36:01.131739 ---
+Logging initialisiert.
+no audio found with name: shoot.wav supported formats: .ogg, .wav
+[93mwarning: missing audio clip: shoot.wav [0m
+no audio found with name: hit.wav supported formats: .ogg, .wav
+[93mwarning: missing audio clip: hit.wav [0m
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+shoot.wav has no audio clip
+shoot.wav has no audio clip
+shoot.wav has no audio clip
+shoot.wav has no audio clip
+shoot.wav has no audio clip
+Menü geöffnet
+Menü geschlossen
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 16:37:24.278944 ---
+Logging initialisiert.
+no audio found with name:  supported formats: .ogg, .wav
+[93mwarning: missing audio clip:  [0m
+Traceback (most recent call last):
+  File "D:\Programmieren\aider\main.py", line 81, in <module>
+    shoot_sound = load_sound('shoot.wav')
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programmieren\aider\main.py", line 78, in load_sound
+    dummy.volume = 0   # Stumm schalten
+    ^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\audio.py", line 42, in volume_setter
+    self._clip.setVolume(value * Audio.volume_multiplier)
+    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'setVolume'
+
+--- Spielstart: 2026-04-19 16:38:32.790300 ---
+Logging initialisiert.
+no audio found with name:  supported formats: .ogg, .wav
+[93mwarning: missing audio clip:  [0m
+Traceback (most recent call last):
+  File "D:\Programmieren\aider\main.py", line 82, in <module>
+    shoot_sound = load_sound('shoot.wav')
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Programmieren\aider\main.py", line 79, in load_sound
+    dummy.volume = 0   # Stumm schalten
+    ^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\audio.py", line 42, in volume_setter
+    self._clip.setVolume(value * Audio.volume_multiplier)
+    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'setVolume'
+
+--- Spielstart: 2026-04-19 16:39:36.346097 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Menü geöffnet
+Menü geschlossen
+Direkter Treffer: entity
+Direkter Treffer: entity
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 16:43:43.875652 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Menü geöffnet
+Menü geschlossen
+Spieler getroffen – Game Over
+* interrupt by keyboard
+
+--- Spielstart: 2026-04-19 16:55:41.778419 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 16:59:13.331463 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+* interrupt by keyboard
+
+--- Spielstart: 2026-04-19 17:06:32.185307 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+Menü geschlossen
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:12:00.524479 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-19 17:12:15.881704 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Treffer: entity
+
+--- Spielstart: 2026-04-19 17:12:54.751478 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:16:56.190535 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:21:47.463611 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Traceback (most recent call last):
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 49, in eventLoopTask
+    self.doEvents()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 43, in doEvents
+    processFunc(dequeueFunc())
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 99, in processEvent
+    messenger.send(eventName, paramList)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 337, in send
+    self.__dispatch(acceptorDict, event, sentArgs, foundWatch)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 422, in __dispatch
+    result = method (*(extraArgs + sentArgs))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\main.py", line 299, in text_input
+    e.text_input(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 750, in text_input
+    add_text(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 158, in add_text
+    self.render()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in render
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in <listcomp>
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'int' is not iterable
+Traceback (most recent call last):
+  File "D:\Programmieren\aider\main.py", line 455, in <module>
+    app.run()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\main.py", line 321, in run
+    super().run()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\ShowBase.py", line 3331, in run
+    self.taskMgr.run()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\task\Task.py", line 553, in run
+    self.step()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\task\Task.py", line 504, in step
+    self.mgr.poll()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 49, in eventLoopTask
+    self.doEvents()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 43, in doEvents
+    processFunc(dequeueFunc())
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 99, in processEvent
+    messenger.send(eventName, paramList)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 337, in send
+    self.__dispatch(acceptorDict, event, sentArgs, foundWatch)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 422, in __dispatch
+    result = method (*(extraArgs + sentArgs))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\main.py", line 299, in text_input
+    e.text_input(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 750, in text_input
+    add_text(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 158, in add_text
+    self.render()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in render
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in <listcomp>
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'int' is not iterable
+
+--- Spielstart: 2026-04-19 17:22:01.709126 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:22:51.515935 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Traceback (most recent call last):
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 49, in eventLoopTask
+    self.doEvents()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 43, in doEvents
+    processFunc(dequeueFunc())
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 99, in processEvent
+    messenger.send(eventName, paramList)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 337, in send
+    self.__dispatch(acceptorDict, event, sentArgs, foundWatch)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 422, in __dispatch
+    result = method (*(extraArgs + sentArgs))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\main.py", line 299, in text_input
+    e.text_input(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 750, in text_input
+    add_text(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 158, in add_text
+    self.render()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in render
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in <listcomp>
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'int' is not iterable
+Traceback (most recent call last):
+  File "D:\Programmieren\aider\main.py", line 455, in <module>
+    app.run()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\main.py", line 321, in run
+    super().run()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\ShowBase.py", line 3331, in run
+    self.taskMgr.run()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\task\Task.py", line 553, in run
+    self.step()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\task\Task.py", line 504, in step
+    self.mgr.poll()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 49, in eventLoopTask
+    self.doEvents()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 43, in doEvents
+    processFunc(dequeueFunc())
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\EventManager.py", line 99, in processEvent
+    messenger.send(eventName, paramList)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 337, in send
+    self.__dispatch(acceptorDict, event, sentArgs, foundWatch)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\direct\showbase\Messenger.py", line 422, in __dispatch
+    result = method (*(extraArgs + sentArgs))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\main.py", line 299, in text_input
+    e.text_input(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 750, in text_input
+    add_text(key)
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\text_field.py", line 158, in add_text
+    self.render()
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in render
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Esisc\AppData\Local\Programs\Python\Python311\Lib\site-packages\ursina\prefabs\input_field.py", line 38, in <listcomp>
+    self.text_field.text = ''.join([e for e in self.text_field.text if e in self.limit_content_to])
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'int' is not iterable
+
+--- Spielstart: 2026-04-19 17:33:05.217603 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Menü geöffnet
+Menü geschlossen
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:33:22.013899 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+Menü geschlossen
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:33:54.046511 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:34:08.187484 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:34:21.478797 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:34:28.954242 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:34:37.216006 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:37:41.710299 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+Menü geschlossen
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:38:00.270904 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:38:19.258131 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:38:23.921628 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 17:42:30.406911 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-19 18:57:55.851030 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-19 18:58:25.667415 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-19 19:02:03.080587 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Menü geöffnet
+
+--- Spielstart: 2026-04-19 19:07:33.430747 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-19 19:09:41.737580 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-20 13:25:07.771129 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 2.389 -> 2.389
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-20 14:18:58.002155 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-20 20:53:07.669327 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-20 21:26:21.777351 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Menü geöffnet
+Menü geschlossen
+Menü geöffnet
+
+--- Spielstart: 2026-04-20 21:50:33.312223 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-20 21:51:48.912247 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-20 22:08:20.478702 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-04-20 23:06:23.505221 ---
+Logging initialisiert.
+os: Windows
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: entity
+Direkter Treffer: entity
+Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Direkter Treffer: entity
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Menü geöffnet
+
+--- Spielstart: 2026-06-14 21:58:00.409731 ---
+Logging initialisiert.
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Treffer: 
+Direkter Treffer: 
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Spieler getroffen – Game Over
+Neues Spiel gestartet.
+Direkter Treffer: 
+Treffer: 
+Treffer: 
+Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Direkter Treffer: 
+Spieler getroffen – Game Over
