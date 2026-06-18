@@ -33,6 +33,7 @@ func setup_input_action(action_name: String, key_code):
 		InputMap.action_add_event(action_name, event)
 
 func _ready():
+	process_mode = PROCESS_MODE_PAUSABLE
 	# Mouse lock by default on desktop
 	if OS.get_name() != "Android" and OS.get_name() != "iOS":
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

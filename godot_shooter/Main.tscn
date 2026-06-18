@@ -141,6 +141,71 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "Neues Spiel"
 
+[node name="PauseButton" type="Button" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 120.0
+offset_bottom = 60.0
+text = "Menü"
+
+[node name="PausePanel" type="Panel" parent="UI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleText" type="Label" parent="UI/PausePanel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 20.0
+offset_right = 100.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 24
+text = "PAUSE"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="UI/PausePanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -20.0
+offset_right = 80.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Weiter"
+
+[node name="QuitButton" type="Button" parent="UI/PausePanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -80.0
+offset_top = -50.0
+offset_right = 80.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Beenden"
+
 [node name="SFX" type="Node" parent="."]
 
 [node name="Shoot" type="AudioStreamPlayer" parent="SFX"]

@@ -5,6 +5,7 @@ var elapsed_time = 0.0
 var current_speed = 0.0
 var game_over_state = false
 var enemy_count = 5
+var is_paused = false
 
 @onready var player = $Player
 @onready var score_text = $UI/ScoreText
@@ -14,6 +15,11 @@ var enemy_count = 5
 @onready var submit_button = $UI/GameOverPanel/SubmitButton
 @onready var restart_button = $UI/GameOverPanel/RestartButton
 
+@onready var pause_button = $UI/PauseButton
+@onready var pause_panel = $UI/PausePanel
+@onready var resume_button = $UI/PausePanel/ResumeButton
+@onready var quit_button = $UI/PausePanel/QuitButton
+
 # Audio players
 @onready var sfx_shoot = $SFX/Shoot
 @onready var sfx_hit = $SFX/Hit
@@ -21,13 +27,22 @@ var enemy_count = 5
 @onready var sfx_step = $SFX/Step
 
 func _ready():
+	process_mode = PROCESS_MODE_ALWAYS
+	$UI.process_mode = PROCESS_MODE_ALWAYS
+	$Player.process_mode = PROCESS_MODE_PAUSABLE
+	$Ground.process_mode = PROCESS_MODE_PAUSABLE
+	$SFX.process_mode = PROCESS_MODE_PAUSABLE
+
 	randomize()
 	submit_button.pressed.connect(submit_score)
 	restart_button.pressed.connect(restart_game)
+	pause_button.pressed.connect(toggle_pause)
+	resume_button.pressed.connect(toggle_pause)
+	quit_button.pressed.connect(quit_game)
 	restart_game()
 
 func _physics_process(delta):
-	if game_over_state: return
+	if game_over_state or get_tree().paused: return
 	
 	elapsed_time += delta
 	if elapsed_time < 1.0:
@@ -87,7 +102,8 @@ func trigger_game_over():
 	# Show mouse on PC
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
-	# Show game over UI panel
+	# Hide pause button and show game over UI panel
+	if pause_button: pause_button.hide()
 	game_over_panel.show()
 	name_input.editable = true
 	submit_button.disabled = false
@@ -107,9 +123,10 @@ func submit_score():
 	restart_button.disabled = false
 
 func restart_game():
-	# Clear active enemies
+	# Clear active enemies immediately from the group so respawn doesn't count them
 	var active_enemies = get_tree().get_nodes_in_group("enemies")
 	for enemy in active_enemies:
+		enemy.remove_from_group("enemies")
 		enemy.queue_free()
 		
 	# Reset state
@@ -118,6 +135,8 @@ func restart_game():
 	current_speed = 0.0
 	game_over_state = false
 	score_text.text = "Score: 0"
+	is_paused = false
+	get_tree().paused = false
 	
 	# Reset player position
 	if player:
@@ -126,8 +145,10 @@ func restart_game():
 		if OS.get_name() != "Android" and OS.get_name() != "iOS":
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			
-	# Hide Game Over overlay
+	# Hide UI overlays
 	game_over_panel.hide()
+	if pause_panel: pause_panel.hide()
+	if pause_button: pause_button.show()
 	
 	# Respawn
 	call_deferred("respawn_enemies")
@@ -145,3 +166,22 @@ func play_sound(sound_name: String):
 
 func quit_game():
 	get_tree().quit()
+
+func _unhandled_input(event):
+	if event.is_action_pressed("ui_cancel"):
+		if not game_over_state:
+			toggle_pause()
+
+func toggle_pause():
+	is_paused = not is_paused
+	get_tree().paused = is_paused
+	
+	if is_paused:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		pause_panel.show()
+		pause_button.hide()
+	else:
+		if OS.get_name() != "Android" and OS.get_name() != "iOS":
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		pause_panel.hide()
+		pause_button.show()

@@ -3,6 +3,9 @@ extends CharacterBody3D
 var speed = 2.0
 @onready var player = get_node("../Player")
 
+func _ready():
+	process_mode = PROCESS_MODE_PAUSABLE
+
 func _physics_process(delta):
 	if get_parent().game_over_state:
 		return

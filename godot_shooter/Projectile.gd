@@ -5,6 +5,7 @@ var direction = Vector3.FORWARD
 var lifetime = 2.0
 
 func _ready():
+	process_mode = PROCESS_MODE_PAUSABLE
 	body_entered.connect(_on_body_entered)
 
 func _physics_process(delta):
