@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // --- Deployment Backend Configuration ---
-  const BACKEND_URL = 'https://riverbed-subpanel-volumes.ngrok-free.dev'; // Hier deine Render-URL eintragen!
+  const BACKEND_URL = 'https://website-qcox.onrender.com'; // Hier deine Render-URL eintragen!
 
   function getApiBaseUrl() {
     if (window.location.hostname === 'localhost' ||
