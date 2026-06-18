@@ -6,6 +6,9 @@ WORKDIR /app
 # Copy all files into the container
 COPY . /app
 
+# Ensure the C++ binary is executable
+RUN chmod +x "/app/c++ spiel/a.out"
+
 # Expose the default port (will be overridden by environment variables in cloud hosts)
 EXPOSE 8000
 
