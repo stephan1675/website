@@ -216,7 +216,10 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 
                 session_id = str(uuid.uuid4())
                 if run_wsl:
-                    cmd = ['wsl', './a.out']
+                    if sys.platform.startswith('win'):
+                        cmd = ['wsl', './a.out']
+                    else:
+                        cmd = ['./a.out']
                 else:
                     cmd = [os.path.join(cpp_dir, selected_exe)]
                 
