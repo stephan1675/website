@@ -24,6 +24,7 @@ class Logger:
         """
         self.terminal.write(message)
         self.log.write(message)
+        self.flush()
 
     def flush(self):
         """Leert die Puffer von Terminal und Logfile."""
@@ -63,7 +64,7 @@ class Projectile(Entity):
             destroy(self)
             return
 
-        hit_info = self.intersects()
+        hit_info = self.intersects(ignore=[state['player']])
         if hit_info.hit and hit_info.entity in state["enemies"]:
             if state["hit_sound"]:
                 state["hit_sound"].play()

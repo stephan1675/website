@@ -66,16 +66,22 @@
         </section>
 
         <!-- Card: Python Shooter -->
-        <section class="dash-card">
+        <section class="dash-card" style="display: flex; flex-direction: column;">
           <div class="card-title-wrapper">
             <i class="fa-brands fa-python card-icon" style="color: #ffd43b;"></i>
             <h3>Python Shooter</h3>
           </div>
-          <p class="card-description">Starte das in Python und der Ursina-Engine entwickelte 3D Shooter-Spiel.</p>
-          <button id="btn-run-python" class="btn btn-primary" style="background: linear-gradient(135deg, #306998, #ffd43b); border: none;">
-            <span>Spiel starten</span>
-            <i class="fa-solid fa-play"></i>
-          </button>
+          <p class="card-description" style="flex-grow: 1;">Starte das in Python und der Ursina-Engine entwickelte 3D Shooter-Spiel.</p>
+          <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <button id="btn-run-python" class="btn btn-primary" style="flex: 1; background: linear-gradient(135deg, #306998, #ffd43b); border: none;">
+              <span>Spiel starten</span>
+              <i class="fa-solid fa-play"></i>
+            </button>
+            <a href="python shooter/dist/python_shooter.exe" class="btn btn-secondary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; border-color: var(--glass-border); color: var(--color-text-primary); background: rgba(255,255,255,0.05);" download>
+              <span>Download</span>
+              <i class="fa-solid fa-download"></i>
+            </a>
+          </div>
         </section>
 
         <!-- Card: C++ Spiel -->
@@ -118,14 +124,18 @@
           <span class="project-tag">HTML5 / CSS3 / Vanilla JS</span>
         </section>
 
-        <!-- Project Placeholder 2 -->
-        <section class="dash-card project-placeholder">
+        <!-- Project 2: Python Shooter -->
+        <section class="dash-card" style="display: flex; flex-direction: column;">
           <div class="card-title-wrapper">
-            <i class="fa-solid fa-folder-plus card-icon" style="color: var(--color-text-muted);"></i>
-            <h3>Neues Projekt</h3>
+            <i class="fa-brands fa-python card-icon" style="color: #ffd43b;"></i>
+            <h3>Python Shooter 3D</h3>
           </div>
-          <p class="card-description">Dieser Platzhalter steht bereit für deine zukünftigen Projekte, Skripte und Applikationen.</p>
-          <span class="project-tag tag-placeholder">In Planung</span>
+          <p class="card-description" style="flex-grow: 1;">Ein packendes 3D-Shooter-Spiel, entwickelt mit Python und der Ursina-Engine. Beweise deine Reflexe gegen herannahende Feinde und speichere deinen Score in der Bestenliste!</p>
+          <span class="project-tag" style="align-self: flex-start; margin-bottom: 1rem;">Python / Ursina Engine</span>
+          <a href="python shooter/dist/python_shooter.exe" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; border-color: var(--glass-border); color: var(--color-text-primary); background: rgba(255,255,255,0.05);" download>
+            <span>Herunterladen (.exe)</span>
+            <i class="fa-solid fa-download"></i>
+          </a>
         </section>
 
         <!-- Project Placeholder 3 -->

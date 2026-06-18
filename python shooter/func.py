@@ -6,9 +6,15 @@ import os
 import random
 import json
 
+# Base directory for executable / script
+if getattr(sys, 'frozen', False):
+    exe_dir = os.path.dirname(sys.executable)
+else:
+    exe_dir = os.path.dirname(os.path.abspath(__file__))
+
 state = {
-    'log_file_path': "game_log.txt",
-    'highscore_file': "highscores.json",
+    'log_file_path': os.path.join(exe_dir, "game_log.txt"),
+    'highscore_file': os.path.join(exe_dir, "highscores.json"),
     'max_highscores': 10,
     'enemy_count': 5,
     'logger': None,
@@ -36,6 +42,7 @@ state = {
     'die_sound': None,
     'step_sound': None,
 }
+
 
 # ── Highscores ────────────────────────────────────────────────────────────────
 
@@ -104,11 +111,24 @@ def format_top10(scores):
 
 def spawn_enemy():
     """Erstellt einen neuen Feind zufällig in der Spielwelt und fügt ihn der Feindeliste hinzu."""
+    # Verhindern, dass Feinde direkt auf oder zu nah am Spieler spawnen
+    print(f"Spawning enemy. Player state: {state['player']}")
+    if state['player']:
+        print(f"Player position: {state['player'].position}")
+    while True:
+        pos = Vec3(random.uniform(-20, 20), 0.5, random.uniform(-20, 20))
+        if state['player'] is None:
+            break
+        d = distance(state['player'].position, pos)
+        print(f"Calculated spawn distance to player position {state['player'].position} is {d:.3f} for pos {pos}")
+        if d > 5.0:
+            break
+
     enemy = Entity(
         model="cube",
         color=color.red,
         scale=1,
-        position=Vec3(random.uniform(-20, 20), 0.5, random.uniform(-20, 20)),
+        position=pos,
         collider="box",
     )
     state['enemies'].append(enemy)
@@ -173,6 +193,8 @@ def restart_game():
 
     state['player'].position = Vec3(0, 1, 0)
     state['player'].enable()
+    mouse.visible = False
+    mouse.locked = True
     print("Neues Spiel gestartet.")
 
 # ── Sound ─────────────────────────────────────────────────────────────────────
@@ -253,7 +275,14 @@ def update():
     if state['menu_visible'] or state['game_over']:
         return
 
-    state['elapsed_time'] += time.dt
+    # Begrenze dt, um extreme Sprünge bei Lag-Spikes oder beim Laden zu verhindern
+    dt = min(time.dt, 0.1)
+
+    state['elapsed_time'] += dt
+
+    # Start-Verzögerung: Feinde bewegen sich erst nach 1 Sekunde aktiver Spielzeit
+    if state['elapsed_time'] < 1.0:
+        return
 
     # Schrittgeräusch
     if state['step_sound'] and any(held_keys[k] for k in ("w", "a", "s", "d")):
@@ -263,8 +292,10 @@ def update():
     base_speed = 2 + state['elapsed_time'] * 0.5
 
     for enemy in state['enemies']:
-        direction_to_player = (state['player'].position - enemy.position).normalized()
-        enemy.position += direction_to_player * time.dt * base_speed
+        direction_to_player = state['player'].position - enemy.position
+        direction_to_player.y = 0
+        direction_to_player = direction_to_player.normalized()
+        enemy.position += direction_to_player * dt * base_speed
 
         # Weltgrenzen
         if enemy.x >  25: enemy.x = -25
@@ -273,9 +304,15 @@ def update():
         if enemy.z < -25: enemy.z =  25
 
         # Kollision Spieler ↔ Gegner
-        if distance(state['player'].position, enemy.position) < 1.5:
+        dist_to_player = distance(state['player'].position, enemy.position)
+        if dist_to_player < 1.5:
+            print(f"Collision! Distance: {dist_to_player:.3f}")
+            print(f"Player pos: {state['player'].position}")
+            print(f"Enemy pos: {enemy.position}")
             state['game_over'] = True
             state['player'].disable()
+            mouse.visible = True
+            mouse.locked = False
             state['game_over_entity'].enabled = True
             if state['die_sound']:
                 state['die_sound'].play()
@@ -320,7 +357,7 @@ def setup(app):
 
     # Sounds
     state['shoot_sound'] = load_sound("shoot1.wav")
-    state['hit_sound']   = load_sound("explode5.wav")
+    state['hit_sound']   = load_sound("explode5.ogg")
     state['die_sound']   = load_sound("die-sound.wav")
     state['step_sound']  = load_sound("step5.wav")
 
