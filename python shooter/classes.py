@@ -22,13 +22,15 @@ class Logger:
         Args:
             message (str): Zu schreibende Nachricht.
         """
-        self.terminal.write(message)
+        if self.terminal is not None:
+            self.terminal.write(message)
         self.log.write(message)
         self.flush()
 
     def flush(self):
         """Leert die Puffer von Terminal und Logfile."""
-        self.terminal.flush()
+        if self.terminal is not None:
+            self.terminal.flush()
         self.log.flush()
 
 
