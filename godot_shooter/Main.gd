@@ -39,6 +39,11 @@ func _ready():
 	pause_button.pressed.connect(toggle_pause)
 	resume_button.pressed.connect(toggle_pause)
 	quit_button.pressed.connect(quit_game)
+	
+	var shoot_btn = get_node_or_null("UI/MobileControls/ShootButton")
+	if shoot_btn:
+		shoot_btn.pressed.connect(_on_shoot_button_pressed)
+		
 	restart_game()
 
 func _physics_process(delta):
@@ -102,8 +107,11 @@ func trigger_game_over():
 	# Show mouse on PC
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
-	# Hide pause button and show game over UI panel
+	# Hide pause button and mobile controls, show game over UI panel
 	if pause_button: pause_button.hide()
+	var mobile_controls = get_node_or_null("UI/MobileControls")
+	if mobile_controls: mobile_controls.hide()
+	
 	game_over_panel.show()
 	name_input.editable = true
 	submit_button.disabled = false
@@ -150,6 +158,14 @@ func restart_game():
 	if pause_panel: pause_panel.hide()
 	if pause_button: pause_button.show()
 	
+	# Update mobile controls visibility
+	var mobile_controls = get_node_or_null("UI/MobileControls")
+	if mobile_controls:
+		if DisplayServer.is_touchscreen_available() or OS.get_name() == "Android" or OS.get_name() == "iOS":
+			mobile_controls.show()
+		else:
+			mobile_controls.hide()
+	
 	# Respawn
 	call_deferred("respawn_enemies")
 
@@ -176,12 +192,21 @@ func toggle_pause():
 	is_paused = not is_paused
 	get_tree().paused = is_paused
 	
+	var mobile_controls = get_node_or_null("UI/MobileControls")
 	if is_paused:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		pause_panel.show()
 		pause_button.hide()
+		if mobile_controls: mobile_controls.hide()
 	else:
 		if OS.get_name() != "Android" and OS.get_name() != "iOS":
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		pause_panel.hide()
 		pause_button.show()
+		if mobile_controls:
+			if DisplayServer.is_touchscreen_available() or OS.get_name() == "Android" or OS.get_name() == "iOS":
+				mobile_controls.show()
+
+func _on_shoot_button_pressed():
+	if player and not game_over_state and not get_tree().paused:
+		player.shoot()

@@ -12,6 +12,9 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 var shoot_cooldown = false
 
+@onready var move_joystick = get_node_or_null("../UI/MobileControls/MoveJoystick")
+@onready var look_joystick = get_node_or_null("../UI/MobileControls/LookJoystick")
+
 # Setup inputs dynamically if they don't exist
 func _enter_tree():
 	setup_input_action("move_forward", KEY_W)
@@ -56,12 +59,21 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	# Check keyboard and simulated touch actions
+	# Look rotation from virtual joystick (Left bottom)
+	if look_joystick and look_joystick.joystick_vector != Vector2.ZERO:
+		rotate_y(-look_joystick.joystick_vector.x * 2.5 * delta)
+		camera.rotate_x(-look_joystick.joystick_vector.y * 2.0 * delta)
+		camera.rotation.x = clamp(camera.rotation.x, -PI/2.5, PI/2.5)
+
+	# Check keyboard or virtual move joystick (Right bottom)
 	var input_dir = Vector2.ZERO
-	if Input.is_action_pressed("move_forward"): input_dir.y -= 1
-	if Input.is_action_pressed("move_backward"): input_dir.y += 1
-	if Input.is_action_pressed("move_left"): input_dir.x -= 1
-	if Input.is_action_pressed("move_right"): input_dir.x += 1
+	if move_joystick and move_joystick.joystick_vector != Vector2.ZERO:
+		input_dir = move_joystick.joystick_vector
+	else:
+		if Input.is_action_pressed("move_forward"): input_dir.y -= 1
+		if Input.is_action_pressed("move_backward"): input_dir.y += 1
+		if Input.is_action_pressed("move_left"): input_dir.x -= 1
+		if Input.is_action_pressed("move_right"): input_dir.x += 1
 
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
