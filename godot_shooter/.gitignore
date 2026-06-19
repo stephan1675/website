@@ -1,2 +1,4 @@
 # Godot 4.x gitignore
 .godot/
+*.apk
+*.idsig
