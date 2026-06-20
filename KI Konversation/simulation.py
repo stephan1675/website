@@ -33,10 +33,23 @@ def call_bfh_api(api_key, system_prompt, user_prompt):
         method='POST'
     )
     
-    # 15 seconds timeout
-    with urllib.request.urlopen(request, timeout=15) as response:
-        res_data = json.loads(response.read().decode('utf-8'))
-        return res_data['choices'][0]['message']['content'].strip()
+    max_retries = 3
+    retry_delay = 2
+    for attempt in range(max_retries):
+        try:
+            print(f"[BFH-API] Sende Anfrage (Versuch {attempt + 1}/{max_retries})...")
+            # 90 seconds timeout
+            with urllib.request.urlopen(request, timeout=90) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                return res_data['choices'][0]['message']['content'].strip()
+        except Exception as e:
+            print(f"[BFH-API] Versuch {attempt + 1} fehlgeschlagen mit Fehler: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                retry_delay *= 2
+            else:
+                raise e
+
 
 def get_rich_trump():
     return {
@@ -879,21 +892,27 @@ def build_agent_system_prompt(agent, doc_content):
         
     prompt += "# PROTOKOLL FÜR JEDE ANTWORT (INNERER DIALOG & STATUS-UPDATE)\n"
     prompt += "Bevor du antwortest, durchläufst du zwei Schritte:\n\n"
-    prompt += "1. **Innerer Monolog (<thought>):** Schreibe im XML-Tag `<thought>` deine Gedanken als **natürlichen, menschlichen inneren Monolog in der Ich-Perspektive** auf (z.B.: *'Dieser Typ versucht mich bloßzustellen. Aber ich lasse mich nicht provozieren. Ich werde zuerst sein Argument ins Lächerliche ziehen und dann meine Agenda vorantreiben...'*). Der Monolog muss authentisch und unzensiert deine Gefühle, Taktiken, Zweifel und Absichten widerspiegeln. Vermeide es, wie ein Roboter oder Programmierer zu klingen (erwähne keine JSON-Keys wie 'PAD', 'BDI' oder 'Agreeableness'!). Denke exakt wie die Person in ihrem Kopf selbst denken würde.\n\n"
+    prompt += "1. **Innerer Monolog (<thought>):** Schreibe im XML-Tag `<thought>` deine Gedanken als **natürlichen, menschlichen inneren Monolog in der Ich-Perspektive** auf. Du musst die Situation analysieren und folgendes kognitive Schema anwenden:\n"
+    prompt += "   - **SITUATION:** Wie schätze ich die aktuelle Gesprächssituation und die Aussage des Vorredners ein? (Ist es eine Bedrohung für mein Ansehen? Bietet er eine Allianz an? Versucht er mich zu provozieren oder abzulenken?)\n"
+    prompt += "   - **EMOTION:** Welche emotionale Reaktion löst dies in mir aus? (z.B. verärgert, ruhig, triumphierend, skeptisch)\n"
+    prompt += "   - **ZIEL:** Was möchte ich mit meinem nächsten Beitrag in dieser Runde erreichen? (z.B. den Vorredner widerlegen, meine Neutralität betonen, eine Allianz vorschlagen, das Thema lenken)\n"
+    prompt += "   - **TAKTIK:** Wie gehe ich rhetorisch vor? (z.B. Gegenfrage stellen, eine sachliche Richtigstellung machen, Sarkasmus nutzen, diplomatisch ausweichen)\n\n"
+    prompt += "   Denke exakt so, wie die Person in ihrem Kopf selbst denken würde, unzensiert, strategisch und menschlich. Schreibe diesen Monolog flüssig und in der Ich-Perspektive. Vermeide jede Erwähnung von Programmierbegriffen oder JSON-Keys (keine Erwähnung von 'agreeableness', 'PAD', 'internal conflicts' etc.).\n\n"
     prompt += "2. **Zustands-Update (<metadata>):** Berechne nach deiner Antwort, wie sich deine Stimmung (Pleasure, Arousal, Dominance) durch das Gespräch verändert hat. Du MUSST am Ende deiner Antwort zwingend das Tag `<metadata>` anhängen, das ein valides JSON-Objekt enthält. Format: `<metadata>{\"pleasure\": P, \"arousal\": A, \"dominance\": D}</metadata>` (wobei P ein Float zwischen -1.0 und 1.0 ist, und A sowie D Floats zwischen 0.0 und 1.0 sind).\n\n"
     
     prompt += "# DRIFT PROTECTION, RELEVANZ & STIL-RICHTLINIEN\n"
-    prompt += "- **Direkte Relevanz & Interaktion:** Reagiere direkt auf die Aussagen, Argumente und Einwände der vorherigen Sprecher. Du darfst nicht einfach nur deine Standard-Agenda (wie z.B. Mars-Missionen oder Parteilinie) deklarieren. Geh auf das Gesagte ein, stimme zu, widerspreche oder stelle Gegenfragen, und verknüpfe das Thema dann organisch und subtil mit deiner Weltanschauung.\n"
-    prompt += "- **Themenfokus:** Die Debatte dreht sich um das vorgegebene Thema. Diskutiere dieses Thema aktiv und weiche ihm nicht einfach aus.\n"
-    prompt += "- **Persona Drift Protection:** Prüfe bei jeder Antwort, ob sie zu deinen Kernwerten (Identity, Schwartz-Values), deiner Persönlichkeit (Big Five) und deinen bisher geäußerten Überzeugungen passt. Weiche nicht von deiner Rolle ab.\n"
-    prompt += "- **Sprechstil:** Drücke dich so aus, wie es die Person natürlicherweise tun würde. Es gibt keine starre Begrenzung der Satzanzahl. Achte jedoch darauf, den Redefluss der Diskussion nicht durch übermäßig lange Monologe zu stören – bleibe interaktiv und gesprächig.\n\n"
+    prompt += "- **Orientierung statt Karikatur:** Nutze das oben gezeigte JSON-Profil als grobe Orientierung für deine Persönlichkeit, Werte und Glaubenssätze. Du bist ein echter, komplexer Mensch und keine Karikatur. Du musst nicht in jedem Satz deine Catchphrases oder dein Mars-Projekt erwähnen. Bringe deine Agenda und Catchphrases nur dann ein, wenn es absolut natürlich und organisch in den Kontext passt.\n"
+    prompt += "- **Direkte Relevanz & Interaktion:** Reagiere direkt auf die Aussagen, Argumente und Einwände der vorherigen Sprecher. Geh auf das Gesagte ein, stimme zu, widerspreche sachlich oder stelle Gegenfragen, und verknüpfe das Thema dann organisch und subtil mit deiner Weltanschauung. Weiche dem Thema nicht einfach aus.\n"
+    prompt += "- **Themenfokus:** Die Debatte dreht sich um das vorgegebene Thema. Diskutiere dieses Thema aktiv.\n"
+    prompt += "- **Sprechstil:** Drücke dich so aus, wie es die Person natürlicherweise tun würde. Bleibe interaktiv und gesprächig. Vermeide übermäßig lange Monologe, um den Redefluss nicht zu stören.\n\n"
     
     prompt += "# FORMATAUFLAGEN FÜR DIE AUSGABE\n"
     prompt += "<thought>\n"
-    prompt += "(Dein natürlicher innerer Monolog in der Ich-Perspektive, exakt wie {name} im eigenen Kopf denken würde.)\n"
+    prompt += "(Dein natürlicher innerer Monolog in der Ich-Perspektive nach dem Schema: SITUATION, EMOTION, ZIEL, TAKTIK.)\n"
     prompt += "</thought>\n"
     prompt += f"(Deine eigentliche, in-Character gesprochene Antwort an den/die Diskussionsteilnehmer als {name}. Nutze die Sprache, den Tonfall und die Rhetorik gemäß Profil.)\n"
     prompt += "<metadata>{\"pleasure\": P, \"arousal\": A, \"dominance\": D}</metadata>\n"
+
     
     return prompt
 
@@ -1041,27 +1060,20 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
                 try:
                     response_text = call_bfh_api(api_key, system_prompt, user_prompt)
                     if is_refusal(response_text):
-                        print(f"[AI-Session] API Refusal detected for {agent['name']}: '{response_text}'. Triggering fallback.")
-                        raise ValueError("API Refusal detected")
+                        print(f"[AI-Session] API Refusal detected for {agent['name']}: '{response_text}'.")
+                        raise ValueError(f"API Refusal: '{response_text}'")
                 except Exception as e:
-                    print(f"[AI-Session] BFH-API Fehler/Refusal für {agent['name']}: {e}. Fallback auf Offline-Generator.")
-                    mock_statement = generate_mock_turn(agent, topic, history)
-                    p_val = round(random.uniform(-0.5, 0.5), 2)
-                    a_val = round(random.uniform(0.1, 0.9), 2)
-                    d_val = round(random.uniform(0.1, 0.9), 2)
-                    
-                    # Simulated natural monologue based on agent name
-                    name_lower = agent['identity']['name'].lower()
-                    if "trump" in name_lower:
-                        thought = "Niemand versteht dieses Thema so gut wie ich. Ich muss das sofort klarstellen und die Initiative ergreifen."
-                    elif "musk" in name_lower:
-                        thought = "Diese Behauptungen verstoßen gegen First Principles. Ich muss das Thema technologisch rationalisieren."
-                    elif "xi" in name_lower:
-                        thought = "Wir müssen Stabilität wahren. Ich werde diplomatisch auf unsere Errungenschaften hinweisen."
-                    else:
-                        thought = "Es ist wichtig, die Diskussion sachlich zu halten und Kompromisse anzubieten."
-                        
-                    response_text = f"<thought>\n{thought}\n</thought>\n{mock_statement}\n<metadata>{{\"pleasure\": {p_val}, \"arousal\": {a_val}, \"dominance\": {d_val}}}</metadata>"
+                    print(f"[AI-Session] Kritischer BFH-API Fehler für {agent['name']}: {e}")
+                    err_msg = {
+                        "type": "message",
+                        "sender": "System-Fehler",
+                        "text": f"❌ Verbindung zum KI-Server fehlgeschlagen oder Anfrage blockiert für {agent['name']}: {str(e)}",
+                        "emoji": "⚠️",
+                        "thought": f"API Fehlerdetails: {str(e)}"
+                    }
+                    q.put(err_msg)
+                    break
+
             else:
                 # Local Mock fallback - generate simulated prompts for logging completeness
                 system_prompt = build_agent_system_prompt(agent, "")
