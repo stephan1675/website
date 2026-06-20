@@ -1,0 +1,65 @@
+
+--- Spielstart: 2026-06-18 21:46:25.812486 ---
+Logging initialisiert.
+no audio found with name: shoot1.wav supported formats: .ogg, .wav
+[93mwarning: missing audio clip: shoot1.wav [0m
+no audio found with name: explode5.ogg supported formats: .ogg, .wav
+[93mwarning: missing audio clip: explode5.ogg [0m
+no audio found with name: die-sound.wav supported formats: .ogg, .wav
+[93mwarning: missing audio clip: die-sound.wav [0m
+no audio found with name: step5.wav supported formats: .ogg, .wav
+[93mwarning: missing audio clip: step5.wav [0m
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 11.367 for pos Vec3(5.32392, 0.5, -9.992807)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 22.291 for pos Vec3(-10.181853, 0.5, 19.804527)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 14.588 for pos Vec3(-13.983057, 0.5, 4.0370664)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 6.505 for pos Vec3(4.2453737, 0.5, -4.826994)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 15.165 for pos Vec3(-5.050628, 0.5, -14.263921)
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Collision! Distance: 1.491
+Player pos: Vec3(0, -0.49899995, 0)
+Enemy pos: Vec3(0.7307132, 0.5, -0.83082193)
+die-sound.wav has no audio clip
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 21:49:20.264811 ---
+Logging initialisiert.
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 14.691 for pos Vec3(-7.5505104, 0.5, 12.56311)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 18.687 for pos Vec3(-18.123315, 0.5, -4.445513)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 23.538 for pos Vec3(-19.284381, 0.5, 13.459104)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 13.607 for pos Vec3(-12.292355, 0.5, -5.748105)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 12.023 for pos Vec3(7.65649, 0.5, 9.215969)
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Collision! Distance: 1.498
+Player pos: Vec3(0, -0.49899995, 0)
+Enemy pos: Vec3(0.71343916, 0.5, 0.8587527)
+Spieler getroffen – Game Over

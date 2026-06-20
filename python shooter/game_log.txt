@@ -1354,3 +1354,340 @@ Direkter Treffer:
 Direkter Treffer: 
 Direkter Treffer: 
 Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 21:36:26.780319 ---
+Logging initialisiert.
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 21:36:41.515423 ---
+Logging initialisiert.
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 21:36:54.254416 ---
+Logging initialisiert.
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Collision! Distance: 1.490
+Player pos: Vec3(0, -0.49899995, 0)
+Enemy pos: Vec3(1.0443981, 0.5, -0.36059385)
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 21:37:10.608871 ---
+Logging initialisiert.
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 20.014 for pos Vec3(-19.291114, 0.5, 5.236706)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 21.348 for pos Vec3(7.631415, 0.5, -19.912107)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 11.425 for pos Vec3(-1.6596912, 0.5, -11.259528)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 7.386 for pos Vec3(-7.3183064, 0.5, 0.008601903)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 19.612 for pos Vec3(-12.855462, 0.5, 14.776848)
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Collision! Distance: 1.470
+Player pos: Vec3(0, -0.49899995, 0)
+Enemy pos: Vec3(-1.0778345, 0.5, 0.0012668812)
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 21:37:28.540289 ---
+Logging initialisiert.
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 13.071 for pos Vec3(-12.176847, 0.5, -4.6443872)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 15.705 for pos Vec3(-9.999214, 0.5, -12.069035)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 20.910 for pos Vec3(14.21988, 0.5, -15.2976264)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 5.878 for pos Vec3(-3.8433823, 0.5, 4.3339443)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 21.021 for pos Vec3(14.441147, 0.5, 15.243061)
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Collision! Distance: 1.467
+Player pos: Vec3(0, -0.49899995, 0)
+Enemy pos: Vec3(-0.7126371, 0.5, 0.8035963)
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 21:37:48.145046 ---
+Logging initialisiert.
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 8.553 for pos Vec3(-4.285757, 0.5, 7.334451)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 20.810 for pos Vec3(19.764484, 0.5, 6.434771)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 20.540 for pos Vec3(-18.348222, 0.5, 9.179081)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 15.332 for pos Vec3(-14.652629, 0.5, 4.4031333)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 14.161 for pos Vec3(13.275086, 0.5, -4.827297)
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Collision! Distance: 1.479
+Player pos: Vec3(0, -0.49899995, 0)
+Enemy pos: Vec3(-0.5502477, 0.5, 0.9416691)
+Spieler getroffen – Game Over
+
+--- Spielstart: 2026-06-18 22:17:44.063907 ---
+Logging initialisiert.
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 17.822 for pos Vec3(17.691307, 0.5, 1.9077502)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 18.986 for pos Vec3(4.258456, 0.5, 18.474847)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 14.213 for pos Vec3(8.21343, 0.5, -11.557017)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 19.069 for pos Vec3(9.916315, 0.5, -16.257387)
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49900007, 0)
+Calculated spawn distance to player position Vec3(0, -0.49900007, 0) is 9.591 for pos Vec3(-9.462124, 0.5, 1.2038284)
+os: Windows
+python version: 3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]
+ursina version: 8.3.0
+development mode: True
+application successfully started
+info: changed aspect ratio: 1.6 -> 1.6
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(0, -0.49899995, 0)
+Calculated spawn distance to player position Vec3(0, -0.49899995, 0) is 19.848 for pos Vec3(-4.8527827, 0.5, -19.219446)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-3.0158951, -0.49899995, 2.826127)
+Calculated spawn distance to player position Vec3(-3.0158951, -0.49899995, 2.826127) is 6.117 for pos Vec3(2.7211618, 0.5, 0.953896)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-4.3012957, -0.49899995, 6.5262217)
+Calculated spawn distance to player position Vec3(-4.3012957, -0.49899995, 6.5262217) is 16.295 for pos Vec3(6.9677166, 0.5, 18.254221)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-2.0275988, -0.49899995, 9.110393)
+Calculated spawn distance to player position Vec3(-2.0275988, -0.49899995, 9.110393) is 23.709 for pos Vec3(-7.8427267, 0.5, -13.852329)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-0.24674111, -0.49899995, 10.099663)
+Calculated spawn distance to player position Vec3(-0.24674111, -0.49899995, 10.099663) is 26.679 for pos Vec3(-6.9991254, 0.5, -15.691489)
+Collision! Distance: 1.485
+Player pos: Vec3(1.1325148, -0.49899995, 11.304778)
+Enemy pos: Vec3(1.6164824, 0.5, 12.290837)
+Spieler getroffen – Game Over
+Spawning enemy. Player state: 
+Player position: Vec3(1.1325148, -0.49899995, 11.304778)
+Calculated spawn distance to player position Vec3(1.1325148, -0.49899995, 11.304778) is 25.252 for pos Vec3(-13.274928, 0.5, -9.409447)
+Spawning enemy. Player state: 
+Player position: Vec3(1.1325148, -0.49899995, 11.304778)
+Calculated spawn distance to player position Vec3(1.1325148, -0.49899995, 11.304778) is 16.116 for pos Vec3(11.39193, 0.5, -1.0829661)
+Spawning enemy. Player state: 
+Player position: Vec3(1.1325148, -0.49899995, 11.304778)
+Calculated spawn distance to player position Vec3(1.1325148, -0.49899995, 11.304778) is 21.085 for pos Vec3(-13.344533, 0.5, -3.9917755)
+Spawning enemy. Player state: 
+Player position: Vec3(1.1325148, -0.49899995, 11.304778)
+Calculated spawn distance to player position Vec3(1.1325148, -0.49899995, 11.304778) is 19.299 for pos Vec3(-15.002396, 0.5, 0.7634606)
+Spawning enemy. Player state: 
+Player position: Vec3(1.1325148, -0.49899995, 11.304778)
+Calculated spawn distance to player position Vec3(1.1325148, -0.49899995, 11.304778) is 19.682 for pos Vec3(-8.37721, 0.5, -5.8986835)
+Neues Spiel gestartet.
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-1.5294915, -0.49899995, -2.0431604)
+Calculated spawn distance to player position Vec3(-1.5294915, -0.49899995, -2.0431604) is 21.658 for pos Vec3(3.317153, 0.5, 19.041667)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-2.7576255, -0.49899995, -3.5316591)
+Calculated spawn distance to player position Vec3(-2.7576255, -0.49899995, -3.5316591) is 18.658 for pos Vec3(-1.098801, 0.5, 15.025829)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-4.3039803, -0.49899995, -6.650469)
+Calculated spawn distance to player position Vec3(-4.3039803, -0.49899995, -6.650469) is 16.513 for pos Vec3(11.353291, 0.5, -1.4980602)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-6.583065, -0.49899995, -8.39264)
+Calculated spawn distance to player position Vec3(-6.583065, -0.49899995, -8.39264) is 24.281 for pos Vec3(9.130839, 0.5, 10.09137)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 37.007 for pos Vec3(12.891616, 0.5, -3.244721)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 27.875 for pos Vec3(4.5561175, 0.5, -7.115051)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 37.156 for pos Vec3(16.882823, 0.5, -12.532065)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 17.279 for pos Vec3(-2.3663365, 0.5, -17.548492)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 41.907 for pos Vec3(-17.52341, 0.5, 19.982111)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 43.090 for pos Vec3(19.028812, 0.5, -1.7657287)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 17.316 for pos Vec3(-18.115385, 0.5, -4.6240892)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 40.179 for pos Vec3(-4.2591662, 0.5, 15.45355)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 28.466 for pos Vec3(6.73968, 0.5, -9.904507)
+Collision! Distance: 1.466
+Player pos: Vec3(-19.06288, -0.49899995, -21.8851)
+Enemy pos: Vec3(-19.004062, 0.5, -20.813585)
+Spieler getroffen – Game Over
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 35.128 for pos Vec3(-5.5335984, 0.5, 10.517853)
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 25.061 for pos Vec3(3.2097744, 0.5, -10.44082)
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 45.217 for pos Vec3(2.4943375, 0.5, 17.849508)
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 18.636 for pos Vec3(-0.557405, 0.5, -19.924066)
+Spawning enemy. Player state: 
+Player position: Vec3(-19.06288, -0.49899995, -21.8851)
+Calculated spawn distance to player position Vec3(-19.06288, -0.49899995, -21.8851) is 7.013 for pos Vec3(-19.008817, 0.5, -14.943358)
+Neues Spiel gestartet.
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-7.5172653, -0.49899995, -6.080399)
+Calculated spawn distance to player position Vec3(-7.5172653, -0.49899995, -6.080399) is 33.645 for pos Vec3(15.357507, 0.5, 18.571556)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-16.05307, -0.49899995, -9.117082)
+Calculated spawn distance to player position Vec3(-16.05307, -0.49899995, -9.117082) is 23.496 for pos Vec3(-6.1637973, 0.5, 12.172496)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-17.285642, -0.49899995, -10.694063)
+Calculated spawn distance to player position Vec3(-17.285642, -0.49899995, -10.694063) is 30.002 for pos Vec3(9.948274, 0.5, 1.8537451)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.688442, -0.49899995, -18.641952)
+Calculated spawn distance to player position Vec3(-21.688442, -0.49899995, -18.641952) is 28.046 for pos Vec3(6.151426, 0.5, -15.399208)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 34.662 for pos Vec3(-0.52723425, 0.5, 8.2740964)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 35.611 for pos Vec3(7.954624, 0.5, 0.31877708)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 40.374 for pos Vec3(15.343899, 0.5, -3.5975046)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 38.612 for pos Vec3(5.9927773, 0.5, 7.660556)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 27.714 for pos Vec3(-17.329811, 0.5, 8.3791275)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 34.909 for pos Vec3(-10.335254, 0.5, 13.968214)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 42.821 for pos Vec3(-2.8131501, 0.5, 19.350734)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 34.768 for pos Vec3(-6.321261, 0.5, 12.097127)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 41.943 for pos Vec3(-3.6291043, 0.5, 18.774066)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 48.980 for pos Vec3(12.092848, 0.5, 16.236085)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 39.908 for pos Vec3(17.869665, 0.5, -17.37799)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 14.060 for pos Vec3(-19.473596, 0.5, -5.1245775)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 20.826 for pos Vec3(-1.5758812, 0.5, -14.950605)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 24.002 for pos Vec3(-15.978174, 0.5, 4.29327)
+Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 28.188 for pos Vec3(1.3053305, 0.5, -3.089544)
+Direkter Treffer: 
+Spawning enemy. Player state: 
+Player position: Vec3(-21.99565, -0.49899995, -18.920591)
+Calculated spawn distance to player position Vec3(-21.99565, -0.49899995, -18.920591) is 13.951 for pos Vec3(-12.727994, 0.5, -8.540247)
+Collision! Distance: 1.402
+Player pos: Vec3(-21.99565, -0.49899995, -18.920591)
+Enemy pos: Vec3(-21.029367, 0.5, -18.732727)
+Spieler getroffen – Game Over
