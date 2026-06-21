@@ -473,6 +473,57 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_success_response("Eingabe empfangen.")
             except Exception as e:
                 self.send_error_response(500, f"Fehler bei Eingabeübertragung: {str(e)}")
+
+        # 9. [NEW] Text-to-Speech proxy
+        elif self.path == '/api/tts':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                text = data.get('text', '').strip()
+                voice = data.get('voice', 'fable').strip()
+                
+                if not text:
+                    self.send_error_response(400, "Text darf nicht leer sein.")
+                    return
+                
+                # Load env variables (for BFH API key)
+                env = load_env()
+                api_key = env.get('BFH_API_KEY') or os.environ.get('BFH_API_KEY')
+                
+                if not api_key:
+                    self.send_error_response(500, "BFH_API_KEY nicht konfiguriert.")
+                    return
+                
+                # Call BFH TTS API
+                req_url = 'https://inference.mlmp.ti.bfh.ch/api/v1/audio/speech'
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Bearer {api_key}'
+                }
+                payload = {
+                    "model": "kokoro-tts",
+                    "input": text,
+                    "voice": voice
+                }
+                
+                req_data = json.dumps(payload).encode('utf-8')
+                req = urllib.request.Request(req_url, data=req_data, headers=headers, method='POST')
+                
+                with urllib.request.urlopen(req) as response:
+                    audio_data = response.read()
+                    
+                self.send_response(200)
+                self.send_header('Content-Type', 'audio/mpeg')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(audio_data)))
+                self.end_headers()
+                self.wfile.write(audio_data)
+                
+            except Exception as e:
+                print(f"[TTS] Fehler bei der TTS-Generierung: {e}")
+                self.send_error_response(500, f"TTS-Fehler: {str(e)}")
                 
         else:
             self.send_error_response(404, "Endpunkt nicht gefunden.")

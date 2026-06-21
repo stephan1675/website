@@ -625,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const discTopic = document.getElementById('disc-topic');
   const discAgentCount = document.getElementById('disc-agent-count');
   const discAgentsConfigs = document.getElementById('disc-agents-configs');
+  const discEnableTts = document.getElementById('disc-enable-tts');
 
   // Chat UI
   const discussionChat = document.getElementById('discussion-chat');
@@ -650,8 +651,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let discussionEventSource = null;
   let discussionIsPaused = false;
   let discussionMessageBuffer = [];
-  let currentDiscussionTurns = []; // Stores all messages for text file export
+  let currentDiscussionTurns = [];
+
+  // TTS State
+  let ttsAudioQueue = [];
+  let ttsIsPlaying = false;
+  let currentTtsAudio = null; // Stores all messages for text file export
   let currentSessionAgents = [];
+
+  // Helper to map agent to voice preset
+  function getRecommendedVoice(personaKey) {
+    switch (personaKey) {
+      case 'trump': return 'onyx';
+      case 'musk': return 'fable';
+      case 'xi': return 'echo';
+      case 'schweiz': return 'sage';
+      case 'user_me': return 'ash';
+      default: return 'fable';
+    }
+  }
 
   // Preset Personas
   const PRESET_PERSONAS = {
@@ -719,6 +737,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Change count handler
   discAgentCount.addEventListener('change', renderAgentsSetup);
 
+  discEnableTts.addEventListener('change', () => {
+    const containers = discAgentsConfigs.querySelectorAll('.select-voice-container');
+    containers.forEach(container => {
+      if (discEnableTts.checked) {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    });
+  });
+
   // Render agents configuration forms dynamically
   function renderAgentsSetup() {
     discAgentsConfigs.innerHTML = '';
@@ -737,6 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
         customOptions += `<option value="custom_${idx}">Eigene: ${p.name}</option>`;
       });
 
+      const ttsEnabled = discEnableTts.checked;
       card.innerHTML = `
         <h4><i class="fa-solid fa-robot" style="color: var(--color-primary);"></i> Teilnehmer ${i}</h4>
         
@@ -750,6 +780,20 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="user_me">Ich (Benutzer)</option>
             ${customOptions}
             <option value="new_custom" style="color: var(--color-secondary); font-weight: bold;">+ Neue Persona erstellen...</option>
+          </select>
+        </div>
+
+        <div class="form-group select-voice-container ${ttsEnabled ? '' : 'hidden'}" style="margin-bottom: 0.75rem;">
+          <label>Stimme (Text-to-Speech)</label>
+          <select class="form-control select-agent-voice" style="padding-left: 1.25rem;">
+            <option value="fable">Fable (Männlich - Lebhaft) [Standard]</option>
+            <option value="onyx">Onyx (Männlich - Tief)</option>
+            <option value="sage">Sage (Männlich - Professionell)</option>
+            <option value="echo">Echo (Männlich - Ernst)</option>
+            <option value="ash">Ash (Männlich - Neutral)</option>
+            <option value="shimmer">Shimmer (Weiblich - Freundlich)</option>
+            <option value="coral">Coral (Weiblich - Warm)</option>
+            <option value="alloy">Alloy (Weiblich - Neutral)</option>
           </select>
         </div>
 
@@ -819,6 +863,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const customForm = card.querySelector('.custom-persona-form');
       const fileInput = card.querySelector('.cust-file-input');
       const fileNameDisplay = card.querySelector(`.id-file-name-display-${i}`);
+      const voiceSelect = card.querySelector('.select-agent-voice');
+
+      // Initialize voice to recommended for the default selection
+      voiceSelect.value = getRecommendedVoice(dropdown.value);
 
       dropdown.addEventListener('change', () => {
         if (dropdown.value === 'new_custom') {
@@ -826,6 +874,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           customForm.classList.add('hidden');
         }
+        
+        // Auto-select recommended voice for presets
+        voiceSelect.value = getRecommendedVoice(dropdown.value);
       });
 
       fileInput.addEventListener('change', () => {
@@ -892,6 +943,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = agentConfigs[i];
         const selector = card.querySelector('.select-agent-persona');
         const selection = selector.value;
+        const voice = card.querySelector('.select-agent-voice').value;
 
         let agentObj = null;
 
@@ -934,7 +986,8 @@ document.addEventListener('DOMContentLoaded', () => {
             agenda: agenda,
             tone: tone,
             emoji: emoji,
-            docFileName: docFileName
+            docFileName: docFileName,
+            voice: voice
           };
 
           // Save custom persona to localStorage if selected
@@ -955,16 +1008,17 @@ document.addEventListener('DOMContentLoaded', () => {
             politicalStance: ["Meine Meinung", "Freiheit", "Hinterfragen"],
             agenda: "Meine Meinung einbringen",
             tone: "neutral",
-            docFileName: ""
+            docFileName: "",
+            voice: voice
           };
         } else if (selection.startsWith('custom_')) {
           // Load from localStorage
           const savedIdx = parseInt(selection.split('_')[1]);
           const savedPersonas = JSON.parse(localStorage.getItem('customPersonas') || '[]');
-          agentObj = savedPersonas[savedIdx];
+          agentObj = { ...savedPersonas[savedIdx], voice: voice };
         } else {
           // Load preset
-          agentObj = PRESET_PERSONAS[selection];
+          agentObj = { ...PRESET_PERSONAS[selection], voice: voice };
         }
 
         agents.push(agentObj);
@@ -1148,6 +1202,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     discussionMessages.appendChild(bubbleRow);
     discussionMessages.scrollTop = discussionMessages.scrollHeight;
+
+    // Trigger Text-to-Speech if enabled and the message is not a system summary
+    if (discEnableTts.checked && turn.sender !== 'System-Protokollant') {
+      const agent = currentSessionAgents.find(a => a.name === turn.sender);
+      const voice = agent ? (agent.voice || 'fable') : 'fable';
+      queueTTS(turn.text, voice);
+    }
   }
 
   // Toggle Pause/Resume
@@ -1159,9 +1220,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (discussionIsPaused) {
       btnChatToggle.innerHTML = '<i class="fa-solid fa-play"></i><span>Fortsetzen</span>';
       showToast('Debatte pausiert.', 'warning');
+      
+      // Pause TTS audio if playing
+      if (currentTtsAudio) {
+        currentTtsAudio.pause();
+      }
     } else {
       btnChatToggle.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pause</span>';
       showToast('Debatte fortgesetzt.', 'success');
+
+      // Resume TTS audio if paused
+      if (currentTtsAudio) {
+        currentTtsAudio.play().catch(err => console.error("Error resuming TTS audio:", err));
+      }
 
       // Flush buffered messages
       discussionMessageBuffer.forEach(turn => renderChatBubble(turn));
@@ -1172,6 +1243,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // End discussion and close session
   function closeDiscussionSession() {
+    // Stop and clear TTS audio
+    stopAllTts();
+
     if (activeDiscussionSessionId) {
       const baseUrl = getApiBaseUrl();
 
@@ -1319,6 +1393,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnChatClose.addEventListener('click', handleStopDiscussion);
 
+
+  // --- Text-to-Speech Audio Queue Handlers ---
+  function queueTTS(text, voice) {
+    ttsAudioQueue.push({ text, voice });
+    processTtsQueue();
+  }
+
+  async function processTtsQueue() {
+    if (ttsIsPlaying) return;
+    if (ttsAudioQueue.length === 0) return;
+    if (discussionIsPaused) return; // Don't start playing new items if paused
+
+    ttsIsPlaying = true;
+    const { text, voice } = ttsAudioQueue.shift();
+
+    try {
+      const baseUrl = getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/api/tts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text, voice })
+      });
+
+      if (!response.ok) {
+        throw new Error('TTS response was not OK');
+      }
+
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+      currentTtsAudio = new Audio(audioUrl);
+
+      currentTtsAudio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        currentTtsAudio = null;
+        ttsIsPlaying = false;
+        processTtsQueue();
+      };
+
+      currentTtsAudio.onerror = (err) => {
+        console.error("[TTS] Audiofehler bei Wiedergabe:", err);
+        URL.revokeObjectURL(audioUrl);
+        currentTtsAudio = null;
+        ttsIsPlaying = false;
+        processTtsQueue();
+      };
+
+      await currentTtsAudio.play();
+    } catch (e) {
+      console.error("[TTS] Fehler bei der TTS-Wiedergabe:", e);
+      ttsIsPlaying = false;
+      // Wait a second before trying next in queue
+      setTimeout(processTtsQueue, 1000);
+    }
+  }
+
+  function stopAllTts() {
+    if (currentTtsAudio) {
+      try {
+        currentTtsAudio.pause();
+      } catch (err) {
+        console.error("[TTS] Fehler beim Stoppen von Audio:", err);
+      }
+      currentTtsAudio = null;
+    }
+    ttsAudioQueue = [];
+    ttsIsPlaying = false;
+  }
 
   // --- Initial Setup on Page Load ---
   updateHomeAuthStatus();
