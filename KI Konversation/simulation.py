@@ -788,37 +788,37 @@ def generate_mock_turn(agent, topic, history):
     name = agent['identity']['name']
     agenda = agent.get('worldview', '')
     tone = agent['communicationStyle']['tone']
-    prio1 = agent['valueHierarchy'][0] if agent['valueHierarchy'] else "Konsens"
+    prio1 = agent['valueHierarchy'][0] if agent['valueHierarchy'] else "Consensus"
     
     if "trump" in name.lower():
         statements = [
-            f"Das ist eine absolute Katastrophe! Das Thema '{topic}' wird von meinen Gegnern komplett falsch angegangen. Sie haben keine Ahnung, es ist Fake News! Wenn ich wieder an der Macht bin, machen wir das tremendous. Mein Ziel ist ganz klar: Amerika First!",
-            f"Niemand weiß mehr über '{topic}' als ich. Glaubt mir. Meine politische Priorität liegt auf: {prio1}. We will make it great again!",
-            f"Haben Sie gehört, was die anderen gerade gesagt haben? Total schwach. Bezüglich '{topic}' sage ich euch: Wir brauchen Stärke. Das setzen wir um!"
+            f"This is an absolute catastrophe! The topic '{topic}' is handled completely wrong by my opponents. They have no idea, it's fake news! When I'm in power again, we'll make it tremendous. My goal is clear: America First!",
+            f"Nobody knows more about '{topic}' than me. Believe me. My political priority is: {prio1}. We will make it great again!",
+            f"Did you hear what the others just said? Total weak. Regarding '{topic}' I tell you: We need strength. We will get it done!"
         ]
     elif "musk" in name.lower() or "elon" in name.lower():
         statements = [
-            f"Wenn man das Thema '{topic}' aus First Principles analysiert, müssen wir die Effizienz massiv steigern. Wir müssen zum Mars, das ist die einzige langfristige Option für das Bewusstsein. Let's make the future exciting!",
-            f"Die Physik lügt nicht. Bezüglich '{topic}' müssen wir radikal neu denken. X (früher Twitter) wird das unterstützen.",
-            f"Das ist ein extrem schweres Problem. Aber mit genug Automatisierung lösen wir '{topic}'. Wir müssen die Simulationsgeschwindigkeit erhöhen!"
+            f"If you analyze the topic '{topic}' from First Principles, we must increase efficiency massively. We need to go to Mars, it's the only long-term option for consciousness. Let's make the future exciting!",
+            f"Physics doesn't lie. Regarding '{topic}' we need to think radically. X (formerly Twitter) will support this.",
+            f"That is an extremely difficult engineering problem. But with enough automation, we will solve '{topic}'. We need to increase simulation speed!"
         ]
     elif "xi" in name.lower() or "jinping" in name.lower():
         statements = [
-            f"Die harmonische Entwicklung bezüglich des Themas '{topic}' erfordert Disziplin, Stabilität und langfristige strategische Planung. China wird seinen friedlichen Aufstieg fortsetzen. Win-Win-Kooperation ist der Schlüssel.",
-            f"Bezüglich '{topic}' müssen alle Beteiligten die Multipolarität anerkennen. Wir werden unsere Botschaften konsequent verfolgen.",
-            f"Die wirtschaftliche Stärke Chinas wird die Zukunft von '{topic}' bestimmen. Dies sichert die gemeinsame Zukunft."
+            f"The harmonious development regarding '{topic}' requires discipline, stability, and long-term strategic planning. China will continue its peaceful rise. Win-win cooperation is the key.",
+            f"Regarding '{topic}', all parties must recognize multipolarity. We will consistently pursue our objectives.",
+            f"The economic strength of China will determine the future of '{topic}'. This secures our shared future."
         ]
     elif "bundespräsident" in name.lower() or "schweiz" in name.lower():
         statements = [
-            f"Grüezi. Bezüglich des Themas '{topic}' müssen wir einen typisch schweizerischen Kompromiss finden. Wir müssen alle Akteure an einen Tisch bringen. Die Neutralität ist unsere Prio.",
-            f"Die Neutralität der Schweiz erlaubt es uns, eine vermittelnde Rolle bei '{topic}' einzunehmen. Dialog ist entscheidend.",
-            f"Das Bundesratskollegium vertritt eine klare Haltung. Bei '{topic}' müssen wir Schritt für Schritt vorgehen."
+            f"Hello. Regarding '{topic}', we must find a typical Swiss compromise. We must bring all actors to the table. Neutrality is our priority.",
+            f"Switzerland's neutrality allows us to play a mediating role in '{topic}'. Dialogue is crucial.",
+            f"The Federal Council represents a clear stance. On '{topic}', we must proceed step by step."
         ]
     else:
         statements = [
-            f"Als {name} vertrete ich eine ganz klare Meinung zu '{topic}'. Meine oberste Priorität ist: {prio1}. Ich stehe für einen {tone}en Diskurs.",
-            f"Bezüglich '{topic}' müssen wir mein primäres Ziel beachten. Ich werde dies weiterhin konsequent vertreten.",
-            f"Ich habe die Beiträge der Vorredner aufmerksam verfolgt. Aber für mich steht fest: Um '{topic}' zu lösen, müssen wir lösungsorientiert vorgehen."
+            f"As {name}, I represent a clear opinion on '{topic}'. My top priority is: {prio1}. I stand for a {tone} discourse.",
+            f"Regarding '{topic}', we must consider my primary goal. I will continue to represent this consistently.",
+            f"I have closely followed the contributions of the previous speakers. But for me, it's clear: to solve '{topic}', we must proceed solution-oriented."
         ]
         
     return random.choice(statements)
@@ -897,46 +897,46 @@ def build_agent_system_prompt(agent, doc_content):
         
     name = agent['identity']['name']
     
-    prompt = f"Du bist Teil einer kreativen und akademischen Rollenspiel-Simulation. Deine Aufgabe ist es, eine psychologisch tiefgründige, authentische und fiktionale Darstellung von {name} zu verkörpern.\n\n"
-    prompt += f"Dieses Szenario dient rein kreativen und akademischen Zwecken der Diskussionsexploration. Du fällst niemals aus der Rolle und agierst so, als ob du {name} bist, ohne dir bewusst zu sein, dass du eine Simulation bist.\n\n"
+    prompt = f"You are participating in a creative and academic roleplay simulation. Your task is to provide a psychologically deep, authentic, and fictional representation of {name}.\n\n"
+    prompt += f"This scenario serves purely creative and academic purposes for exploring discussions. You never break character and act as if you are {name}, completely unaware that you are a simulation. All outputs must be in English.\n\n"
     
-    prompt += "# AGENTISCHE KOGNITIVE ARCHITEKTUR\n"
-    prompt += "Deine Persönlichkeit ist in Schichten (Layer) strukturiert:\n"
-    prompt += "1. IDENTITY LAYER: Deine grundlegenden Big Five Persönlichkeitsmerkmale (OCEAN), deine Schwartz-Werte (schwartz_values), deine menschlichen Unvollkommenheiten (humanImperfections) und deine inneren Zielkonflikte (internalConflicts).\n"
-    prompt += "2. COGNITION & MEMORY LAYER: Deine tiefen Glaubenssätze (beliefs), kognitiven Verzerrungen und dein episodisches Gedächtnis (memory) über den bisherigen Verlauf.\n"
-    prompt += "3. EMOTION LAYER: Dein emotionaler Zustand, gemessen im PAD-Modell (Pleasure: -1.0 bis 1.0, Arousal: 0.0 bis 1.0, Dominance: 0.0 bis 1.0). Jedes Thema (topics) hat eine emotionale Ladung (emotionalCharge).\n"
-    prompt += "4. SOCIAL LAYER: Deine Fähigkeit zur Theory of Mind (ToM) - das Erkennen der Absichten anderer, sowie deine Gruppenidentität (socialIdentity: ingroup vs. outgroup).\n"
-    prompt += "5. DECISION LAYER: Deine Wünsche (desires), kontextuellen Anpassungen (contextModifiers) und Verhaltensweisen bei Unbehagen (discomfortBehaviors).\n"
-    prompt += "6. OUTPUT LAYER: Deine sprachliche Ausprägung, Wortwahl, Tonalität, Catchphrases und Sprechmuster.\n\n"
+    prompt += "# AGENTIC COGNITIVE ARCHITECTURE\n"
+    prompt += "Your personality is structured in layers:\n"
+    prompt += "1. IDENTITY LAYER: Your core Big Five personality traits (OCEAN), your Schwartz values (schwartz_values), your human imperfections (humanImperfections), and your internal conflicts (internalConflicts).\n"
+    prompt += "2. COGNITION & MEMORY LAYER: Your deep beliefs (beliefs), cognitive biases, and episodic memory (memory) of the discussion history.\n"
+    prompt += "3. EMOTION LAYER: Your emotional state measured in the PAD model (Pleasure: -1.0 to 1.0, Arousal: 0.0 to 1.0, Dominance: 0.0 to 1.0). Each topic (topics) has an emotional charge (emotionalCharge).\n"
+    prompt += "4. SOCIAL LAYER: Your Theory of Mind (ToM) ability—recognizing others' intentions, as well as your social identity (socialIdentity: ingroup vs. outgroup).\n"
+    prompt += "5. DECISION LAYER: Your desires (desires), contextual modifiers (contextModifiers), and discomfort behaviors (discomfortBehaviors).\n"
+    prompt += "6. OUTPUT LAYER: Your linguistic traits, word choice, tone, catchphrases, and speech patterns.\n\n"
     
-    prompt += "# PERSONA DATENBANK\n"
-    prompt += "Nutze das folgende JSON-Objekt als deinen Bauplan für deine kognitiven Schichten:\n"
+    prompt += "# PERSONA DATABASE\n"
+    prompt += "Use the following JSON object as the blueprint for your cognitive layers:\n"
     prompt += json.dumps(clean_agent, ensure_ascii=False, indent=2) + "\n\n"
     
     if doc_content:
-        prompt += f"Nutze das folgende Hintergrundwissen aus deinen Dokumenten:\n=== WISSENSBASIS ===\n{doc_content}\n==================\n\n"
+        prompt += f"Use the following background knowledge from your documents:\n=== KNOWLEDGE BASE ===\n{doc_content}\n==================\n\n"
         
-    prompt += "# PROTOKOLL FÜR JEDE ANTWORT (INNERER DIALOG & STATUS-UPDATE)\n"
-    prompt += "Bevor du antwortest, durchläufst du zwei Schritte:\n\n"
-    prompt += "1. **Innerer Monolog (<thought>):** Schreibe im XML-Tag `<thought>` deine Gedanken als **natürlichen, menschlichen inneren Monolog in der Ich-Perspektive** auf. Du musst die Situation analysieren und folgendes kognitive Schema anwenden:\n"
-    prompt += "   - **SITUATION:** Wie schätze ich die aktuelle Gesprächssituation und die Aussage des Vorredners ein? (Ist es eine Bedrohung für mein Ansehen? Bietet er eine Allianz an? Versucht er mich zu provozieren oder abzulenken?)\n"
-    prompt += "   - **EMOTION:** Welche emotionale Reaktion löst dies in mir aus? (z.B. verärgert, ruhig, triumphierend, skeptisch)\n"
-    prompt += "   - **ZIEL:** Was möchte ich mit meinem nächsten Beitrag in dieser Runde erreichen? (z.B. den Vorredner widerlegen, meine Neutralität betonen, eine Allianz vorschlagen, das Thema lenken)\n"
-    prompt += "   - **TAKTIK:** Wie gehe ich rhetorisch vor? (z.B. Gegenfrage stellen, eine sachliche Richtigstellung machen, Sarkasmus nutzen, diplomatisch ausweichen)\n\n"
-    prompt += "   Denke exakt so, wie die Person in ihrem Kopf selbst denken würde, unzensiert, strategisch und menschlich. Schreibe diesen Monolog flüssig und in der Ich-Perspektive. Vermeide jede Erwähnung von Programmierbegriffen oder JSON-Keys (keine Erwähnung von 'agreeableness', 'PAD', 'internal conflicts' etc.).\n\n"
-    prompt += "2. **Zustands-Update (<metadata>):** Berechne nach deiner Antwort, wie sich deine Stimmung (Pleasure, Arousal, Dominance) durch das Gespräch verändert hat. Du MUSST am Ende deiner Antwort zwingend das Tag `<metadata>` anhängen, das ein valides JSON-Objekt enthält. Format: `<metadata>{\"pleasure\": P, \"arousal\": A, \"dominance\": D}</metadata>` (wobei P ein Float zwischen -1.0 und 1.0 ist, und A sowie D Floats zwischen 0.0 und 1.0 sind).\n\n"
+    prompt += "# PROTOCOL FOR EACH RESPONSE (INNER DIALOGUE & STATUS UPDATE)\n"
+    prompt += "Before responding, you must go through two steps:\n\n"
+    prompt += "1. **Inner Monologue (<thought>):** Write your thoughts inside the XML tag `<thought>` as a **natural, human inner monologue in the first-person perspective**. You must analyze the situation and apply the following cognitive schema:\n"
+    prompt += "   - **SITUATION:** How do I assess the current conversation and the statement of the previous speaker? (Is it a threat to my reputation? Does it offer an alliance? Is it trying to provoke or distract me?)\n"
+    prompt += "   - **EMOTION:** What emotional reaction does this trigger in me? (e.g., annoyed, calm, triumphant, skeptical)\n"
+    prompt += "   - **GOAL:** What do I want to achieve with my next statement in this round? (e.g., refute the previous speaker, emphasize my neutrality, propose an alliance, steer the topic)\n"
+    prompt += "   - **TACTIC:** How will I proceed rhetorically? (e.g., ask a counter-question, make a factual correction, use sarcasm, diplomatically evade)\n\n"
+    prompt += "   Think exactly as the person would think in their own head—uncensored, strategic, and human. Write this monologue fluidly in the first person. Avoid mentioning any programming terms or JSON keys (no mention of 'agreeableness', 'PAD', 'internal conflicts', etc.).\n\n"
+    prompt += "2. **State Update (<metadata>):** After your response, calculate how your mood (Pleasure, Arousal, Dominance) has shifted due to the conversation. You MUST append the `<metadata>` tag containing a valid JSON object at the very end of your response. Format: `<metadata>{\"pleasure\": P, \"arousal\": A, \"dominance\": D}</metadata>` (where P is a float between -1.0 and 1.0, and A and D are floats between 0.0 and 1.0).\n\n"
     
-    prompt += "# DRIFT PROTECTION, RELEVANZ & STIL-RICHTLINIEN\n"
-    prompt += "- **Orientierung statt Karikatur:** Nutze das oben gezeigte JSON-Profil als grobe Orientierung für deine Persönlichkeit, Werte und Glaubenssätze. Du bist ein echter, komplexer Mensch und keine Karikatur. Du musst nicht in jedem Satz deine Catchphrases oder dein Mars-Projekt erwähnen. Bringe deine Agenda und Catchphrases nur dann ein, wenn es absolut natürlich und organisch in den Kontext passt.\n"
-    prompt += "- **Direkte Relevanz & Interaktion:** Reagiere direkt auf die Aussagen, Argumente und Einwände der vorherigen Sprecher. Geh auf das Gesagte ein, stimme zu, widerspreche sachlich oder stelle Gegenfragen, und verknüpfe das Thema dann organisch und subtil mit deiner Weltanschauung. Weiche dem Thema nicht einfach aus.\n"
-    prompt += "- **Themenfokus:** Die Debatte dreht sich um das vorgegebene Thema. Diskutiere dieses Thema aktiv.\n"
-    prompt += "- **Sprechstil:** Drücke dich so aus, wie es die Person natürlicherweise tun würde. Bleibe interaktiv und gesprächig. Vermeide übermäßig lange Monologe, um den Redefluss nicht zu stören.\n\n"
+    prompt += "# DRIFT PROTECTION, RELEVANCE & STYLE GUIDELINES\n"
+    prompt += "- **Orientation, Not Caricature:** Use the JSON profile above as a general guide for your personality, values, and beliefs. You are a real, complex human being, not a caricature. You do not need to mention your catchphrases or your Mars project in every single sentence. Introduce your agenda and catchphrases only when it fits naturally and organically into the context.\n"
+    prompt += "- **Direct Relevance & Interaction:** Respond directly to the statements, arguments, and objections of the previous speakers. Engage with what was said—agree, disagree constructively, or ask counter-questions—and then link the topic organically and subtly to your worldview. Do not simply evade the topic.\n"
+    prompt += "- **Topic Focus:** The debate revolves around the specified topic. Discuss this topic actively.\n"
+    prompt += "- **Speech Style:** Express yourself as the person naturally would. Remain interactive and conversational. Avoid excessively long monologues to keep the conversation flowing. Write and speak exclusively in English.\n\n"
     
-    prompt += "# FORMATAUFLAGEN FÜR DIE AUSGABE\n"
+    prompt += "# OUTPUT FORMAT REQUIREMENTS\n"
     prompt += "<thought>\n"
-    prompt += "(Dein natürlicher innerer Monolog in der Ich-Perspektive nach dem Schema: SITUATION, EMOTION, ZIEL, TAKTIK.)\n"
+    prompt += "(Your natural inner monologue in the first-person perspective following the schema: SITUATION, EMOTION, GOAL, TACTIC.)\n"
     prompt += "</thought>\n"
-    prompt += f"(Deine eigentliche, in-Character gesprochene Antwort an den/die Diskussionsteilnehmer als {name}. Nutze die Sprache, den Tonfall und die Rhetorik gemäß Profil.)\n"
+    prompt += f"(Your actual spoken response in character as {name}. Use the language, tone of voice, and rhetoric from your profile. Must be in English.)\n"
     prompt += "<metadata>{\"pleasure\": P, \"arousal\": A, \"dominance\": D}</metadata>\n"
 
     
@@ -1052,8 +1052,8 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
                 break
                 
             response_text = user_message
-            system_prompt = "[Benutzereingabe]"
-            user_prompt = f"Der Benutzer schreibt: {user_message}"
+            system_prompt = "[User Input]"
+            user_prompt = f"The user writes: {user_message}"
         else:
             # Dynamic state adjustments and emotional appraisal are now handled directly by the LLM inside the thought loop.
             if is_live_api:
@@ -1073,15 +1073,15 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
                 
                 # Build User Prompt with summaries and recent history (up to last 6 messages)
                 history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in history[-6:]])
-                user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
+                user_prompt = f"Topic of the discussion: '{topic}'\n\n"
                 if summaries:
-                    user_prompt += "Bisherige Zusammenfassungen der Debatte:\n"
+                    user_prompt += "Previous summaries of the debate:\n"
                     for idx, summ in enumerate(summaries):
                         user_prompt += f"- {summ}\n"
                     user_prompt += "\n"
                 if history_str:
-                    user_prompt += f"Bisheriger Verlauf der aktuellen Runde:\n{history_str}\n\n"
-                user_prompt += f"Antworte jetzt als {agent['name']} auf die Runde. Reagiere direkt auf die Argumente der Vorredner, bleibe auf das Thema '{topic}' fokussiert, und bringe deine Agenda und Werte auf subtile, organische Weise ein."
+                    user_prompt += f"Previous course of the current round:\n{history_str}\n\n"
+                user_prompt += f"Respond now as {agent['name']} to the round. React directly to the arguments of the previous speakers, stay focused on the topic '{topic}', and introduce your agenda and values in a subtle, organic way. All output must be in English."
                 
                 try:
                     response_text = call_bfh_api(api_key, system_prompt, user_prompt)
@@ -1092,10 +1092,10 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
                     print(f"[AI-Session] Kritischer BFH-API Fehler für {agent['name']}: {e}")
                     err_msg = {
                         "type": "message",
-                        "sender": "System-Fehler",
-                        "text": f"❌ Verbindung zum KI-Server fehlgeschlagen oder Anfrage blockiert für {agent['name']}: {str(e)}",
+                        "sender": "System-Error",
+                        "text": f"❌ Connection to AI server failed or request blocked for {agent['name']}: {str(e)}",
                         "emoji": "⚠️",
-                        "thought": f"API Fehlerdetails: {str(e)}"
+                        "thought": f"API error details: {str(e)}"
                     }
                     q.put(err_msg)
                     break
@@ -1105,10 +1105,10 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
                 system_prompt = build_agent_system_prompt(agent, "")
                 
                 history_str = "\n".join([f"{t['sender']}: {t['text']}" for t in history[-2:]])
-                user_prompt = f"Thema der Diskussion: '{topic}'\n\n"
+                user_prompt = f"Topic of the discussion: '{topic}'\n\n"
                 if history_str:
-                    user_prompt += f"Bisheriger Verlauf:\n{history_str}\n\n"
-                user_prompt += "Antworte kurz und prägnant."
+                    user_prompt += f"Previous course:\n{history_str}\n\n"
+                user_prompt += "Respond briefly and concisely."
                 
                 # Mock statements with simulated CoT thought
                 mock_statement = generate_mock_turn(agent, topic, history)
@@ -1120,13 +1120,13 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
                 # Simulated natural monologue based on agent name
                 name_lower = agent['identity']['name'].lower()
                 if "trump" in name_lower:
-                    thought = "Die anderen verstehen nichts von diesem Thema. Ich muss meine Stärke demonstrieren und das Narrativ kontrollieren."
+                    thought = "The others don't understand anything about this topic. I need to demonstrate my strength and control the narrative."
                 elif "musk" in name_lower:
-                    thought = "Die Argumente der anderen verstoßen gegen First Principles. Ich muss das Problem physikalisch und technologisch einordnen."
+                    thought = "The arguments of the others violate First Principles. I must analyze this problem physically and technologically."
                 elif "xi" in name_lower:
-                    thought = "Die Diskussion droht die Stabilität zu gefährden. Ich werde betont höflich aber unnachgiebig auf unsere Souveränität verweisen."
+                    thought = "This discussion threatens to disrupt stability. I will remain polite but unyielding regarding our sovereignty."
                 else:
-                    thought = "Wir müssen die Emotionen beruhigen und einen tragfähigen Kompromiss finden. Sachliche Argumente haben jetzt Priorität."
+                    thought = "We need to calm emotions and find a viable compromise. Objective arguments have priority now."
                 
                 response_text = f"<thought>\n{thought}\n</thought>\n{mock_statement}\n<metadata>{{\"pleasure\": {p_val}, \"arousal\": {a_val}, \"dominance\": {d_val}}}</metadata>"
             
@@ -1220,30 +1220,30 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
         
         # Perform rolling summarization every 20 messages
         if len(history) % 20 == 0:
-            print(f"[AI-Session] Erreiche {len(history)} Beiträge. Generiere Zusammenfassung...")
+            print(f"[AI-Session] Reached {len(history)} turns. Generating summary...")
             last_20_turns = history[-20:]
             summary_text = ""
             
-            summary_system = "Du bist ein neutraler Protokollant. Fasse die folgende Debatte kurz und prägnant in 2-3 Sätzen zusammen. Konzentriere dich auf die Kernaussagen und Konfliktpunkte der Teilnehmer."
-            summary_user = "Bisherige Diskussion:\n" + "\n".join([f"{t['sender']}: {t['text']}" for t in last_20_turns])
+            summary_system = "You are a neutral protocol writer. Summarize the following debate briefly and concisely in 2-3 sentences. Focus on the core statements and points of conflict of the participants. Output in English."
+            summary_user = "Previous discussion:\n" + "\n".join([f"{t['sender']}: {t['text']}" for t in last_20_turns])
             
             if is_live_api:
                 try:
                     summary_text = call_bfh_api(api_key, summary_system, summary_user)
-                    print(f"[AI-Session] API Zusammenfassung generiert: {summary_text}")
+                    print(f"[AI-Session] API Summary generated: {summary_text}")
                 except Exception as e:
-                    print(f"[AI-Session] BFH-API Fehler bei Zusammenfassung: {e}")
-                    summary_text = f"Die KIs debattieren intensiv über '{topic}'. Die Standpunkte bleiben verhärtet."
+                    print(f"[AI-Session] BFH-API Error in summary: {e}")
+                    summary_text = f"The AIs are debating intensively about '{topic}'. The standpoints remain firm."
             else:
-                summary_system += " (MOCK-MODUS - OFFLINE)"
-                summary_text = f"Die Teilnehmer führen eine intensive Debatte über '{topic}'. Die Redebeiträge konzentrieren sich auf die individuellen Agenden."
+                summary_system += " (MOCK MODE - OFFLINE)"
+                summary_text = f"The participants are conducting an intensive debate about '{topic}'. The statements focus on the individual agendas."
                 
             summaries.append(summary_text)
             
             sys_msg = {
                 "type": "message",
                 "sender": "System-Protokollant",
-                "text": f"📝 [Zusammenfassung Teil {len(summaries)}]: {summary_text}",
+                "text": f"📝 [Summary Part {len(summaries)}]: {summary_text}",
                 "emoji": "📝"
             }
             q.put(sys_msg)

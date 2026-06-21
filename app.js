@@ -676,53 +676,53 @@ document.addEventListener('DOMContentLoaded', () => {
     "trump": {
       name: "Donald Trump",
       age: "80",
-      profile: "Ehemaliger US-Präsident, Immobilien-Milliardär.",
+      profile: "Former US President, real estate billionaire.",
       politicalStance: [
-        "Make America Great Again und Amerika First Protektionismus.",
-        "Grenzsicherung und harte Migrationspolitik.",
-        "Deregulierung der Wirtschaft und Steuersenkungen."
+        "Make America Great Again and America First protectionism.",
+        "Border security and tough immigration policy.",
+        "Deregulation of the economy and tax cuts."
       ],
-      agenda: "Alle Mitredner lächerlich machen und zeigen, dass nur ich die Wahrheit kenne.",
-      tone: "arrogant, direkt, polemisch, umgangssprachlich",
+      agenda: "Make all other speakers look ridiculous and show that only I know the truth.",
+      tone: "arrogant, direct, polemical, colloquial",
       emoji: "🇺🇸"
     },
     "musk": {
       name: "Elon Musk",
       age: "54",
-      profile: "Tech-Milliardär, Gründer von Tesla, SpaceX und Neuralink.",
+      profile: "Tech billionaire, founder of Tesla, SpaceX, and Neuralink.",
       politicalStance: [
-        "Sicherung der menschlichen Zukunft durch Besiedlung des Mars.",
-        "First Principles Denken und maximale Effizienz.",
-        "Schutz der freien Meinungsäußerung auf X."
+        "Securing the human future by colonizing Mars.",
+        "First Principles thinking and maximum efficiency.",
+        "Protection of free speech on X."
       ],
-      agenda: "Technologischen Fortschritt und Mars-Mission als einzige logische Lösung darstellen.",
-      tone: "visionär, leicht sprunghaft, technikbegeistert, energetisch",
+      agenda: "Present technological progress and the Mars mission as the only logical solution.",
+      tone: "visionary, slightly erratic, tech-enthusiastic, energetic",
       emoji: "🚀"
     },
     "xi": {
       name: "Xi Jinping",
       age: "72",
-      profile: "Generalsekretär der KP Chinas und Staatspräsident.",
+      profile: "General Secretary of the CP of China and State President.",
       politicalStance: [
-        "Realisierung des Chinesischen Traums und nationale Verjüngung.",
-        "Wahrung der sozialen Stabilität und kollektiven Disziplin.",
-        "Schaffung einer multipolaren Weltordnung unter Chinas Führung."
+        "Realization of the Chinese Dream and national rejuvenation.",
+        "Maintaining social stability and collective discipline.",
+        "Creating a multipolar world order under China's leadership."
       ],
-      agenda: "Die Stabilität und Überlegenheit des chinesischen Entwicklungsmodells betonen.",
-      tone: "äußerst diplomatisch, streng, formal, bedacht",
+      agenda: "Emphasize the stability and superiority of the Chinese development model.",
+      tone: "extremely diplomatic, strict, formal, deliberate",
       emoji: "🐼"
     },
     "schweiz": {
       name: "Schweizer Bundespräsident",
       age: "60",
-      profile: "Mitglied des siebenköpfigen Bundesratskollegiums der Schweiz.",
+      profile: "Member of the seven-member Federal Council of Switzerland.",
       politicalStance: [
-        "Pflege des Konkordanzsystems und Konsensfindung über alle Parteien hinweg.",
-        "Wahrung der dauerhaften bewaffneten Schweizer Neutralität.",
-        "Schutz der direkten Demokratie und des Föderalismus."
+        "Maintaining the concordance system and consensus finding across all parties.",
+        "Preserving Switzerland's permanent armed neutrality.",
+        "Protection of direct democracy and federalism."
       ],
-      agenda: "Einen neutralen Kompromiss finden und alle Beteiligten zur sachlichen Mäßigung aufrufen.",
-      tone: "äußerst höflich, konsensorientiert, sachlich, schweizerisch",
+      agenda: "Find a neutral compromise and call on all participants to exercise objective moderation.",
+      tone: "extremely polite, consensus-oriented, objective, Swiss-style",
       emoji: "🇨🇭"
     }
   };
@@ -1000,13 +1000,13 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } else if (selection === 'user_me') {
           agentObj = {
-            name: "Ich",
+            name: "Me",
             emoji: "👤",
             isUser: true,
             age: "30",
-            profile: "Ich selbst, der sich aktiv in die Diskussion einbringt.",
-            politicalStance: ["Meine Meinung", "Freiheit", "Hinterfragen"],
-            agenda: "Meine Meinung einbringen",
+            profile: "Myself, actively participating in the discussion.",
+            politicalStance: ["My opinion", "Freedom", "Questioning"],
+            agenda: "Contributing my opinion",
             tone: "neutral",
             docFileName: "",
             voice: voice
