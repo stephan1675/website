@@ -863,6 +863,32 @@ def generate_markdown_log(log_data):
         
     return md
 
+def save_session_logs(log_data, topic, session_id):
+    if not log_data or not log_data.get("turns"):
+        return
+    try:
+        logs_dir = os.path.join(os.getcwd(), 'logs')
+        os.makedirs(logs_dir, exist_ok=True)
+        
+        safe_topic = "".join([c if c.isalnum() else "_" for c in topic]).lower()[:30].strip("_")
+        if not safe_topic:
+            safe_topic = "debatte"
+        filename_base = f"debatte_{safe_topic}_{session_id[:8]}"
+        
+        # 1. Save structured JSON log
+        json_path = os.path.join(logs_dir, f"{filename_base}.json")
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(log_data, f, ensure_ascii=False, indent=2)
+            
+        # 2. Save human-readable Markdown log
+        md_path = os.path.join(logs_dir, f"{filename_base}.md")
+        with open(md_path, 'w', encoding='utf-8') as f:
+            f.write(generate_markdown_log(log_data))
+            
+        print(f"[AI-Session] Server-Logs erfolgreich aktualisiert in {logs_dir} (JSON und MD)")
+    except Exception as e:
+        print(f"[AI-Session] Fehler beim Speichern der Server-Logs: {e}")
+
 def build_agent_system_prompt(agent, doc_content):
     # Strip internal helper keys from the JSON dump
     clean_agent = {k: v for k, v in agent.items() if k not in ('docFileName', 'name', 'emoji')}
@@ -1188,6 +1214,7 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
             "thought_text": thought_content
         }
         log_data["turns"].append(log_turn)
+        save_session_logs(log_data, topic, session_id)
         
         turn_counter += 1
         
@@ -1233,6 +1260,7 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
                 "thought_text": ""
             }
             log_data["turns"].append(log_summary)
+            save_session_logs(log_data, topic, session_id)
             
         time.sleep(3.5)
         
@@ -1240,25 +1268,5 @@ def run_discussion_loop(session_id, topic, agents, q, stop_event, api_key, user_
     q.put(exit_data)
     print(f"[AI-Session] Diskussionsrunde [{session_id}] beendet.")
     
-    # Save logs to server logs folder (logs/)
-    if log_data["turns"]:
-        try:
-            logs_dir = os.path.join(os.getcwd(), 'logs')
-            os.makedirs(logs_dir, exist_ok=True)
-            
-            safe_topic = "".join([c if c.isalnum() else "_" for c in topic]).lower()[:30].strip("_")
-            filename_base = f"debatte_{safe_topic}_{session_id[:8]}"
-            
-            # 1. Save structured JSON log
-            json_path = os.path.join(logs_dir, f"{filename_base}.json")
-            with open(json_path, 'w', encoding='utf-8') as f:
-                json.dump(log_data, f, ensure_ascii=False, indent=2)
-                
-            # 2. Save human-readable Markdown log
-            md_path = os.path.join(logs_dir, f"{filename_base}.md")
-            with open(md_path, 'w', encoding='utf-8') as f:
-                f.write(generate_markdown_log(log_data))
-                
-            print(f"[AI-Session] Server-Logs erfolgreich gespeichert in {logs_dir} (JSON und MD)")
-        except Exception as e:
-            print(f"[AI-Session] Fehler beim Speichern der Server-Logs: {e}")
+    # Save final logs to server logs folder (logs/)
+    save_session_logs(log_data, topic, session_id)

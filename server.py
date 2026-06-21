@@ -159,6 +159,14 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     time.sleep(0.1)
             except Exception as e:
                 print(f"[AI-Session] Discussion Stream getrennt für {session_id}: {e}")
+                # Safe cleanup in case the client closed the connection/tab without sending close request
+                if session_id in active_discussions:
+                    try:
+                        active_discussions[session_id]['stop_event'].set()
+                        del active_discussions[session_id]
+                        print(f"[AI-Session] Session [{session_id}] nach Verbindungsabbruch beendet und bereinigt.")
+                    except Exception as clean_err:
+                        print(f"[AI-Session] Fehler bei automatischer Bereinigung nach Verbindungsabbruch: {clean_err}")
             return
             
         # 3. Ping Endpoint to wake up Render

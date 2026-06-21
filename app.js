@@ -1182,7 +1182,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: JSON.stringify({
           id: activeDiscussionSessionId
-        })
+        }),
+        keepalive: true
       });
 
       activeDiscussionSessionId = null;
