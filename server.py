@@ -586,6 +586,13 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
                 
+            except urllib.error.HTTPError as e:
+                try:
+                    err_body = e.read().decode('utf-8')
+                except Exception:
+                    err_body = str(e)
+                print(f"[Clone] ElevenLabs HTTP Error {e.code}: {err_body}")
+                self.send_error_response(e.code, f"ElevenLabs Fehler: {err_body}")
             except Exception as e:
                 print(f"[Clone] Fehler bei Stimmenklonierung: {e}")
                 self.send_error_response(500, f"Cloning-Fehler: {str(e)}")
@@ -667,6 +674,13 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(audio_data)
                 
+            except urllib.error.HTTPError as e:
+                try:
+                    err_body = e.read().decode('utf-8')
+                except Exception:
+                    err_body = str(e)
+                print(f"[TTS] ElevenLabs/BFH HTTP Error {e.code}: {err_body}")
+                self.send_error_response(e.code, f"TTS-API-Fehler: {err_body}")
             except Exception as e:
                 print(f"[TTS] Fehler bei der TTS-Generierung: {e}")
                 self.send_error_response(500, f"TTS-Fehler: {str(e)}")
