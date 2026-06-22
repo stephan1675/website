@@ -1,0 +1,50 @@
+# Stephan Jeremias
+
+Factual profile of Stephan Jeremias, Mechatronics and System Technology student, specializing in rapid prototyping, hardware-software integration, and mechanical design.
+
+## Steckbrief (Overview)
+- **Name**: Stephan Jeremias (born Wegmann, November 16, 1982)
+- **Location**: Hinterkappelen (Bern), Switzerland
+- **Role**: Part-time student (4th Semester) in Bachelor of Science in Mechatronics and System Technology at BFH Biel (Berner Fachhochschule)
+- **Professional Persona**: Analytical, calm, solution-oriented maker mentality, highly reliable. Focuses on delivering precise, thoroughly designed physical and software solutions from the background.
+- **Languages**: German (Native), Spanish (Native), English (Spoken: Fluent, Written: Good)
+- **LinkedIn**: https://www.linkedin.com/in/stephan-jeremias
+
+## Career Arc & Transition
+- **Original Training**: Trained and certified as a Biology Laboratory Assistant (Biologielaborant) at Novartis.
+- **Interim Career**: Worked for nearly a decade in social care (youth counselor and care worker), refining communication, stability, and team-oriented collaboration.
+- **The Red Thread (Engineering Shift)**: Re-oriented his career path to engineering to professionalize his lifelong passion for tinkering, technical problem-solving, and creating concrete, measurable, and tangible systems.
+- **Maturity & Focus**: Father of two children (born 2018 and 2021). Highly focused on long-term stability, reliability, and corporate loyalty.
+
+## Professional Experience
+### R&D Intern | Compact Motion GmbH (March 2026 - June 2026)
+Worked on the development and optimization of linear motor starter kits and test benches:
+- **Prototyping**: Optimized and replicated the "Rhino" linear motor starter kits, including CAD modifications, 3D printing of custom protective covers, electrical schematics drafting, and Bill of Materials (BOM) creation.
+- **Test Bench Restoration**: Recommissioned and re-calibrated a complex Innosuisse test rig.
+- **Software Expansion**: Modified and extended Python scripts for test bench logging and automation using VS Code, Git, SSH, and the Linux CLI.
+- **Data Science**: Handled data acquisition and systematic evaluation in Python (e.g., verifying temperature dependencies and testing magnetic counterweights).
+- **IT/Infrastructure**: Provided IT setup and company relocation assistance, including configuring static IPs on Raspberry Pi controllers for test-bench WLAN integration.
+
+## Key Projects
+### 1. Robotics arm wheelchair control study (BFH Biel)
+- Assisted in a research study for controlling a robotic arm mounted on a wheelchair (utilizing voice and tablet input) to enhance autonomy for disabled individuals.
+
+### 2. Custom DIY RC Car
+- Fully designed and built a remote-controlled car from scratch.
+- Mechanical layout designt in Autodesk Fusion 360, custom chassis components printed on a Prusa 3D printer.
+- Manually soldered PCBs and programmed object-oriented firmware in C++ for an ESP32 microcontroller.
+
+### 3. Tower Defense C++ Game
+- Designed a turn-based CLI Tower Defense game utilizing object-oriented C++.
+- Modeled the architecture using UML diagramming, implemented version control with Git.
+
+### 4. Makerspace Infrastructure Helferteam (BFH Biel)
+- Active member of the setup team for the BFH Makerspace workshop.
+- Maintained the 3D printer park, set up wood/laser work areas, and built partition walls.
+
+## Technical Skills (Hard Skills)
+- **Programming Languages**: C, C++, Python, MATLAB
+- **Mechanical Design (CAD)**: Autodesk Fusion, Siemens NX
+- **Electronics & Hardware**: ESP32, Arduino, PCB soldering, Oscilloscope, Multimeter, UART, I2C
+- **Fabrication**: FDM 3D printing (Prusa), CO2 laser cutting
+- **Software Engineering**: Git, UML diagramming, Linux CLI, SSH

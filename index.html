@@ -5,8 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Premium Portal - Home & Dashboard</title>
   <!-- Meta tags for SEO & best practices -->
-  <meta name="description" content="Ein hochmodernes und sicheres lokales Portal mit Anmelde- und Registrierungsfunktionen.">
+  <meta name="description" content="Stephan Jeremias - Student in Mechatronik & Systemtechnik an der BFH Biel. Projekt-Portfolio und nützliche Tools.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  
+  <!-- Structured Schema Data for AI Bots (AI SEO) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "mainEntity": {
+      "@type": "Person",
+      "name": "Stephan Jeremias",
+      "birthDate": "1982-11-16",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Hinterkappelen",
+        "addressRegion": "Bern",
+        "addressCountry": "CH"
+      },
+      "jobTitle": "Student in Mechatronik & Systemtechnik",
+      "worksFor": {
+        "@type": "CollegeOrUniversity",
+        "name": "Berner Fachhochschule BFH"
+      },
+      "alumniOf": [
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Berner Fachhochschule BFH Biel"
+        }
+      ],
+      "knowsAbout": [
+        "Mechatronik",
+        "Systemtechnik",
+        "Linearmotoren",
+        "CAD-Konstruktion",
+        "Prototyping",
+        "Robotik",
+        "Software Engineering",
+        "C++ Programming",
+        "Python Scripting"
+      ],
+      "sameAs": [
+        "https://www.linkedin.com/in/stephan-jeremias"
+      ]
+    }
+  }
+  </script>
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/variables.css">
@@ -28,16 +72,80 @@
     <main id="home-view" class="dashboard-container">
       <!-- Header -->
       <header class="dash-header">
-        <div class="dash-logo">Portal.</div>
+        <div class="dash-logo">Stephan Jeremias.</div>
         <div id="home-auth-status" class="dash-user-profile">
           <!-- Will be filled by JS dynamically -->
         </div>
       </header>
 
-      <!-- Welcome Banner -->
-      <section class="welcome-banner glass-card-wide">
-        <h1>Willkommen auf meinem Portal</h1>
-        <p>Entdecke meine Projekte und starte installierte Spiele oder Simulationen direkt von diesem Control-Panel aus.</p>
+      <!-- Premium Hero Banner (Human & AI Optimized) -->
+      <section class="welcome-banner glass-card-wide" style="text-align: left; padding: 3rem 2.5rem; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;">
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="project-tag" style="background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.2); color: var(--color-primary); font-size: 0.75rem;">Mechatronik &amp; Systemtechnik</span>
+            <span class="project-tag" style="background: rgba(6, 182, 212, 0.08); border-color: rgba(6, 182, 212, 0.2); color: var(--color-secondary); font-size: 0.75rem;">Embedded Systems</span>
+            <span class="project-tag" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.2); color: var(--color-success); font-size: 0.75rem;">R&amp;D Prototyping</span>
+          </div>
+          <h1 style="font-size: 2.6rem; text-align: left; line-height: 1.2; margin: 0; background: linear-gradient(135deg, #ffffff 40%, var(--color-primary) 75%, var(--color-secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Stephan Jeremias
+          </h1>
+          <p style="color: var(--color-text-secondary); font-size: 1.1rem; line-height: 1.6; margin: 0; max-width: 100%;">
+            Studierender (4. Semester, BFH Biel) &amp; R&amp;D-Tüftler. Ich entwickele und optimiere mechatronische Systeme durch die gezielte Kombination von Mechanik, Elektronik und sauberem Software-Engineering.
+          </p>
+          <p style="color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">
+            <strong>Der rote Faden:</strong> Ursprünglich als Biologielaborant bei Novartis ausgebildet und danach fast ein Jahrzehnt im sozialen Bereich engagiert, habe ich meinen Fokus neu geschärft. Heute professionalisiere ich meine Leidenschaft für praktische Problemlösungen, Systementwicklung und präzises Troubleshooting in der Industrie.
+          </p>
+          <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap;">
+            <a href="https://www.linkedin.com/in/stephan-jeremias" target="_blank" class="btn btn-secondary" style="width: auto; padding: 0.65rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; border-color: rgba(99, 102, 241, 0.3); color: #fff; background: rgba(99, 102, 241, 0.05); text-decoration: none;">
+              <i class="fa-brands fa-linkedin" style="color: #0077b5;"></i>
+              <span>LinkedIn Profil</span>
+            </a>
+            <a href="llms.txt" target="_blank" class="btn btn-secondary" style="width: auto; padding: 0.65rem 1.25rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; border-color: var(--glass-border); color: var(--color-text-secondary); background: rgba(255, 255, 255, 0.02); text-decoration: none;">
+              <i class="fa-solid fa-robot"></i>
+              <span>llms.txt (Für KIs)</span>
+            </a>
+          </div>
+        </div>
+        <div class="user-avatar" style="width: 120px; height: 120px; font-size: 3rem; border-width: 4px; box-shadow: 0 8px 30px var(--color-primary-glow); font-family: var(--font-heading); background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+          SJ
+        </div>
+      </section>
+
+      <!-- Key Hard Skills Showcase -->
+      <section class="glass-card-wide" style="padding: 2rem 2.5rem; text-align: left; margin-bottom: 0.5rem; border-radius: var(--border-radius-md);">
+        <h3 style="font-size: 1.2rem; color: var(--color-text-primary); margin-bottom: 1.25rem; font-family: var(--font-heading); display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-microchip" style="color: var(--color-secondary);"></i>
+          <span>Tech Stack &amp; Hard Skills</span>
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+          <div>
+            <h4 style="font-size: 0.9rem; color: var(--color-primary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Software &amp; Sprachen</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 0.4rem;">
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-primary); margin-right: 0.5rem;"></i>C/C++ (Objektorientiert, ESP32)</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-primary); margin-right: 0.5rem;"></i>Python (Datenanalyse, Scripting)</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-primary); margin-right: 0.5rem;"></i>MATLAB / Simulink</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-primary); margin-right: 0.5rem;"></i>Git Version Control &amp; UML</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-size: 0.9rem; color: var(--color-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Hardware &amp; Tools</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 0.4rem;">
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-secondary); margin-right: 0.5rem;"></i>CAD: Autodesk Fusion, Siemens NX</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-secondary); margin-right: 0.5rem;"></i>Labor: Oszilloskop, Multimeter, UART/I2C</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-secondary); margin-right: 0.5rem;"></i>Rapid Prototyping: 3D-Druck, Löten, CO2-Laser</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-secondary); margin-right: 0.5rem;"></i>Inbetriebnahme &amp; E-Schemata (BOM)</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-size: 0.9rem; color: var(--color-success); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Sprachen &amp; Soft-Facts</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 0.4rem;">
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-success); margin-right: 0.5rem;"></i>Deutsch &amp; Spanisch (Muttersprachen)</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-success); margin-right: 0.5rem;"></i>Englisch (Sehr gut gesprochen, gut schriftlich)</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-success); margin-right: 0.5rem;"></i>Macher-Mentalität: ruhig, fokussiert, loyal</li>
+              <li><i class="fa-solid fa-circle" style="font-size: 0.4rem; color: var(--color-success); margin-right: 0.5rem;"></i>Strukturierte &amp; analytische Arbeitsweise</li>
+            </ul>
+          </div>
+        </div>
       </section>
 
       <!-- Action Cards Grid -->
@@ -49,7 +157,7 @@
             <i class="fa-solid fa-code card-icon"></i>
             <h3>Projekt-Galerie</h3>
           </div>
-          <p class="card-description">Schau dir meine aktuellen Programmierarbeiten, Webseiten und Software-Projekte an.</p>
+          <p class="card-description">Erfahre mehr über die Steuerung von Rollstuhl-Roboterarmen an der BFH, RC-Car-Bauten und C++ Software-Architekturen.</p>
           <button id="btn-view-projects" class="btn btn-primary">
             <span>Projekte ansehen</span>
             <i class="fa-solid fa-arrow-right"></i>
@@ -73,7 +181,7 @@
         <section class="dash-card" style="display: flex; flex-direction: column;">
           <div class="card-title-wrapper">
             <i class="fa-brands fa-python card-icon" style="color: #ffd43b;"></i>
-            <h3>Python Shooter</h3>
+            <h3>Python Shooter 3D</h3>
           </div>
           <p class="card-description" style="flex-grow: 1;">Starte das in Python und der Ursina-Engine entwickelte 3D Shooter-Spiel.</p>
           <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
@@ -102,6 +210,43 @@
         </section>
 
       </div>
+
+      <!-- Ask AI About Me (AI SEO Widget) -->
+      <section class="glass-card-wide" style="padding: 2.5rem; text-align: left; margin-top: 0.5rem; border-radius: var(--border-radius-md);">
+        <div class="card-title-wrapper" style="margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-wand-magic-sparkles card-icon" style="color: var(--color-primary);"></i>
+          <h3>Frag die KI über mich (AI Prompt)</h3>
+        </div>
+        <p class="card-description" style="margin-bottom: 1.25rem; font-size: 0.95rem;">
+          Möchtest du ein Profiling von einer KI erstellen lassen? Kopiere den folgenden Prompt und füge ihn in ChatGPT, Gemini oder Copilot ein. Er ist so formuliert, dass die KIs meine verknüpfte <code>llms.txt</code> Datei abrufen und ein präzises Bild zeichnen.
+        </p>
+
+        <!-- Copyable prompt box -->
+        <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); padding: 1.25rem; border-radius: var(--border-radius-sm); font-family: monospace; font-size: 0.85rem; color: var(--color-text-secondary); text-align: left; position: relative; margin-bottom: 1.5rem; word-break: break-word; line-height: 1.5; padding-right: 3rem;">
+          <span id="ai-seo-prompt-text">Lies das Profil von Stephan Jeremias auf seiner Webseite und der llms.txt Datei (https://github.com/stephan1675/website/blob/develop/llms.txt). Wer ist Stephan Jeremias, was zeichnet ihn als Mechatroniker aus und welche R&amp;D-Erfahrungen bei Compact Motion bringt er mit?</span>
+          <button id="btn-copy-ai-prompt" class="btn-save-note" style="position: absolute; right: 0.75rem; bottom: 0.75rem; padding: 0.4rem 0.80rem; font-size: 0.75rem; width: auto; background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3); color: var(--color-primary); display: flex; align-items: center; gap: 0.35rem; transition: var(--transition-fast);">
+            <i class="fa-regular fa-copy"></i>
+            <span>Kopieren</span>
+          </button>
+        </div>
+
+        <!-- LLM Quick launch buttons -->
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; font-size: 0.9rem;">
+          <span style="color: var(--color-text-secondary); font-weight: 500;">Direkt in Chat öffnen:</span>
+          
+          <a id="link-chatgpt" href="https://chatgpt.com/?q=Lies+das+Profil+von+Stephan+Jeremias+auf+seiner+Webseite+und+der+llms.txt+Datei+%28https%3A%2F%2Fgithub.com%2Fstephan1675%2Fwebsite%2Fblob%2Fdevelop%2Fllms.txt%29.+Wer+ist+Stephan+Jeremias%2C+was+zeichnet+ihn+als+Mechatroniker+aus+und+welche+R%26D-Erfahrungen+bei+Compact+Motion+bringt+er+mit%3F" target="_blank" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem; border-radius: var(--border-radius-sm); border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: var(--color-text-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-bolt" style="color: #10a37f;"></i><span>ChatGPT</span>
+          </a>
+
+          <a id="link-gemini" href="https://gemini.google.com/app?q=Lies+das+Profil+von+Stephan+Jeremias+auf+seiner+Webseite+und+der+llms.txt+Datei+%28https%3A%2F%2Fgithub.com%2Fstephan1675%2Fwebsite%2Fblob%2Fdevelop%2Fllms.txt%29.+Wer+ist+Stephan+Jeremias%2C+was+zeichnet+ihn+als+Mechatroniker+aus+und+welche+R%26D-Erfahrungen+bei+Compact+Motion+bringt+er+mit%3F" target="_blank" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem; border-radius: var(--border-radius-sm); border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: var(--color-text-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-sparkles" style="color: #4285f4;"></i><span>Gemini</span>
+          </a>
+
+          <a id="link-copilot" href="https://copilot.microsoft.com/?q=Lies+das+Profil+von+Stephan+Jeremias+auf+seiner+Webseite+und+der+llms.txt+Datei+%28https%3A%2F%2Fgithub.com%2Fstephan1675%2Fwebsite%2Fblob%2Fdevelop%2Fllms.txt%29.+Wer+ist+Stephan+Jeremias%2C+was+zeichnet+ihn+als+Mechatroniker+aus+und+welche+R%26D-Erfahrungen+bei+Compact+Motion+bringt+er+mit%3F" target="_blank" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem; border-radius: var(--border-radius-sm); border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: var(--color-text-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-brands fa-microsoft" style="color: #00a4ef;"></i><span>Copilot</span>
+          </a>
+        </div>
+      </section>
     </main>
     
     <!-- ==========================================
