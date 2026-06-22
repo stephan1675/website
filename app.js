@@ -659,6 +659,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentTtsAudio = null; // Stores all messages for text file export
   let currentSessionAgents = [];
   let agentVoiceClones = {};
+  let recordedAudioBlobs = [];
 
   // Helper to map agent to voice preset
   function getRecommendedVoice(personaKey) {
@@ -796,6 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="coral">Coral (Weiblich - Warm)</option>
             <option value="alloy">Alloy (Weiblich - Neutral)</option>
             <option value="elevenlabs_clone" style="color: var(--color-primary); font-weight: bold;">🎙️ Eigene Stimme klonen (ElevenLabs)</option>
+            <option value="elevenlabs_W1m7sYaOoCpc4hBK5WXK" style="color: var(--color-warning); font-weight: bold;">👹 Shrek / Oger (ElevenLabs)</option>
             <option value="elevenlabs_custom_id" style="color: var(--color-secondary); font-weight: bold;">🔑 Vorhandene ElevenLabs Voice-ID verwenden</option>
           </select>
         </div>
@@ -1278,6 +1280,7 @@ document.addEventListener('DOMContentLoaded', () => {
       discussionIsPaused = false;
       discussionMessageBuffer = [];
       currentDiscussionTurns = [];
+      recordedAudioBlobs = [];
 
       chatUserInputPanel.classList.add('hidden');
       chatUserInputField.value = '';
@@ -1496,6 +1499,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chatUserInputField.value = '';
     discussionMessageBuffer = [];
     currentDiscussionTurns = [];
+    recordedAudioBlobs = [];
     showToast('Debatte beendet.', 'info');
   }
 
@@ -1553,6 +1557,21 @@ document.addEventListener('DOMContentLoaded', () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    // Concatenate and download audio transcript if available
+    if (recordedAudioBlobs.length > 0) {
+      showToast('Kompiliere Gesprächs-Audio...', 'info');
+      const audioBlob = new Blob(recordedAudioBlobs, { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audioLink = document.createElement('a');
+      audioLink.href = audioUrl;
+      audioLink.download = `ki_debatte_${safeTopic}_${timestamp}.mp3`;
+      
+      document.body.appendChild(audioLink);
+      audioLink.click();
+      document.body.removeChild(audioLink);
+      URL.revokeObjectURL(audioUrl);
+    }
   }
 
   // Submit user keyboard contribution
@@ -1643,6 +1662,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const blob = await response.blob();
+      recordedAudioBlobs.push(blob);
       const audioUrl = URL.createObjectURL(blob);
       currentTtsAudio = new Audio(audioUrl);
 
