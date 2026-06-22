@@ -516,6 +516,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnCloseTerminal.addEventListener('click', closeTerminalSession);
 
+  // Prompt copy button functionality
+  const btnCopyPrompt = document.getElementById('btn-copy-ai-prompt');
+  const promptTextEl = document.getElementById('ai-seo-prompt-text');
+  if (btnCopyPrompt && promptTextEl) {
+    btnCopyPrompt.addEventListener('click', (e) => {
+      e.preventDefault();
+      const textToCopy = promptTextEl.innerText || promptTextEl.textContent;
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          showToast('Prompt in Zwischenablage kopiert!', 'success');
+        })
+        .catch(err => {
+          console.error('Fehler beim Kopieren:', err);
+          showToast('Kopieren fehlgeschlagen.', 'error');
+        });
+    });
+  }
+
   // Initialize AI discussion module
   initDiscussion();
 
