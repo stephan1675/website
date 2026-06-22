@@ -796,6 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="coral">Coral (Weiblich - Warm)</option>
             <option value="alloy">Alloy (Weiblich - Neutral)</option>
             <option value="elevenlabs_clone" style="color: var(--color-primary); font-weight: bold;">🎙️ Eigene Stimme klonen (ElevenLabs)</option>
+            <option value="elevenlabs_custom_id" style="color: var(--color-secondary); font-weight: bold;">🔑 Vorhandene ElevenLabs Voice-ID verwenden</option>
           </select>
         </div>
 
@@ -825,6 +826,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <input type="file" class="clone-file-input" id="file-input-agent-${i}" accept=".wav,.mp3">
           </div>
           <span class="file-upload-name" id="clone-file-name-agent-${i}">Kein Sample verknüpft</span>
+        </div>
+
+        <!-- ElevenLabs Manual Voice ID Container (hidden by default) -->
+        <div class="voice-clone-container hidden" id="voice-id-container-agent-${i}">
+          <div class="voice-clone-title"><i class="fa-solid fa-key"></i> ElevenLabs Voice-ID eingeben</div>
+          <div class="form-group" style="margin-bottom: 0.25rem;">
+            <input type="text" class="form-control clone-voice-id-input" id="voice-id-input-agent-${i}" placeholder="z.B. 21m00Tcm4TlvDq8ikWAM" style="padding-left: 1rem;">
+          </div>
+          <span class="file-upload-name" style="text-align: left; margin-top: 0.25rem;">Kopiere die Voice ID aus deinem ElevenLabs Dashboard (VoiceLab).</span>
         </div>
 
         <!-- Collapsible Custom Form (hidden by default) -->
@@ -900,6 +910,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Voice Cloning elements & state
       const cloneContainer = card.querySelector(`#voice-clone-container-agent-${i}`);
+      const voiceIdContainer = card.querySelector(`#voice-id-container-agent-${i}`);
       const recordBtn = card.querySelector(`#record-btn-agent-${i}`);
       const previewBtn = card.querySelector(`#preview-btn-agent-${i}`);
       const recIndicator = card.querySelector(`#rec-indicator-agent-${i}`);
@@ -913,10 +924,16 @@ document.addEventListener('DOMContentLoaded', () => {
       let recordSeconds = 0;
 
       function updateVoiceCloneVisibility() {
-        if (voiceSelect.value === 'elevenlabs_clone' && discEnableTts.checked) {
-          cloneContainer.classList.remove('hidden');
-        } else {
-          cloneContainer.classList.add('hidden');
+        // Hide both first
+        cloneContainer.classList.add('hidden');
+        voiceIdContainer.classList.add('hidden');
+
+        if (discEnableTts.checked) {
+          if (voiceSelect.value === 'elevenlabs_clone') {
+            cloneContainer.classList.remove('hidden');
+          } else if (voiceSelect.value === 'elevenlabs_custom_id') {
+            voiceIdContainer.classList.remove('hidden');
+          }
         }
       }
 
@@ -1214,6 +1231,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const agentName = agentObj.name || `Teilnehmer ${i + 1}`;
           showToast(`Kloniere Stimme bei ElevenLabs für ${agentName}...`, 'info');
           const voiceId = await cloneVoice(agentName, cloneData.blob, cloneData.filename);
+          agentObj.voice = 'elevenlabs_' + voiceId;
+        } else if (voice === 'elevenlabs_custom_id') {
+          const voiceIdInput = card.querySelector(`#voice-id-input-agent-${i + 1}`);
+          const voiceId = voiceIdInput ? voiceIdInput.value.trim() : '';
+          if (!voiceId) {
+            throw new Error(`Teilnehmer ${i + 1}: Bitte gib eine ElevenLabs Voice-ID ein.`);
+          }
           agentObj.voice = 'elevenlabs_' + voiceId;
         }
 
