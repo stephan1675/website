@@ -8,8 +8,12 @@
   <meta name="description" content="Ein hochmodernes und sicheres lokales Portal mit Anmelde- und Registrierungsfunktionen.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
   
-  <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/discussion.css">
+  <link rel="stylesheet" href="css/command_center.css">
   
   <!-- FontAwesome Icons for modern visuals -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -383,60 +387,282 @@
           </button>
         </div>
       </header>
-      
-      <!-- Dashboard Grid -->
-      <div class="dash-grid">
-        
-        <!-- Card 1: Account Stats -->
-        <section class="dash-card">
-          <div class="card-title-wrapper">
-            <i class="fa-solid fa-chart-simple card-icon"></i>
-            <h3>Konto-Aktivität</h3>
-          </div>
-          <div class="stats-list">
-            <div class="stat-item">
-              <span class="stat-label">Mitglied seit</span>
-              <span id="stat-created" class="stat-value">--.--.----</span>
+
+      <!-- Tab Navigation Bar -->
+      <div class="tab-navigation glass-card-wide" style="margin-bottom: 0rem; padding: 0.75rem 1.5rem; display: flex; gap: 1rem; justify-content: flex-start; align-items: center; border-radius: var(--border-radius-md);">
+        <button class="tab-btn active" data-tab="tab-projects" style="background: none; border: none; font-family: var(--font-heading); color: var(--color-text-secondary); cursor: pointer; padding: 0.6rem 1.2rem; font-weight: 600; font-size: 0.95rem; border-radius: var(--border-radius-sm); transition: var(--transition-fast); display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-folder-tree"></i>
+          <span>Projekt-Planer</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-theory" style="background: none; border: none; font-family: var(--font-heading); color: var(--color-text-secondary); cursor: pointer; padding: 0.6rem 1.2rem; font-weight: 600; font-size: 0.95rem; border-radius: var(--border-radius-sm); transition: var(--transition-fast); display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-bezier-curve"></i>
+          <span>Theorie-Playground</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-account" style="background: none; border: none; font-family: var(--font-heading); color: var(--color-text-secondary); cursor: pointer; padding: 0.6rem 1.2rem; font-weight: 600; font-size: 0.95rem; border-radius: var(--border-radius-sm); transition: var(--transition-fast); display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-user-gear"></i>
+          <span>Konto & Info</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Project Planner -->
+      <div id="tab-projects" class="tab-content">
+        <div class="planner-layout" style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem;">
+          
+          <!-- Left: Project Selector List -->
+          <section class="dash-card" style="padding: 1.5rem;">
+            <div class="card-title-wrapper" style="margin-bottom: 1rem;">
+              <i class="fa-solid fa-list-check card-icon"></i>
+              <h3>Projekte</h3>
             </div>
-            <div class="stat-item">
-              <span class="stat-label">Logins insgesamt</span>
-              <span id="stat-logins" class="stat-value">0</span>
+            <div id="project-selector-list" class="project-list-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- Dynamically populated project items -->
             </div>
-            <div class="stat-item">
-              <span class="stat-label">Sitzungsstatus</span>
-              <span class="stat-value" style="color: var(--color-success);">Aktiv</span>
+          </section>
+
+          <!-- Right: Active Project Details & Task Board -->
+          <section class="dash-card" style="padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="planner-detail-header" style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h2 id="active-project-title" style="font-size: 1.6rem; color: var(--color-text-primary); margin-bottom: 0.25rem;">Projekt auswählen</h2>
+                <p id="active-project-desc" style="color: var(--color-text-secondary); font-size: 0.9rem; margin: 0;">Wähle links ein Projekt aus, um Aufgaben zu planen.</p>
+              </div>
+              <button id="btn-launch-active-project" class="btn btn-primary hidden" style="width: auto; padding: 0.6rem 1.25rem; font-size: 0.85rem;">
+                <i class="fa-solid fa-play"></i>
+                <span>Projekt starten</span>
+              </button>
             </div>
-          </div>
-        </section>
-        
-        <!-- Card 2: Quick Notes Widget -->
-        <section class="dash-card">
-          <div class="card-title-wrapper">
-            <i class="fa-regular fa-note-sticky card-icon"></i>
-            <h3>Schnelle Notizen</h3>
-          </div>
-          <div class="notes-container">
-            <textarea id="quick-notes" class="notes-textarea" placeholder="Schreibe hier etwas auf... Deine Notizen werden automatisch in deinem Browser gespeichert!"></textarea>
-            <button id="save-note-btn" class="btn-save-note">
-              <i class="fa-regular fa-floppy-disk"></i>
-              <span>Speichern</span>
-            </button>
-          </div>
-        </section>
-        
-        <!-- Card 3: Info & Documentation -->
-        <section class="dash-card">
-          <div class="card-title-wrapper">
-            <i class="fa-solid fa-circle-info card-icon"></i>
-            <h3>Über diese App</h3>
-          </div>
-          <div class="welcome-card-content">
-            <p>Willkommen in deinem persönlichen Bereich! Diese Website läuft vollständig im Browser als <span class="welcome-highlight">Single Page Application</span>.</p>
-            <p>Da kein Backend-Server vorhanden ist, werden alle Daten mithilfe der <span class="welcome-highlight">HTML5 LocalStorage API</span> verschlüsselt simuliert auf deinem Computer hinterlegt.</p>
-            <p>Du kannst dich abmelden, die Seite aktualisieren oder den Browser schließen – deine Daten bleiben erhalten, solange du den Browserverlauf nicht löschst.</p>
-          </div>
-        </section>
-        
+
+            <!-- Progress Bar -->
+            <div id="active-project-progress-container" class="hidden" style="width: 100%;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--color-text-secondary); margin-bottom: 0.4rem;">
+                <span>Fortschritt</span>
+                <span id="active-project-progress-text">0% (0/0)</span>
+              </div>
+              <div class="progress-bar-wrapper" style="height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; overflow: hidden; width: 100%;">
+                <div id="active-project-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)); border-radius: 3px; transition: var(--transition-smooth);"></div>
+              </div>
+            </div>
+
+            <!-- Task Management Board -->
+            <div id="active-project-board-content" class="hidden" style="display: flex; flex-direction: column; gap: 1.5rem;">
+              
+              <!-- Add Task Form -->
+              <form id="add-task-form" style="display: flex; gap: 0.75rem;">
+                <input type="text" id="new-task-input" class="form-control" placeholder="Neue Aufgabe hinzufügen..." style="padding: 0.75rem 1rem; padding-left: 1rem;" required>
+                <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">
+                  <i class="fa-solid fa-plus"></i><span>Hinzufügen</span>
+                </button>
+              </form>
+
+              <!-- Checkbox List -->
+              <div id="project-tasks-list" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 350px; overflow-y: auto; padding-right: 0.5rem;">
+                <!-- Tasks will appear here dynamically -->
+              </div>
+
+              <!-- Local Project Notes -->
+              <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+                <label style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600; color: var(--color-text-secondary);">Projektspezifische Notizen</label>
+                <textarea id="project-notes-textarea" class="notes-textarea" style="height: 120px;" placeholder="Notizen für dieses Projekt... (automatisches Speichern beim Tippen)"></textarea>
+              </div>
+
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+      <!-- Tab 2: Theory Playground (Simulators) -->
+      <div id="tab-theory" class="tab-content hidden">
+        <div class="dash-grid" style="grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));">
+          
+          <!-- Simulator 1: PID-Regler -->
+          <section class="dash-card" style="padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+            <div class="card-title-wrapper" style="margin-bottom: 0.25rem;">
+              <i class="fa-solid fa-gears card-icon" style="color: var(--color-secondary);"></i>
+              <h3>PID-Regelkreis Simulator</h3>
+            </div>
+            <p class="card-description" style="margin-bottom: 0.75rem; font-size: 0.85rem;">
+              Simuliere den Einschwingvorgang eines Regelkreises. Optimiere $K_p$, $K_i$ und $K_d$, um den Sollwert ohne Überschwingen oder Dauerschwingen zu erreichen.
+            </p>
+            
+            <div style="background: rgba(0, 0, 0, 0.2); border-radius: var(--border-radius-sm); border: 1px solid var(--glass-border); padding: 0.5rem; display: flex; justify-content: center; align-items: center; position: relative;">
+              <canvas id="pid-canvas" width="480" height="240" style="max-width: 100%; border-radius: 4px; display: block;"></canvas>
+            </div>
+
+            <!-- Controller Sliders -->
+            <div class="simulator-controls" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              
+              <!-- System presets -->
+              <div style="display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 500;">Preset:</span>
+                <button class="btn btn-secondary pid-preset-btn" data-preset="drone" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: var(--border-radius-sm);">Drohne (Höhe)</button>
+                <button class="btn btn-secondary pid-preset-btn" data-preset="motor" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: var(--border-radius-sm);">DC-Motor (Drehzahl)</button>
+                <button class="btn btn-secondary pid-preset-btn" data-preset="heating" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: var(--border-radius-sm);">Heizung (Temperatur)</button>
+              </div>
+
+              <!-- Sliders -->
+              <div class="slider-row" style="display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 600;">P-Anteil (Kp)</span>
+                <input type="range" id="pid-kp" class="simulator-slider" min="0" max="15" step="0.1" value="2.5" style="accent-color: var(--color-primary); cursor: pointer;">
+                <span id="pid-kp-val" style="font-family: monospace; font-weight: bold; color: var(--color-primary); text-align: right;">2.5</span>
+              </div>
+              <div class="slider-row" style="display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 600;">I-Anteil (Ki)</span>
+                <input type="range" id="pid-ki" class="simulator-slider" min="0" max="3" step="0.01" value="0.05" style="accent-color: var(--color-secondary); cursor: pointer;">
+                <span id="pid-ki-val" style="font-family: monospace; font-weight: bold; color: var(--color-secondary); text-align: right;">0.05</span>
+              </div>
+              <div class="slider-row" style="display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 600;">D-Anteil (Kd)</span>
+                <input type="range" id="pid-kd" class="simulator-slider" min="0" max="5" step="0.05" value="1.2" style="accent-color: var(--color-success); cursor: pointer;">
+                <span id="pid-kd-val" style="font-family: monospace; font-weight: bold; color: var(--color-success); text-align: right;">1.20</span>
+              </div>
+              <div class="slider-row" style="display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 600;">Sollwert (r)</span>
+                <input type="range" id="pid-setpoint" class="simulator-slider" min="10" max="90" step="1" value="50" style="accent-color: var(--color-text-primary); cursor: pointer;">
+                <span id="pid-setpoint-val" style="font-family: monospace; font-weight: bold; color: var(--color-text-primary); text-align: right;">50.0</span>
+              </div>
+            </div>
+
+            <!-- Stats & Control Panel -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 0.75rem; font-size: 0.85rem;">
+              <div style="display: flex; gap: 1rem; color: var(--color-text-secondary);">
+                <span>Fehler: <strong id="pid-error-val" style="font-family: monospace; color: var(--color-danger);">0.0</strong></span>
+                <span>Stellgröße: <strong id="pid-effort-val" style="font-family: monospace; color: var(--color-secondary);">0.0</strong></span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button id="btn-pid-play" class="btn btn-secondary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: var(--border-radius-sm); border-color: rgba(255, 255, 255, 0.1);">
+                  <i class="fa-solid fa-pause"></i><span>Pause</span>
+                </button>
+                <button id="btn-pid-reset" class="btn btn-secondary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: var(--border-radius-sm); border-color: rgba(255, 255, 255, 0.1);">
+                  <i class="fa-solid fa-arrow-rotate-left"></i><span>Reset</span>
+                </button>
+              </div>
+            </div>
+
+          </section>
+
+          <!-- Simulator 2: Filter -->
+          <section class="dash-card" style="padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+            <div class="card-title-wrapper" style="margin-bottom: 0.25rem;">
+              <i class="fa-solid fa-wave-square card-icon" style="color: var(--color-primary);"></i>
+              <h3>Signal-Rauschfilter Simulator</h3>
+            </div>
+            <p class="card-description" style="margin-bottom: 0.75rem; font-size: 0.85rem;">
+              Simuliere rohe, verrauschte Sensordaten (rot) und vergleiche, wie ein gleitender Mittelwert (Moving Average) oder Tiefpassfilter (cyan) das Signal glättet.
+            </p>
+
+            <div style="background: rgba(0, 0, 0, 0.2); border-radius: var(--border-radius-sm); border: 1px solid var(--glass-border); padding: 0.5rem; display: flex; justify-content: center; align-items: center; position: relative;">
+              <canvas id="filter-canvas" width="480" height="240" style="max-width: 100%; border-radius: 4px; display: block;"></canvas>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="simulator-controls" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              
+              <!-- Filter type selector -->
+              <div style="display: flex; gap: 0.5rem; align-items: center; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 500;">Filtertyp:</span>
+                <button class="btn btn-secondary filter-type-btn active" data-filter="moving" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: var(--border-radius-sm);">Gleitender Mittelwert</button>
+                <button class="btn btn-secondary filter-type-btn" data-filter="lowpass" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: var(--border-radius-sm);">Exponential-Tiefpass</button>
+              </div>
+
+              <!-- Noise level -->
+              <div class="slider-row" style="display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 600;">Rauschen</span>
+                <input type="range" id="filter-noise" class="simulator-slider" min="0" max="15" step="0.5" value="5.0" style="accent-color: var(--color-danger); cursor: pointer;">
+                <span id="filter-noise-val" style="font-family: monospace; font-weight: bold; color: var(--color-danger); text-align: right;">5.0</span>
+              </div>
+
+              <!-- Filter parameter strength slider -->
+              <div class="slider-row" style="display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span id="filter-param-label" style="color: var(--color-text-secondary); font-weight: 600;">Fenster (N)</span>
+                <input type="range" id="filter-param" class="simulator-slider" min="2" max="40" step="1" value="10" style="accent-color: var(--color-secondary); cursor: pointer;">
+                <span id="filter-param-val" style="font-family: monospace; font-weight: bold; color: var(--color-secondary); text-align: right;">10</span>
+              </div>
+
+              <!-- Signal frequency slider -->
+              <div class="slider-row" style="display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--color-text-secondary); font-weight: 600;">Frequenz (f)</span>
+                <input type="range" id="filter-freq" class="simulator-slider" min="0.1" max="1.5" step="0.05" value="0.4" style="accent-color: var(--color-text-primary); cursor: pointer;">
+                <span id="filter-freq-val" style="font-family: monospace; font-weight: bold; color: var(--color-text-primary); text-align: right;">0.40 Hz</span>
+              </div>
+
+            </div>
+
+            <!-- Stats & Control Panel -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 0.75rem; font-size: 0.85rem;">
+              <div style="display: flex; gap: 1rem; color: var(--color-text-secondary);">
+                <span>Signalverlust: <strong id="filter-loss-val" style="font-family: monospace; color: var(--color-warning);">0.0%</strong></span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button id="btn-filter-play" class="btn btn-secondary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: var(--border-radius-sm); border-color: rgba(255, 255, 255, 0.1);">
+                  <i class="fa-solid fa-pause"></i><span>Pause</span>
+                </button>
+                <button id="btn-filter-reset" class="btn btn-secondary" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: var(--border-radius-sm); border-color: rgba(255, 255, 255, 0.1);">
+                  <i class="fa-solid fa-arrow-rotate-left"></i><span>Reset</span>
+                </button>
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+      </div>
+
+      <!-- Tab 3: Account Info -->
+      <div id="tab-account" class="tab-content hidden">
+        <div class="dash-grid">
+          
+          <!-- Card 1: Account Stats -->
+          <section class="dash-card">
+            <div class="card-title-wrapper">
+              <i class="fa-solid fa-chart-simple card-icon"></i>
+              <h3>Konto-Aktivität</h3>
+            </div>
+            <div class="stats-list">
+              <div class="stat-item">
+                <span class="stat-label">Mitglied seit</span>
+                <span id="stat-created" class="stat-value">--.--.----</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Logins insgesamt</span>
+                <span id="stat-logins" class="stat-value">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Sitzungsstatus</span>
+                <span class="stat-value" style="color: var(--color-success);">Aktiv</span>
+              </div>
+            </div>
+          </section>
+          
+          <!-- Card 2: Quick Notes Widget (Global) -->
+          <section class="dash-card">
+            <div class="card-title-wrapper">
+              <i class="fa-regular fa-note-sticky card-icon"></i>
+              <h3>Globale Notizen</h3>
+            </div>
+            <div class="notes-container">
+              <textarea id="quick-notes" class="notes-textarea" placeholder="Schreibe hier globale Gedanken auf..."></textarea>
+              <button id="save-note-btn" class="btn-save-note">
+                <i class="fa-regular fa-floppy-disk"></i>
+                <span>Speichern</span>
+              </button>
+            </div>
+          </section>
+          
+          <!-- Card 3: Info & Documentation -->
+          <section class="dash-card">
+            <div class="card-title-wrapper">
+              <i class="fa-solid fa-circle-info card-icon"></i>
+              <h3>Über diese App</h3>
+            </div>
+            <div class="welcome-card-content">
+              <p>Willkommen in deinem persönlichen Bereich! Diese Website läuft vollständig im Browser als <span class="welcome-highlight">Single Page Application</span>.</p>
+              <p>Da kein Backend-Server vorhanden ist, werden alle Daten mithilfe der <span class="welcome-highlight">HTML5 LocalStorage API</span> verschlüsselt simuliert auf deinem Computer hinterlegt.</p>
+              <p>Du kannst dich abmelden, die Seite aktualisieren oder den Browser schließen – deine Daten bleiben erhalten, solange du den Browserverlauf nicht löschst.</p>
+            </div>
+          </section>
+          
+        </div>
       </div>
       
     </main>
@@ -505,6 +731,6 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- JavaScript logic -->
-  <script src="app.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
