@@ -658,6 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let ttsIsPlaying = false;
   let currentTtsAudio = null; // Stores all messages for text file export
   let currentSessionAgents = [];
+  let agentVoiceClones = {};
 
   // Helper to map agent to voice preset
   function getRecommendedVoice(personaKey) {
@@ -794,7 +795,36 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="shimmer">Shimmer (Weiblich - Freundlich)</option>
             <option value="coral">Coral (Weiblich - Warm)</option>
             <option value="alloy">Alloy (Weiblich - Neutral)</option>
+            <option value="elevenlabs_clone" style="color: var(--color-primary); font-weight: bold;">🎙️ Eigene Stimme klonen (ElevenLabs)</option>
           </select>
+        </div>
+
+        <!-- ElevenLabs Voice Cloning Container (hidden by default) -->
+        <div class="voice-clone-container hidden" id="voice-clone-container-agent-${i}">
+          <div class="voice-clone-title"><i class="fa-solid fa-microphone"></i> Stimme aufnehmen oder hochladen</div>
+          <div class="recorder-controls">
+            <button type="button" class="record-btn" id="record-btn-agent-${i}">
+              <i class="fa-solid fa-microphone"></i>
+              <span>Aufnahme starten</span>
+            </button>
+            <button type="button" class="clone-preview-btn" id="preview-btn-agent-${i}" disabled>
+              <i class="fa-solid fa-play"></i>
+              <span>Anhören</span>
+            </button>
+            <div class="recording-indicator hidden" id="rec-indicator-agent-${i}">
+              <div class="recording-dot"></div>
+              <span id="rec-timer-agent-${i}">0:00</span>
+            </div>
+          </div>
+          <div class="voice-clone-divider">ODER</div>
+          <div class="file-upload-wrapper" style="margin-top: 0.25rem;">
+            <div class="file-upload-btn">
+              <i class="fa-solid fa-file-audio"></i>
+              <span>Audio-Datei hochladen (.wav, .mp3)</span>
+            </div>
+            <input type="file" class="clone-file-input" id="file-input-agent-${i}" accept=".wav,.mp3">
+          </div>
+          <span class="file-upload-name" id="clone-file-name-agent-${i}">Kein Sample verknüpft</span>
         </div>
 
         <!-- Collapsible Custom Form (hidden by default) -->
@@ -868,6 +898,31 @@ document.addEventListener('DOMContentLoaded', () => {
       // Initialize voice to recommended for the default selection
       voiceSelect.value = getRecommendedVoice(dropdown.value);
 
+      // Voice Cloning elements & state
+      const cloneContainer = card.querySelector(`#voice-clone-container-agent-${i}`);
+      const recordBtn = card.querySelector(`#record-btn-agent-${i}`);
+      const previewBtn = card.querySelector(`#preview-btn-agent-${i}`);
+      const recIndicator = card.querySelector(`#rec-indicator-agent-${i}`);
+      const recTimer = card.querySelector(`#rec-timer-agent-${i}`);
+      const cloneFileInput = card.querySelector(`#file-input-agent-${i}`);
+      const cloneFileName = card.querySelector(`#clone-file-name-agent-${i}`);
+
+      let mediaRecorder = null;
+      let recordedChunks = [];
+      let recordInterval = null;
+      let recordSeconds = 0;
+
+      function updateVoiceCloneVisibility() {
+        if (voiceSelect.value === 'elevenlabs_clone' && discEnableTts.checked) {
+          cloneContainer.classList.remove('hidden');
+        } else {
+          cloneContainer.classList.add('hidden');
+        }
+      }
+
+      voiceSelect.addEventListener('change', updateVoiceCloneVisibility);
+      discEnableTts.addEventListener('change', updateVoiceCloneVisibility);
+
       dropdown.addEventListener('change', () => {
         if (dropdown.value === 'new_custom') {
           customForm.classList.remove('hidden');
@@ -877,6 +932,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Auto-select recommended voice for presets
         voiceSelect.value = getRecommendedVoice(dropdown.value);
+        updateVoiceCloneVisibility();
       });
 
       fileInput.addEventListener('change', () => {
@@ -884,6 +940,105 @@ document.addEventListener('DOMContentLoaded', () => {
           fileNameDisplay.textContent = `Ausgewählt: ${fileInput.files[0].name}`;
         } else {
           fileNameDisplay.textContent = 'Kein Dokument verknüpft';
+        }
+      });
+
+      // Microphone Recording Handler
+      recordBtn.addEventListener('click', async () => {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+          recordBtn.innerHTML = '<i class="fa-solid fa-microphone"></i><span>Aufnahme starten</span>';
+          recordBtn.classList.remove('recording');
+          recIndicator.classList.add('hidden');
+          clearInterval(recordInterval);
+          return;
+        }
+
+        try {
+          recordedChunks = [];
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          
+          let options = { mimeType: 'audio/webm' };
+          if (!MediaRecorder.isTypeSupported('audio/webm')) {
+            options = { mimeType: 'audio/ogg' };
+          }
+          
+          mediaRecorder = new MediaRecorder(stream, options);
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) {
+              recordedChunks.push(e.data);
+            }
+          };
+
+          mediaRecorder.onstop = () => {
+            stream.getTracks().forEach(track => track.stop());
+            
+            const mime = mediaRecorder.mimeType || 'audio/webm';
+            const ext = mime.split(';')[0].split('/')[1] || 'webm';
+            const blob = new Blob(recordedChunks, { type: mime });
+            const filename = `recording_${i}_${Date.now()}.${ext}`;
+            const previewUrl = URL.createObjectURL(blob);
+            
+            if (agentVoiceClones[i] && agentVoiceClones[i].previewUrl) {
+              URL.revokeObjectURL(agentVoiceClones[i].previewUrl);
+            }
+            agentVoiceClones[i] = {
+              blob: blob,
+              filename: filename,
+              previewUrl: previewUrl
+            };
+            
+            cloneFileName.textContent = `Aufnahme bereit: ~${(blob.size / 1024).toFixed(1)} KB`;
+            previewBtn.disabled = false;
+          };
+
+          mediaRecorder.start();
+          recordBtn.innerHTML = '<i class="fa-solid fa-stop"></i><span>Aufnahme beenden</span>';
+          recordBtn.classList.add('recording');
+          recIndicator.classList.remove('hidden');
+          
+          recordSeconds = 0;
+          recTimer.textContent = '0:00';
+          clearInterval(recordInterval);
+          recordInterval = setInterval(() => {
+            recordSeconds++;
+            const mins = Math.floor(recordSeconds / 60);
+            const secs = recordSeconds % 60;
+            recTimer.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+          }, 1000);
+
+        } catch (err) {
+          console.error('[Recorder] Fehler:', err);
+          showToast('Mikrofon-Zugriff verweigert oder nicht unterstützt.', 'error');
+        }
+      });
+
+      // Preview Cloned Voice Sample Handler
+      previewBtn.addEventListener('click', () => {
+        const cloneData = agentVoiceClones[i];
+        if (cloneData && cloneData.previewUrl) {
+          const previewAudio = new Audio(cloneData.previewUrl);
+          previewAudio.play().catch(e => console.error('[Preview] Fehler bei Wiedergabe:', e));
+        }
+      });
+
+      // Voice Cloning File Upload Handler
+      cloneFileInput.addEventListener('change', () => {
+        if (cloneFileInput.files.length > 0) {
+          const file = cloneFileInput.files[0];
+          const previewUrl = URL.createObjectURL(file);
+          
+          if (agentVoiceClones[i] && agentVoiceClones[i].previewUrl) {
+            URL.revokeObjectURL(agentVoiceClones[i].previewUrl);
+          }
+          agentVoiceClones[i] = {
+            blob: file,
+            filename: file.name,
+            previewUrl: previewUrl
+          };
+          
+          cloneFileName.textContent = `Datei bereit: ${file.name} (~${(file.size / 1024).toFixed(1)} KB)`;
+          previewBtn.disabled = false;
         }
       });
     }
@@ -922,6 +1077,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const data = await response.json();
     return data.filename;
+  }
+
+  // Helper: Upload clone audio to backend and return voice_id
+  async function cloneVoice(name, audioBlob, filename) {
+    const baseUrl = getApiBaseUrl();
+    const base64Data = await readFileAsBase64(audioBlob);
+
+    const response = await fetch(`${baseUrl}/api/voice/clone`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        filename: filename,
+        content: base64Data
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Stimmenklonierung fehlgeschlagen');
+    }
+
+    const data = await response.json();
+    return data.voice_id;
   }
 
   // Submit setup and start discussion
@@ -1019,6 +1200,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           // Load preset
           agentObj = { ...PRESET_PERSONAS[selection], voice: voice };
+        }
+
+        if (voice === 'elevenlabs_clone') {
+          const cloneData = agentVoiceClones[i + 1]; // 1-based indexing in state
+          if (!cloneData || !cloneData.blob) {
+            throw new Error(`Teilnehmer ${i + 1}: Bitte Sprachaufnahme erstellen oder Audio-Datei hochladen für ElevenLabs-Klonierung.`);
+          }
+          if (window.location.protocol === 'file:') {
+            throw new Error('Stimmenklonierung benötigt den laufenden server.py Server. (Aktuell über file:// geöffnet).');
+          }
+          
+          const agentName = agentObj.name || `Teilnehmer ${i + 1}`;
+          showToast(`Kloniere Stimme bei ElevenLabs für ${agentName}...`, 'info');
+          const voiceId = await cloneVoice(agentName, cloneData.blob, cloneData.filename);
+          agentObj.voice = 'elevenlabs_' + voiceId;
         }
 
         agents.push(agentObj);

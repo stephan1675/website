@@ -9,6 +9,7 @@ import queue
 import uuid
 import time
 import urllib.parse
+import urllib.request
 import base64
 import random
 
@@ -39,6 +40,36 @@ def load_env():
         except Exception as e:
             print(f"[Launcher] Fehler beim Einlesen von .env: {e}")
     return env
+
+# Helper to build multipart/form-data payload without external packages
+def build_multipart_formdata(fields, files):
+    boundary = "Boundary-" + uuid.uuid4().hex
+    body = []
+    
+    # Add fields
+    for key, value in fields.items():
+        body.append(f'--{boundary}'.encode('utf-8'))
+        body.append(f'Content-Disposition: form-data; name="{key}"'.encode('utf-8'))
+        body.append(b'')
+        body.append(str(value).encode('utf-8'))
+        
+    # Add files
+    for key, file_info in files.items():
+        filename = file_info['filename']
+        content = file_info['content']
+        mime_type = file_info.get('mime_type', 'application/octet-stream')
+        
+        body.append(f'--{boundary}'.encode('utf-8'))
+        body.append(f'Content-Disposition: form-data; name="{key}"; filename="{filename}"'.encode('utf-8'))
+        body.append(f'Content-Type: {mime_type}'.encode('utf-8'))
+        body.append(b'')
+        body.append(content)
+        
+    body.append(f'--{boundary}--'.encode('utf-8'))
+    body.append(b'')
+    
+    content_type = f'multipart/form-data; boundary={boundary}'
+    return content_type, b'\r\n'.join(body)
 
 # BFH API and AI Discussion Simulation loader from "KI Konversation" package
 # Uses dynamic import mechanism to bypass folder name space restrictions in standard python imports
@@ -474,6 +505,91 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
             except Exception as e:
                 self.send_error_response(500, f"Fehler bei Eingabeübertragung: {str(e)}")
 
+        # 8b. [NEW] ElevenLabs Voice Cloning
+        elif self.path == '/api/voice/clone':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                name = data.get('name', 'Custom Voice').strip()
+                filename = data.get('filename', 'recording.wav').strip()
+                content = data.get('content') # Base64 string
+                
+                if not content:
+                    self.send_error_response(400, "Kein Audio-Inhalt übermittelt.")
+                    return
+                
+                # Load env variables (for ElevenLabs API key)
+                env = load_env()
+                elevenlabs_key = env.get('ELEVENLABS_API_KEY') or os.environ.get('ELEVENLABS_API_KEY')
+                
+                if not elevenlabs_key:
+                    self.send_error_response(500, "ELEVENLABS_API_KEY nicht in .env konfiguriert.")
+                    return
+                
+                # Split off data uri metadata if present
+                if ',' in content:
+                    content = content.split(',', 1)[1]
+                
+                audio_bytes = base64.b64decode(content)
+                
+                # Prepare fields and files for ElevenLabs multipart API
+                fields = {
+                    "name": name,
+                    "description": "Cloned voice for AI discussion platform."
+                }
+                
+                # Determine mime type from filename
+                mime_type = "audio/wav"
+                if filename.endswith(".mp3"):
+                    mime_type = "audio/mpeg"
+                elif filename.endswith(".m4a"):
+                    mime_type = "audio/mp4"
+                
+                files = {
+                    "files": {
+                        "filename": filename,
+                        "content": audio_bytes,
+                        "mime_type": mime_type
+                    }
+                }
+                
+                content_type, body = build_multipart_formdata(fields, files)
+                
+                req_url = 'https://api.elevenlabs.io/v1/voices/add'
+                headers = {
+                    'Content-Type': content_type,
+                    'xi-api-key': elevenlabs_key
+                }
+                
+                req = urllib.request.Request(req_url, data=body, headers=headers, method='POST')
+                
+                with urllib.request.urlopen(req) as response:
+                    res_data = response.read()
+                    
+                res_json = json.loads(res_data.decode('utf-8'))
+                voice_id = res_json.get('voice_id')
+                
+                if not voice_id:
+                    self.send_error_response(500, "Keine Voice ID von ElevenLabs erhalten.")
+                    return
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                response = {
+                    "status": "success",
+                    "voice_id": voice_id
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                
+            except Exception as e:
+                print(f"[Clone] Fehler bei Stimmenklonierung: {e}")
+                self.send_error_response(500, f"Cloning-Fehler: {str(e)}")
+
         # 9. [NEW] Text-to-Speech proxy
         elif self.path == '/api/tts':
             try:
@@ -488,31 +604,61 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_error_response(400, "Text darf nicht leer sein.")
                     return
                 
-                # Load env variables (for BFH API key)
                 env = load_env()
-                api_key = env.get('BFH_API_KEY') or os.environ.get('BFH_API_KEY')
                 
-                if not api_key:
-                    self.send_error_response(500, "BFH_API_KEY nicht konfiguriert.")
-                    return
-                
-                # Call BFH TTS API
-                req_url = 'https://inference.mlmp.ti.bfh.ch/api/v1/audio/speech'
-                headers = {
-                    'Content-Type': 'application/json',
-                    'Authorization': f'Bearer {api_key}'
-                }
-                payload = {
-                    "model": "kokoro-tts",
-                    "input": text,
-                    "voice": voice
-                }
-                
-                req_data = json.dumps(payload).encode('utf-8')
-                req = urllib.request.Request(req_url, data=req_data, headers=headers, method='POST')
-                
-                with urllib.request.urlopen(req) as response:
-                    audio_data = response.read()
+                # Check if ElevenLabs voice ID is requested
+                if voice.startswith('elevenlabs_'):
+                    voice_id = voice.replace('elevenlabs_', '')
+                    
+                    elevenlabs_key = env.get('ELEVENLABS_API_KEY') or os.environ.get('ELEVENLABS_API_KEY')
+                    if not elevenlabs_key:
+                        self.send_error_response(500, "ELEVENLABS_API_KEY nicht konfiguriert.")
+                        return
+                    
+                    req_url = f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}'
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'xi-api-key': elevenlabs_key
+                    }
+                    payload = {
+                        "text": text,
+                        "model_id": "eleven_multilingual_v2",
+                        "voice_settings": {
+                            "stability": 0.5,
+                            "similarity_boost": 0.75
+                        }
+                    }
+                    
+                    req_data = json.dumps(payload).encode('utf-8')
+                    req = urllib.request.Request(req_url, data=req_data, headers=headers, method='POST')
+                    
+                    with urllib.request.urlopen(req) as response:
+                        audio_data = response.read()
+                else:
+                    # Load env variables (for BFH API key)
+                    api_key = env.get('BFH_API_KEY') or os.environ.get('BFH_API_KEY')
+                    
+                    if not api_key:
+                        self.send_error_response(500, "BFH_API_KEY nicht konfiguriert.")
+                        return
+                    
+                    # Call BFH TTS API
+                    req_url = 'https://inference.mlmp.ti.bfh.ch/api/v1/audio/speech'
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': f'Bearer {api_key}'
+                    }
+                    payload = {
+                        "model": "kokoro-tts",
+                        "input": text,
+                        "voice": voice
+                    }
+                    
+                    req_data = json.dumps(payload).encode('utf-8')
+                    req = urllib.request.Request(req_url, data=req_data, headers=headers, method='POST')
+                    
+                    with urllib.request.urlopen(req) as response:
+                        audio_data = response.read()
                     
                 self.send_response(200)
                 self.send_header('Content-Type', 'audio/mpeg')
