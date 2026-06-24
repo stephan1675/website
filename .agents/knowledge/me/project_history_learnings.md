@@ -38,6 +38,12 @@ Nach der ersten Implementierung wurde ein autonomer Audit-Subagent (`code_critic
 - **Charmap-Encoding Crash:** Konsolen-Emojis führten unter Windows-Systemen zu Serverabstürzen. Alle Emojis wurden aus den stdout-Prints entfernt.
 - **HTML Nesting Bug:** Durch ein fehlendes schließendes `</div>` im Registrierungsbereich wurde das Passwort-Vergessen-Formular fälschlicherweise in einem ausgeblendeten CSS-Container gerendert, was zu einer leeren Ansicht führte. Dies wurde erfolgreich korrigiert.
 
+### Phase 5: Command Center-Erweiterungen & Caching-Fix (24. Juni 2026)
+- **Status-Dropdowns**: Ersetzung einfacher Checkboxen durch ein 3-stufiges Status-Modell (Geplant, In Ausführung, Erledigt) mit dynamischer Farbkodierung im Frontend.
+- **Accordion-Notizen**: Aufgabenkarten lassen sich auf Klick aufklappen und offenbaren ein aufgabenspezifisches Notizenfeld mit automatischem Speichern im LocalStorage.
+- **Manuelle Fortschritts-Eingabe**: Ermöglichung des manuellen Überschreibens des Fortschrittsbalkens auf Klick, inklusive Reset-Option (Auto-Berechnung basierend auf Status).
+- **Caching-Fix**: Behebung von hartnäckigem Client-Caching bei Code-Updates durch Hinzufügen von `Cache-Control`-Headern in der Get-Methode des HTTP-Servers (`server.py`).
+
 ---
 
 ## 3. Lerneffekte für zukünftige Projekte (Lessons Learned)
@@ -45,3 +51,4 @@ Nach der ersten Implementierung wurde ein autonomer Audit-Subagent (`code_critic
 1. **Security-First ab Minute Eins:** Die Praxis zeigt, dass die nachträgliche Absicherung von API-Endpunkten aufwendiger ist als das direkte Implementieren von Token-Authentifizierung und starken Hashes bei der Feature-Erstellung.
 2. **Kombination aus manuellen & automatisierten Tests:** Das für dieses Projekt geschriebene Testskript (`scratch/test_auth.py`) simulierte den gesamten End-to-End-Ablauf vollautomatisch und hat die Verifikationszeit für den Passwort-Reset-Fluss massiv verkürzt. Dieser Ansatz sollte bei komplexen Logikänderungen immer gewählt werden.
 3. **Subagenten als wertvolle Partner:** Die Delegation von Audits an spezialisierte Code-Critics deckt logische Fehler auf, die man selbst leicht übersieht. Das spart Debugging-Zeit und erhöht die Softwarequalität signifikant.
+4. **Cache-Prävention bei lokalen Servern:** Um Verwirrung durch veralteten Browser-Cache bei Entwicklungsänderungen auszuschließen, sollten lokale Server immer standardmäßig no-cache Header für statische Assets senden.

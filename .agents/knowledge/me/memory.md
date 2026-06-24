@@ -59,3 +59,17 @@ Im JavaScript-Code wurde der Passwort-Eingabetyp mittels `button.previousElement
 1. **Strukturunabhängige Selektoren verwenden:** Anstatt uns auf die genaue Reihenfolge der Geschwister-Elemente (`previousElementSibling`) zu verlassen, sollte das Element robuster über die Elternbox gesucht werden:
    `const input = button.parentElement.querySelector('input');`
 2. **Automatisiertes Testen von State-Veränderungen:** Wenn möglich, sollten Klick-Events auf Sichtbarkeits-Toggles und deren Auswirkung auf das DOM in Integrations- oder Unit-Tests abgedeckt werden.
+
+---
+
+## 5. Vorfall: Aggressives Browser-Caching bei statischen Assets (24. Juni 2026)
+
+### Was ist passiert?
+Nach dem Einspielen der Command Center Aufgaben-Erweiterungen (Status-Badges, Notizen-Textbereiche, Fortschritts-Override) wurden die Änderungen auf der Benutzeroberfläche des Nutzers trotz Neuladens nicht angezeigt. Der Browser lud weiterhin die alte Version der JavaScript- und CSS-Dateien aus dem lokalen Cache.
+
+### Wo lag die Schwierigkeit?
+Der standardmäßige Python-Klassen-Webserver (`http.server.SimpleHTTPRequestHandler`) setzt für statische Ressourcen keine spezifischen Cache-Control-Header. Browser cachen diese Dateien daher sehr aggressiv, wodurch Änderungen im lokalen Dateisystem erst nach manuellem Cache-Löschen oder verzögert geladen werden. Ein einfacher Klick auf "Neu laden" reicht meistens nicht aus.
+
+### Wie klappt es das nächste Mal besser?
+1. **Cache-Control im Server erzwingen**: Den HTTP-Handler des lokalen Servers so erweitern, dass er bei jedem Request `Cache-Control: no-store, no-cache, must-revalidate, max-age=0` sowie Pragma/Expires Header sendet. Dies garantiert, dass der Browser bei jedem Seitenaufruf im Entwicklungsmodus die neuesten Dateien lädt.
+2. **Aktives Hinweisen auf Hard-Reloads**: Falls Cache-Probleme vermutet werden, den Benutzer gezielt auf Tastaturkombinationen wie `Strg + F5` (Windows) oder `Cmd + Shift + R` (Mac) hinweisen.

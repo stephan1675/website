@@ -35,6 +35,7 @@ Please follow this structured workflow for all tasks in this workspace:
   - Run syntax/compilation checks before requesting feedback.
   - Run `git status` and verify you are on the correct branch (`develop` or feature branch) before starting development.
   - Use `generate_image` for UI mockup designs and gain user visual approval before implementing frontend CSS/HTML.
+  - Automatically update the agent memory files ([memory.md](file:///c:/Users/Esisc/OneDrive%20-%20Berner%20Fachhochschule/Desktop/Website/.agents/knowledge/me/memory.md) and [project_history_learnings.md](file:///c:/Users/Esisc/OneDrive%20-%20Berner%20Fachhochschule/Desktop/Website/.agents/knowledge/me/project_history_learnings.md)) upon task completion to document learnings, incidents, and solutions.
 - **Ask First**:
   - Start long-running background processes (e.g. servers).
   - Install new package dependencies.
