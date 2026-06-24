@@ -12,6 +12,136 @@ import urllib.parse
 import urllib.request
 import base64
 import random
+import hashlib
+import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+# User database path
+USERS_LOCK = threading.Lock()
+USERS_FILE = 'users.json'
+
+# Helper to read users from users.json
+def load_users():
+    with USERS_LOCK:
+        if not os.path.exists(USERS_FILE):
+            return []
+        try:
+            with open(USERS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"[Auth] Fehler beim Laden von users.json: {e}")
+            return []
+
+# Helper to save users to users.json
+def save_users(users):
+    with USERS_LOCK:
+        try:
+            with open(USERS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(users, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"[Auth] Fehler beim Speichern von users.json: {e}")
+
+# Helper for salted PBKDF2-HMAC-SHA256 password hashing
+def hash_password(password, salt=None):
+    if not salt:
+        salt = secrets.token_hex(16)
+    iterations = 100000
+    hashed = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), iterations)
+    return f"{salt}:{iterations}:{hashed.hex()}"
+
+def verify_password(password, stored_hash):
+    try:
+        parts = stored_hash.split(':')
+        if len(parts) == 3:
+            salt, iterations_str, hashed_hex = parts
+            iterations = int(iterations_str)
+            hashed = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), iterations)
+            return hashed.hex() == hashed_hex
+        elif len(parts) == 2:
+            # Fallback backward compatibility for SHA-256
+            salt, hashed = parts
+            return hashlib.sha256((password + salt).encode('utf-8')).hexdigest() == hashed
+    except Exception:
+        pass
+    return False
+
+# Helper to send email or fallback to local files
+def send_email(to_email, subject, html_content, text_content):
+    env = load_env()
+    
+    smtp_server = env.get('SMTP_SERVER') or os.environ.get('SMTP_SERVER')
+    smtp_port = env.get('SMTP_PORT') or os.environ.get('SMTP_PORT')
+    smtp_user = env.get('SMTP_USER') or os.environ.get('SMTP_USER')
+    smtp_password = env.get('SMTP_PASSWORD') or os.environ.get('SMTP_PASSWORD')
+    smtp_sender = env.get('SMTP_SENDER') or smtp_user or "no-reply@localhost"
+
+    email_sent = False
+    
+    if smtp_server and smtp_port and smtp_user and smtp_password:
+        try:
+            print(f"[Email] Sende echte SMTP E-Mail an {to_email}...")
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = subject
+            msg['From'] = smtp_sender
+            msg['To'] = to_email
+            
+            part1 = MIMEText(text_content, 'plain', 'utf-8')
+            part2 = MIMEText(html_content, 'html', 'utf-8')
+            msg.attach(part1)
+            msg.attach(part2)
+            
+            port = int(smtp_port)
+            if port == 465:
+                # SSL
+                server = smtplib.SMTP_SSL(smtp_server, port, timeout=10)
+            else:
+                # TLS/StartTLS
+                server = smtplib.SMTP(smtp_server, port, timeout=10)
+                server.ehlo()
+                if port == 587:
+                    server.starttls()
+                    server.ehlo()
+            
+            server.login(smtp_user, smtp_password)
+            server.sendmail(smtp_sender, to_email, msg.as_string())
+            server.quit()
+            print(f"[Email] Echte SMTP E-Mail erfolgreich an {to_email} gesendet.")
+            email_sent = True
+        except Exception as e:
+            print(f"[Email] Fehler beim Senden der echten SMTP E-Mail an {to_email}: {e}")
+            print("[Email] Weiche auf lokale HTML-Aufzeichnung aus.")
+            
+    if not email_sent:
+        # Local mock fallback
+        try:
+            os.makedirs('sent_emails', exist_ok=True)
+            timestamp = int(time.time())
+            safe_to = to_email.replace('@', '_at_').replace('.', '_')
+            filename = f"sent_emails/email_{timestamp}_{safe_to}.html"
+            
+            # Debug header
+            debug_header = f"""<!-- email_mock_simulator -->
+<div style="background:#4f46e5; color:#ffffff; padding:15px; font-family:sans-serif; text-align:center; font-size:14px; margin-bottom:20px; border-radius:8px; line-height:1.5; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    <strong>📬 LOKALER E-MAIL SIMULATOR</strong><br>
+    Diese E-Mail wurde abgefangen und lokal gespeichert. In einer Live-Umgebung wäre sie an <strong>{to_email}</strong> gesendet worden.<br>
+    Betreff: <strong>{subject}</strong>
+</div>
+"""
+            
+            full_html = debug_header + html_content
+            
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(full_html)
+                
+            print("==========================================================================")
+            print(f"[E-MAIL SIMULATOR] Eine E-Mail an {to_email} wurde lokal aufgezeichnet:")
+            print(f"   Betreff: {subject}")
+            print(f"   Datei: {os.path.abspath(filename)}")
+            print("==========================================================================")
+        except Exception as e:
+            print(f"[Email] Fehler beim Schreiben der Mock-E-Mail: {e}")
 
 # Port selection
 PORT = int(os.environ.get("PORT", 8000))
@@ -205,13 +335,304 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
             self.send_success_response("pong")
             return
             
+        # 4. GET User Profile (Secure token-based auth)
+        elif parsed_url.path == '/api/auth/user-profile':
+            auth_header = self.headers.get('Authorization')
+            if not auth_header or not auth_header.startswith('Bearer '):
+                self.send_error_response(401, "Nicht autorisiert. Fehlendes oder ungültiges Token.")
+                return
+                
+            token = auth_header.split(' ', 1)[1].strip()
+            users = load_users()
+            user = next((u for u in users if u.get('sessionToken') == token), None)
+            if not user:
+                self.send_error_response(401, "Nicht autorisiert. Token ist ungültig oder abgelaufen.")
+                return
+                
+            profile = {
+                "username": user["username"],
+                "email": user["email"],
+                "createdAt": user.get("createdAt", ""),
+                "loginCount": user.get("loginCount", 0),
+                "notes": user.get("notes", "")
+            }
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(profile).encode('utf-8'))
+            return
+            
         else:
             super().do_GET()
 
     # Custom POST overrides
     def do_POST(self):
+        # Auth endpoints
+        if self.path == '/api/auth/register':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                username = data.get('username', '').strip()
+                email = data.get('email', '').strip().lower()
+                password = data.get('password', '')
+                
+                if not username or not email or not password:
+                    self.send_error_response(400, "Alle Felder (Benutzername, E-Mail, Passwort) sind erforderlich.")
+                    return
+                
+                if len(username) < 3:
+                    self.send_error_response(400, "Der Benutzername muss mindestens 3 Zeichen lang sein.")
+                    return
+                if len(password) < 8:
+                    self.send_error_response(400, "Das Passwort muss mindestens 8 Zeichen lang sein.")
+                    return
+                    
+                users = load_users()
+                if any(u['email'] == email for u in users):
+                    self.send_error_response(400, "Diese E-Mail-Adresse ist bereits registriert.")
+                    return
+                if any(u['username'].lower() == username.lower() for u in users):
+                    self.send_error_response(400, "Dieser Benutzername ist bereits vergeben.")
+                    return
+                    
+                new_user = {
+                    "username": username,
+                    "email": email,
+                    "passwordHash": hash_password(password),
+                    "createdAt": time.strftime("%d.%m.%Y"),
+                    "loginCount": 0,
+                    "notes": ""
+                }
+                
+                users.append(new_user)
+                save_users(users)
+                
+                # Send welcome email
+                subject = "Willkommen im Portal!"
+                text_content = f"Hallo {username},\n\nvielen Dank für deine Registrierung auf unserer Website!\n\nDein Benutzername lautet: {username}\nDeine registrierte E-Mail: {email}\n\nDu kannst dich jetzt anmelden.\n\nBeste Grüße,\nDein Portal-Team"
+                
+                html_content = f"""
+                <html>
+                <body style="font-family: sans-serif; background-color: #0f0f19; color: #f3f4f6; padding: 30px;">
+                    <div style="max-width: 600px; margin: 0 auto; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+                        <h1 style="color: #6366f1; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-top: 0;">Portal.</h1>
+                        <p style="font-size: 16px; line-height: 1.6;">Hallo <strong>{username}</strong>,</p>
+                        <p style="font-size: 16px; line-height: 1.6;">Vielen Dank für deine Registrierung! Dein Account wurde erfolgreich erstellt.</p>
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Benutzername:</strong> {username}</p>
+                            <p style="margin: 5px 0;"><strong>E-Mail:</strong> {email}</p>
+                        </div>
+                        <p style="font-size: 16px; line-height: 1.6;">Du kannst dich ab sofort mit deinem Passwort anmelden.</p>
+                        <p style="margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px; font-size: 14px; color: #9ca3af;">
+                            Dies ist eine automatisch generierte E-Mail.
+                        </p>
+                    </div>
+                </body>
+                </html>
+                """
+                
+                threading.Thread(target=send_email, args=(email, subject, html_content, text_content), daemon=True).start()
+                
+                self.send_success_response("Konto erfolgreich erstellt! Eine Willkommens-E-Mail wurde gesendet.")
+            except Exception as e:
+                self.send_error_response(500, f"Registrierungsfehler: {str(e)}")
+            return
+
+        elif self.path == '/api/auth/login':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                email = data.get('email', '').strip().lower()
+                password = data.get('password', '')
+                
+                if not email or not password:
+                    self.send_error_response(400, "E-Mail und Passwort sind erforderlich.")
+                    return
+                    
+                users = load_users()
+                user = next((u for u in users if u['email'] == email), None)
+                
+                if not user or not verify_password(password, user['passwordHash']):
+                    self.send_error_response(401, "Ungültige E-Mail-Adresse oder falsches Passwort.")
+                    return
+                
+                # Generate dynamic session token
+                session_token = secrets.token_hex(32)
+                user['sessionToken'] = session_token
+                user['loginCount'] = user.get('loginCount', 0) + 1
+                save_users(users)
+                
+                profile = {
+                    "username": user["username"],
+                    "email": user["email"],
+                    "createdAt": user.get("createdAt", ""),
+                    "loginCount": user["loginCount"],
+                    "notes": user.get("notes", "")
+                }
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "status": "success",
+                    "message": f"Willkommen zurück, {user['username']}!",
+                    "sessionToken": session_token,
+                    "user": profile
+                }).encode('utf-8'))
+            except Exception as e:
+                self.send_error_response(500, f"Login-Fehler: {str(e)}")
+            return
+
+        elif self.path == '/api/auth/save-notes':
+            try:
+                auth_header = self.headers.get('Authorization')
+                if not auth_header or not auth_header.startswith('Bearer '):
+                    self.send_error_response(401, "Nicht autorisiert. Fehlendes oder ungültiges Token.")
+                    return
+                token = auth_header.split(' ', 1)[1].strip()
+                
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                notes = data.get('notes', '')
+                
+                users = load_users()
+                user = next((u for u in users if u.get('sessionToken') == token), None)
+                
+                if not user:
+                    self.send_error_response(401, "Nicht autorisiert. Token ist ungültig oder abgelaufen.")
+                    return
+                    
+                user['notes'] = notes
+                save_users(users)
+                
+                self.send_success_response("Notiz erfolgreich gespeichert!")
+            except Exception as e:
+                self.send_error_response(500, f"Fehler beim Speichern: {str(e)}")
+            return
+
+        elif self.path == '/api/auth/forgot-password':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                email = data.get('email', '').strip().lower()
+                
+                if not email:
+                    self.send_error_response(400, "E-Mail-Adresse fehlt.")
+                    return
+                    
+                users = load_users()
+                user = next((u for u in users if u['email'] == email), None)
+                
+                if not user:
+                    self.send_success_response("Wenn diese E-Mail-Adresse existiert, wurde ein Link zum Zurücksetzen gesendet.")
+                    return
+                    
+                token = secrets.token_urlsafe(32)
+                expiry = time.time() + 3600
+                
+                user['resetToken'] = token
+                user['resetTokenExpiry'] = expiry
+                save_users(users)
+                
+                env = load_env()
+                base_url = env.get('BASE_URL') or os.environ.get('BASE_URL')
+                if not base_url:
+                    host_header = self.headers.get('Host', 'localhost:8000')
+                    protocol = "https" if "render.com" in host_header else "http"
+                    base_url = f"{protocol}://{host_header}"
+                base_url = base_url.rstrip('/')
+                reset_link = f"{base_url}/reset-password.html?token={token}"
+                
+                subject = "Passwort zurücksetzen"
+                text_content = f"Hallo {user['username']},\n\njemand hat das Zurücksetzen deines Passworts angefordert.\n\nKlicke auf den folgenden Link, um ein neues Passwort einzugeben:\n{reset_link}\n\nDieser Link ist für 1 Stunde gültig. Falls du dies nicht angefordert hast, ignoriere diese E-Mail.\n\nBeste Grüße,\nDein Portal-Team"
+                
+                html_content = f"""
+                <html>
+                <body style="font-family: sans-serif; background-color: #0f0f19; color: #f3f4f6; padding: 30px;">
+                    <div style="max-width: 600px; margin: 0 auto; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+                        <h1 style="color: #6366f1; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-top: 0;">Portal.</h1>
+                        <p style="font-size: 16px; line-height: 1.6;">Hallo <strong>{user['username']}</strong>,</p>
+                        <p style="font-size: 16px; line-height: 1.6;">Du hast das Zurücksetzen deines Passworts angefordert. Klicke auf die Schaltfläche unten, um ein neues Passwort zu vergeben:</p>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="{reset_link}" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">Passwort zurücksetzen</a>
+                        </div>
+                        
+                        <p style="font-size: 14px; color: #9ca3af; line-height: 1.6;">Oder kopiere diesen Link in deinen Browser:</p>
+                        <p style="font-size: 13px; word-break: break-all; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">{reset_link}</p>
+                        
+                        <p style="font-size: 14px; color: #9ca3af; margin-top: 20px;">Dieser Link ist <strong>1 Stunde</strong> lang gültig. Falls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.</p>
+                        
+                        <p style="margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px; font-size: 14px; color: #9ca3af;">
+                            Dies ist eine automatisch generierte E-Mail.
+                        </p>
+                    </div>
+                </body>
+                </html>
+                """
+                
+                threading.Thread(target=send_email, args=(email, subject, html_content, text_content), daemon=True).start()
+                
+                self.send_success_response("Wenn diese E-Mail-Adresse existiert, wurde ein Link zum Zurücksetzen gesendet.")
+            except Exception as e:
+                self.send_error_response(500, f"Fehler bei Passwort-Zurücksetzungsanfrage: {str(e)}")
+            return
+
+        elif self.path == '/api/auth/reset-password':
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length).decode('utf-8')
+                data = json.loads(post_data)
+                
+                token = data.get('token', '').strip()
+                new_password = data.get('password', '')
+                
+                if not token or not new_password:
+                    self.send_error_response(400, "Token und neues Passwort sind erforderlich.")
+                    return
+                    
+                if len(new_password) < 8:
+                    self.send_error_response(400, "Das Passwort muss mindestens 8 Zeichen lang sein.")
+                    return
+                    
+                users = load_users()
+                user = None
+                for u in users:
+                    if u.get('resetToken') == token:
+                        expiry = u.get('resetTokenExpiry', 0)
+                        if expiry > time.time():
+                            user = u
+                            break
+                            
+                if not user:
+                    self.send_error_response(400, "Der Token ist ungültig oder bereits abgelaufen.")
+                    return
+                    
+                user['passwordHash'] = hash_password(new_password)
+                if 'resetToken' in user:
+                    del user['resetToken']
+                if 'resetTokenExpiry' in user:
+                    del user['resetTokenExpiry']
+                    
+                save_users(users)
+                
+                self.send_success_response("Passwort erfolgreich zurückgesetzt! Du kannst dich jetzt einloggen.")
+            except Exception as e:
+                self.send_error_response(500, f"Fehler beim Passwort-Zurücksetzen: {str(e)}")
+            return
+
         # 1. Python Shooter
-        if self.path == '/api/run-python':
+        elif self.path == '/api/run-python':
             try:
                 game_dir = os.path.join(os.getcwd(), 'python shooter')
                 if not os.path.exists(game_dir):
@@ -371,6 +792,14 @@ class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
                 
                 # Clean up filename to prevent path traversal
                 safe_filename = os.path.basename(filename)
+                
+                # Whitelist document extensions (reject HTML, JS, executables)
+                allowed_extensions = {'.txt', '.pdf', '.md', '.doc', '.docx', '.json'}
+                _, ext = os.path.splitext(safe_filename.lower())
+                if ext not in allowed_extensions:
+                    self.send_error_response(400, f"Ungültiger Dateityp. Erlaubte Dateitypen: {', '.join(allowed_extensions)}")
+                    return
+                    
                 file_path = os.path.join(docs_dir, safe_filename)
                 
                 # Split off data uri metadata if present
@@ -732,10 +1161,10 @@ if __name__ == '__main__':
     try:
         with ThreadingHTTPServer(("", PORT), LauncherHTTPHandler) as httpd:
             print("==========================================================")
-            print(f"🚀 Lokaler Webserver (Multithreaded) läuft unter:")
-            print(f"   👉 http://localhost:{PORT}")
+            print(f"[Launcher] Lokaler Webserver (Multithreaded) laeuft unter:")
+            print(f"   http://localhost:{PORT}")
             print("==========================================================")
-            print(" Drücken Sie [STRG] + [C] in diesem Fenster, um den Server zu beenden.\n")
+            print(" Druecken Sie [STRG] + [C] in diesem Fenster, um den Server zu beenden.\n")
             httpd.serve_forever()
     except KeyboardInterrupt:
         print("\n[Launcher] Webserver wird beendet. Auf Wiedersehen!")

@@ -11,6 +11,9 @@ const dashboardSection = document.getElementById('dashboard-section');
 
 const loginView = document.getElementById('login-view');
 const registerView = document.getElementById('register-view');
+const forgotPasswordView = document.getElementById('forgot-password-view');
+const forgotPasswordForm = document.getElementById('forgot-password-form');
+const forgotEmailInput = document.getElementById('forgot-email');
 
 // Forms & Inputs
 const loginForm = document.getElementById('login-form');
@@ -34,6 +37,8 @@ const btnDashBack = document.getElementById('btn-dash-back');
 
 const goToRegisterBtn = document.getElementById('go-to-register');
 const goToLoginBtn = document.getElementById('go-to-login');
+const goToForgotBtn = document.getElementById('go-to-forgot');
+const forgotToLoginBtn = document.getElementById('forgot-to-login');
 
 const btnRunPython = document.getElementById('btn-run-python');
 const btnRunCpp = document.getElementById('btn-run-cpp');
@@ -105,39 +110,50 @@ export function navigateToView(targetView) {
 }
 
 // --- Home View Header - Authentication Status ---
-export function updateHomeAuthStatus() {
-  const activeSessionEmail = localStorage.getItem('currentUserSession');
+export async function updateHomeAuthStatus() {
+  const token = localStorage.getItem('sessionToken');
   homeAuthStatus.innerHTML = '';
 
-  if (activeSessionEmail) {
-    const users = JSON.parse(localStorage.getItem('users'));
-    const user = users.find(u => u.email === activeSessionEmail);
-
-    if (user) {
-      const letter = user.username.charAt(0).toUpperCase();
-
-      homeAuthStatus.innerHTML = `
-        <div class="user-avatar" style="width: 35px; height: 35px; font-size: 0.9rem;">${letter}</div>
-        <div class="user-info" style="display: block; margin-right: 0.5rem;">
-          <span class="user-name" style="font-size: 0.85rem; display: block;">${user.username}</span>
-        </div>
-        <button id="home-to-dash-btn" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem; width: auto; margin-right: 0.5rem;">
-          <i class="fa-solid fa-gauge"></i>
-          <span>Dashboard</span>
-        </button>
-        <button id="home-logout-btn" class="btn-logout" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        </button>
-      `;
-
-      document.getElementById('home-to-dash-btn').addEventListener('click', () => {
-        showDashboard(user);
+  if (token) {
+    try {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/auth/user-profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
+      if (res.ok) {
+        const user = await res.json();
+        const letter = user.username.charAt(0).toUpperCase();
 
-      document.getElementById('home-logout-btn').addEventListener('click', () => {
-        performLogout();
-      });
-      return;
+        homeAuthStatus.innerHTML = `
+          <div class="user-avatar" style="width: 35px; height: 35px; font-size: 0.9rem;">${letter}</div>
+          <div class="user-info" style="display: block; margin-right: 0.5rem;">
+            <span class="user-name" style="font-size: 0.85rem; display: block;">${user.username}</span>
+          </div>
+          <button id="home-to-dash-btn" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem; width: auto; margin-right: 0.5rem;">
+            <i class="fa-solid fa-gauge"></i>
+            <span>Dashboard</span>
+          </button>
+          <button id="home-logout-btn" class="btn-logout" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        `;
+
+        document.getElementById('home-to-dash-btn').addEventListener('click', () => {
+          showDashboard(user);
+        });
+
+        document.getElementById('home-logout-btn').addEventListener('click', () => {
+          performLogout();
+        });
+        return;
+      } else {
+        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('currentUserSession');
+      }
+    } catch (err) {
+      console.warn("[Auth] Failed to update home auth status from server:", err);
     }
   }
 
@@ -151,6 +167,7 @@ export function updateHomeAuthStatus() {
   document.getElementById('home-login-btn').addEventListener('click', () => {
     loginView.classList.remove('hidden');
     registerView.classList.add('hidden');
+    forgotPasswordView.classList.add('hidden');
     navigateToView(authSection);
   });
 }
@@ -171,6 +188,7 @@ function showDashboard(user) {
 
 // --- Logout Logic ---
 function performLogout() {
+  localStorage.removeItem('sessionToken');
   localStorage.removeItem('currentUserSession');
   showToast('Erfolgreich abgemeldet.', 'info');
   updateHomeAuthStatus();
@@ -181,12 +199,14 @@ function performLogout() {
 function switchAuthSubView(showSub, hideSub) {
   loginView.classList.add('fade-out');
   registerView.classList.add('fade-out');
+  forgotPasswordView.classList.add('fade-out');
 
   setTimeout(() => {
     hideSub.classList.add('hidden');
     showSub.classList.remove('hidden');
     loginView.classList.remove('fade-out');
     registerView.classList.remove('fade-out');
+    forgotPasswordView.classList.remove('fade-out');
   }, 200);
 }
 
@@ -280,37 +300,40 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('users'));
+    const baseUrl = getApiBaseUrl();
+    const btnSubmit = registerForm.querySelector('button[type="submit"]');
+    const origContent = btnSubmit.innerHTML;
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<span>Erstellt...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
 
-    if (users.some(u => u.email === email)) {
-      showToast('Diese E-Mail-Adresse ist bereits registriert!', 'error');
-      return;
-    }
-    if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-      showToast('Dieser Benutzername ist bereits vergeben!', 'error');
-      return;
-    }
-
-    const newUser = {
-      username: username,
-      email: email,
-      passwordHash: mockHash(password),
-      createdAt: new Date().toLocaleDateString('de-DE'),
-      loginCount: 0,
-      notes: ''
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    showToast('Konto erfolgreich erstellt! Du kannst dich jetzt anmelden.', 'success');
-    registerForm.reset();
-
-    strengthBar.className = 'strength-bar';
-    strengthText.textContent = 'Passwortstärke';
-    strengthText.style.color = 'var(--color-text-muted)';
-
-    switchAuthSubView(loginView, registerView);
+    fetch(`${baseUrl}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, email, password })
+    })
+      .then(res => res.json().then(data => {
+        if (!res.ok) throw new Error(data.message || 'Registrierung fehlgeschlagen.');
+        return data;
+      }))
+      .then(data => {
+        showToast(data.message || 'Konto erfolgreich erstellt! Eine Willkommens-E-Mail wurde gesendet.', 'success');
+        registerForm.reset();
+        
+        strengthBar.className = 'strength-bar';
+        strengthText.textContent = 'Passwortstärke';
+        strengthText.style.color = 'var(--color-text-muted)';
+        
+        switchAuthSubView(loginView, registerView);
+      })
+      .catch(err => {
+        showToast(err.message, 'error');
+      })
+      .finally(() => {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = origContent;
+      });
   });
 
   // Login Form
@@ -320,41 +343,123 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = loginEmail.value.trim().toLowerCase();
     const password = loginPassword.value;
 
-    const users = JSON.parse(localStorage.getItem('users'));
-    const userIndex = users.findIndex(u => u.email === email);
+    const baseUrl = getApiBaseUrl();
+    const btnSubmit = loginForm.querySelector('button[type="submit"]');
+    const origContent = btnSubmit.innerHTML;
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<span>Anmelden...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
 
-    if (userIndex === -1 || users[userIndex].passwordHash !== mockHash(password)) {
-      showToast('Ungültige E-Mail-Adresse oder falsches Passwort.', 'error');
-      return;
-    }
-
-    const user = users[userIndex];
-    user.loginCount = (user.loginCount || 0) + 1;
-    users[userIndex] = user;
-
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('currentUserSession', email);
-
-    showToast(`Willkommen zurück, ${user.username}!`, 'success');
-    loginForm.reset();
-
-    updateHomeAuthStatus();
-    showDashboard(user);
+    fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    })
+      .then(res => res.json().then(data => {
+        if (!res.ok) throw new Error(data.message || 'Login fehlgeschlagen.');
+        return data;
+      }))
+      .then(data => {
+        localStorage.setItem('sessionToken', data.sessionToken);
+        localStorage.setItem('currentUserSession', email);
+        showToast(data.message, 'success');
+        loginForm.reset();
+        
+        updateHomeAuthStatus();
+        showDashboard(data.user);
+      })
+      .catch(err => {
+        showToast(err.message, 'error');
+      })
+      .finally(() => {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = origContent;
+      });
   });
 
   // Save notes
   saveNoteBtn.addEventListener('click', () => {
-    const currentEmail = localStorage.getItem('currentUserSession');
-    if (!currentEmail) return;
+    const token = localStorage.getItem('sessionToken');
+    if (!token) return;
 
-    const users = JSON.parse(localStorage.getItem('users'));
-    const userIndex = users.findIndex(u => u.email === currentEmail);
+    const notes = quickNotes.value;
+    const baseUrl = getApiBaseUrl();
+    
+    saveNoteBtn.disabled = true;
+    const origText = saveNoteBtn.textContent;
+    saveNoteBtn.textContent = 'Speichert...';
 
-    if (userIndex !== -1) {
-      users[userIndex].notes = quickNotes.value;
-      localStorage.setItem('users', JSON.stringify(users));
-      showToast('Notiz erfolgreich gespeichert!', 'success');
-    }
+    fetch(`${baseUrl}/api/auth/save-notes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ notes })
+    })
+      .then(res => res.json().then(data => {
+        if (!res.ok) throw new Error(data.message || 'Speichern fehlgeschlagen.');
+        return data;
+      }))
+      .then(data => {
+        showToast(data.message, 'success');
+      })
+      .catch(err => {
+        showToast(err.message, 'error');
+      })
+      .finally(() => {
+        saveNoteBtn.disabled = false;
+        saveNoteBtn.textContent = origText;
+      });
+  });
+
+  // Forgot Password Form Submit
+  forgotPasswordForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const email = forgotEmailInput.value.trim().toLowerCase();
+    const baseUrl = getApiBaseUrl();
+    const btnSubmit = forgotPasswordForm.querySelector('button[type="submit"]');
+    const origContent = btnSubmit.innerHTML;
+    
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<span>Sende...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+
+    fetch(`${baseUrl}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    })
+      .then(res => res.json().then(data => {
+        if (!res.ok) throw new Error(data.message || 'Fehler beim Senden.');
+        return data;
+      }))
+      .then(data => {
+        showToast(data.message, 'success');
+        forgotPasswordForm.reset();
+        switchAuthSubView(loginView, forgotPasswordView);
+      })
+      .catch(err => {
+        showToast(err.message, 'error');
+      })
+      .finally(() => {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = origContent;
+      });
+  });
+
+  // Forgot Password navigation bindings
+  goToForgotBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchAuthSubView(forgotPasswordView, loginView);
+  });
+
+  forgotToLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchAuthSubView(loginView, forgotPasswordView);
   });
 
   // Game Click listeners

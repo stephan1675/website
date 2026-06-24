@@ -22,3 +22,7 @@ logs/
 Thumbs.db
 EHthumbs.db
 Desktop.ini
+
+# Local User Database & Local E-mails
+users.json
+sent_emails/

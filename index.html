@@ -427,7 +427,10 @@
           </div>
           
           <div class="form-group">
-            <label for="login-password">Passwort</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+              <label for="login-password" style="margin-bottom: 0;">Passwort</label>
+              <a href="#" id="go-to-forgot" style="font-size: 0.8rem; color: var(--color-primary); text-decoration: none; font-weight: 600; transition: var(--transition-fast);">Passwort vergessen?</a>
+            </div>
             <div class="input-wrapper">
               <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
               <i class="fa-solid fa-lock input-icon"></i>
@@ -501,6 +504,33 @@
         <div class="auth-footer">
           <span>Bereits registriert? </span>
           <a href="#" id="go-to-login">Hier einloggen</a>
+      </div>
+      
+      <!-- Forgot Password View (Hidden initially) -->
+      <div id="forgot-password-view" class="hidden">
+        <div class="auth-header">
+          <div class="logo">Reset.</div>
+          <p>Geben Sie Ihre E-Mail ein, um Ihr Passwort zurückzusetzen</p>
+        </div>
+        
+        <form id="forgot-password-form" autocomplete="off">
+          <div class="form-group">
+            <label for="forgot-email">E-Mail-Adresse</label>
+            <div class="input-wrapper">
+              <input type="email" id="forgot-email" class="form-control" placeholder="name@beispiel.com" required>
+              <i class="fa-regular fa-envelope input-icon"></i>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+            <span>Link anfordern</span>
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          <span>Zurück zum </span>
+          <a href="#" id="forgot-to-login">Login</a>
         </div>
       </div>
       
