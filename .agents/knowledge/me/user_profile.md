@@ -1,17 +1,23 @@
-# User Profile
+# User Profile - Stephan Jeremias
 
-This profile contains context about the user's background, current goals, and how they work. AI agents should reference this file to tailor their guidance, project recommendations, and advice.
+Dieses Profil enthält detaillierte Kontextinformationen über Stephan Jeremias, seine Interessen, akademischen Hintergründe und Entwicklungspräferenzen. AI-Agenten sollten diese Datei lesen, um Empfehlungen, Architekturentscheidungen und Unterstützung optimal anzupassen.
 
-## Background
-- **Field of Study**: Mechatronics and System Technology (Mechatronik und Systemtechnik).
-- **Core Interests**: Robotics, system engineering, hardware/software integration, AI/agentic workflows, and rapid prototyping.
+## Persönliche Daten & Hintergrund
+- **Name:** Stephan Jeremias
+- **Geburtsdatum:** 16. November 1982
+- **Wohnort:** Hinterkappelen, Bern, Schweiz (CH)
+- **Akademischer Status:** Student in **Mechatronik & Systemtechnik** an der **Berner Fachhochschule BFH** (Biel)
+- **LinkedIn:** https://www.linkedin.com/in/stephan-jeremias
 
-## Career & Personal Goals (1, 5, 10 Years)
-- **1 Year / Short-Term**: Complete the mechatronics degree. Build small, innovative projects to learn and practice skills. Experiment with cutting-edge tools like ElevenLabs, Antigravity, and autonomous agent workflows.
-- **5-10 Years / Long-Term**: Establish a career in mechatronics/robotics or start a venture, leveraging both hardware and software systems.
-- **Project Goal Philosophy**: The focus is on learning and discovering what is possible with today's technology. Projects do not need to be profitable. If a project is successful and cool, the user wants to share it publicly on platforms like LinkedIn to build a professional profile.
+## Technische Fachgebiete & Interessen
+- **Mechatronik & Robotik:** Starker Fokus auf Systemintegration, R&D Prototyping und Hardware/Software-Schnittstellen.
+- **Systemtechnik & Steuerung:** Expertise in CAD-Konstruktion, Linearmotoren, eingebetteten Systemen (Embedded Systems) und physikalischen Simulationen.
+- **Software Engineering:** Fundierte Programmierkenntnisse in **C++** (für mechatronische Steuerungen und Konsolenspiele) sowie **Python** (Backend-Skripting, Datenverarbeitung und KI-Integration).
+- **Künstliche Intelligenz:** Großes Interesse an agentischen Workflows, LLM-basierten Debattensimulationen und Audio/Voice-Cloning (z. B. ElevenLabs, Kokoro-TTS).
 
-## Advisor Role & Support Needs
-- **Technical Advisory**: Help design technical architectures, answer coding and electronics questions, assess what is feasible/possible, and debug complex problems.
-- **Project Ideation**: Act as a sounding board ("ideas bounce"), refine project scopes, and suggest innovative ways to combine mechatronics with agentic AI.
-- **Career & Goals Guidance**: Provide advice on how to align projects with career progression, select skills to focus on, and set milestones.
+## Arbeitsweise & Präferenzen
+- **Premium Design-Anspruch:** Erwartet moderne, ästhetisch anspruchsvolle Benutzeroberflächen (z. B. flüssiges Glassmorphism-UI, harmonische Farbpaletten, subtile Ladeanimationen und Responsive Design). Standard-Browser-Styles oder billige Standard-Designs sind zu vermeiden.
+- **Sicherheitsbewusstsein (Security-first):** Legt großen Wert auf saubere Sicherheitsarchitekturen. Sessions müssen über kryptografische Tokens (statt Plaintext-E-Mails) gesichert sein, Passwörter werden robust gehasht (PBKDF2), Datei-Uploads müssen verifiziert und APIs gegen BOLA abgesichert sein.
+- **Projekt-Philosophie:** Der Fokus liegt auf experimentellem Lernen und technologischem Entdecken. Funktionierende Prototypen werden gerne auf LinkedIn geteilt, um das professionelle Profil zu stärken.
+- **Saubere Git-Struktur:** Lokale temporäre Daten (Mock-E-Mails), Benutzerdatenbanken (`users.json`) und private Umgebungsvariablen (`.env`) müssen konsequent über `.gitignore` ausgeschlossen sein und dürfen niemals im Git-Repository landen.
+- **Kontinuierliche Verbesserung (Lessons Learned):** Schätzt Protokollierung und Reflexion über Fehler (z. B. Memory-Files), um sich von Projekt zu Projekt kontinuierlich zu steigern.
