@@ -44,3 +44,18 @@ Die Einfachheit von `localStorage` verleitet dazu, schnell eine Identifikationsm
 ### Wie klappt es das nächste Mal besser?
 1. **Sicherheit ab Stunde Null:** Auch bei Prototypen von Anfang an auf tokenbasierte Authentifizierung (Session-Tokens) setzen.
 2. **Critic-Subagenten frühzeitig nutzen:** Der Critic-Subagent hat hervorragende Arbeit geleistet. Er sollte bei jedem sicherheitsrelevanten Feature vor der finalen Freigabe fest in den Workflow integriert werden.
+
+---
+
+## 4. Vorfall: Passwort-Sichtbarkeits-Toggle ohne Funktion (24. Juni 2026)
+
+### Was ist passiert?
+Beim Klicken auf das Augensymbol wurde das Passwort nicht im Klartext angezeigt, sondern verblieb im gepunkteten Modus (`••••••••`).
+
+### Wo lag die Schwierigkeit?
+Im JavaScript-Code wurde der Passwort-Eingabetyp mittels `button.previousElementSibling` umgeschaltet. Da im HTML-Layout ein Schloss-Symbol (`<i class="fa-solid fa-lock input-icon"></i>`) direkt vor dem Button eingefügt war, lieferte `previousElementSibling` das Icon-Element statt des `<input>`-Elements zurück. Das Umschalten des Typs schlug daher lautlos fehl.
+
+### Wie klappt es das nächste Mal besser?
+1. **Strukturunabhängige Selektoren verwenden:** Anstatt uns auf die genaue Reihenfolge der Geschwister-Elemente (`previousElementSibling`) zu verlassen, sollte das Element robuster über die Elternbox gesucht werden:
+   `const input = button.parentElement.querySelector('input');`
+2. **Automatisiertes Testen von State-Veränderungen:** Wenn möglich, sollten Klick-Events auf Sichtbarkeits-Toggles und deren Auswirkung auf das DOM in Integrations- oder Unit-Tests abgedeckt werden.
