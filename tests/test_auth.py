@@ -36,6 +36,19 @@ def run_tests():
         "email": "testrunner@example.com",
         "password": "SuperSecurePassword123!"
     }
+
+    # Clean up test user in users.json to avoid password mismatch from previous runs
+    users_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'users.json')
+    if os.path.exists(users_file):
+        try:
+            with open(users_file, 'r', encoding='utf-8') as f:
+                users = json.load(f)
+            users = [u for u in users if u.get('email') != test_user['email']]
+            with open(users_file, 'w', encoding='utf-8') as f:
+                json.dump(users, f, indent=2, ensure_ascii=False)
+            print("   [INFO] Vorherige Testdaten bereinigt.")
+        except Exception as e:
+            print(f"   [WARN] Fehler beim Bereinigen von users.json: {e}")
     
     # 1. Register
     code, resp = make_request('/api/auth/register', test_user)
