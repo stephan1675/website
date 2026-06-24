@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.password-toggle').forEach(button => {
     button.addEventListener('click', (e) => {
       e.preventDefault();
-      const input = button.previousElementSibling;
+      const input = button.parentElement.querySelector('input');
       const icon = button.querySelector('i');
 
       if (input.type === 'password') {
