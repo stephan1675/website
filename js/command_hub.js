@@ -79,12 +79,72 @@ export function initCommandHub() {
   const progressContainer = document.getElementById('active-project-progress-container');
   const progressBar = document.getElementById('active-project-progress-bar');
   const progressText = document.getElementById('active-project-progress-text');
+  const progressResetBtn = document.getElementById('active-project-progress-reset');
   
   const boardContent = document.getElementById('active-project-board-content');
   const addTaskForm = document.getElementById('add-task-form');
   const newTaskInput = document.getElementById('new-task-input');
   const projectTasksList = document.getElementById('project-tasks-list');
   const projectNotesTextarea = document.getElementById('project-notes-textarea');
+
+  // --- Manual Progress Override ---
+  if (progressText) {
+    progressText.addEventListener('click', () => {
+      const currentData = getActiveProjectData();
+      
+      // If already editing (contains an input element), do nothing
+      if (progressText.querySelector('input')) return;
+
+      const currentPercent = getProgressBarPercentage(currentData);
+      
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = '0';
+      input.max = '100';
+      input.className = 'progress-manual-input';
+      input.value = currentPercent;
+      
+      // Store current display content
+      const originalHTML = progressText.innerHTML;
+      progressText.innerHTML = '';
+      progressText.appendChild(input);
+      input.focus();
+      input.select();
+
+      const finishEdit = () => {
+        let val = parseInt(input.value);
+        if (isNaN(val) || val < 0) val = 0;
+        if (val > 100) val = 100;
+        
+        saveProjectData(undefined, undefined, val);
+        const updatedData = getActiveProjectData();
+        updateProgressBar(updatedData.tasks);
+        showToast(`Fortschritt manuell auf ${val}% gesetzt.`, 'info');
+      };
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          input.blur();
+        } else if (e.key === 'Escape') {
+          // Cancel edit
+          progressText.innerHTML = originalHTML;
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        finishEdit();
+      });
+    });
+  }
+
+  if (progressResetBtn) {
+    progressResetBtn.addEventListener('click', () => {
+      saveProjectData(undefined, undefined, null);
+      const updatedData = getActiveProjectData();
+      updateProgressBar(updatedData.tasks);
+      showToast('Fortschrittsbalken wird wieder automatisch berechnet.', 'success');
+    });
+  }
 
   // Render project selection list on load
   PROJECTS.forEach(project => {
@@ -144,7 +204,32 @@ export function initCommandHub() {
     if (!currentProjectId) return;
 
     const dataKey = `project_data_${currentProjectId}`;
-    const data = JSON.parse(localStorage.getItem(dataKey) || '{"tasks": [], "notes": ""}');
+    const data = JSON.parse(localStorage.getItem(dataKey) || '{"tasks": [], "notes": "", "customProgress": null}');
+
+    // Run data migration if needed
+    let hasMigrated = false;
+    if (data.tasks && Array.isArray(data.tasks)) {
+      data.tasks.forEach(task => {
+        if (task.status === undefined) {
+          task.status = task.completed ? 'completed' : 'planned';
+          delete task.completed;
+          hasMigrated = true;
+        }
+        if (task.notes === undefined) {
+          task.notes = '';
+          hasMigrated = true;
+        }
+      });
+    }
+
+    if (data.customProgress === undefined) {
+      data.customProgress = null;
+      hasMigrated = true;
+    }
+
+    if (hasMigrated) {
+      localStorage.setItem(dataKey, JSON.stringify(data));
+    }
 
     // Load notes
     projectNotesTextarea.value = data.notes || '';
@@ -155,18 +240,22 @@ export function initCommandHub() {
   }
 
   // Save current project data back to LocalStorage
-  function saveProjectData(tasks, notes) {
+  function saveProjectData(tasks, notes, customProgress) {
     if (!currentProjectId) return;
 
     const dataKey = `project_data_${currentProjectId}`;
+    const current = JSON.parse(localStorage.getItem(dataKey) || '{"tasks": [], "notes": "", "customProgress": null}');
+
     const data = {
-      tasks: tasks,
-      notes: notes
+      tasks: tasks !== undefined ? tasks : current.tasks,
+      notes: notes !== undefined ? notes : current.notes,
+      customProgress: customProgress !== undefined ? customProgress : current.customProgress
     };
 
     localStorage.setItem(dataKey, JSON.stringify(data));
   }
 
+  // Render tasks checklist
   // Render tasks checklist
   function renderTasksList(tasks) {
     projectTasksList.innerHTML = '';
@@ -177,33 +266,95 @@ export function initCommandHub() {
     }
 
     tasks.forEach(task => {
-      const row = document.createElement('div');
-      row.className = 'task-row';
-      row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: var(--border-radius-sm); margin-bottom: 0.25rem; transition: var(--transition-fast);';
+      const card = document.createElement('div');
+      card.className = 'task-card';
+      card.setAttribute('data-task-id', task.id);
 
-      const labelStyle = task.completed ? 'text-decoration: line-through; color: var(--color-text-muted);' : 'color: var(--color-text-primary);';
+      const isCompleted = task.status === 'completed';
+      const textStyleClass = isCompleted ? 'task-text completed' : 'task-text';
+      
+      let statusClass = 'status-planned';
+      if (task.status === 'in_progress') statusClass = 'status-in-progress';
+      if (task.status === 'completed') statusClass = 'status-completed';
 
-      row.innerHTML = `
-        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; flex-grow: 1; text-align: left; font-size: 0.9rem; ${labelStyle}">
-          <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--color-primary);">
-          <span>${task.text}</span>
-        </label>
-        <button class="btn-delete-task" style="background: none; border: none; color: var(--color-text-muted); cursor: pointer; transition: var(--transition-fast); font-size: 0.95rem;">
-          <i class="fa-regular fa-trash-can"></i>
-        </button>
+      card.innerHTML = `
+        <div class="task-header">
+          <!-- Status Select -->
+          <select class="task-status-select ${statusClass}">
+            <option value="planned" ${task.status === 'planned' ? 'selected' : ''} style="background-color: var(--bg-primary); color: var(--color-text-primary);">Geplant</option>
+            <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''} style="background-color: var(--bg-primary); color: var(--color-text-primary);">In Ausführung</option>
+            <option value="completed" ${task.status === 'completed' ? 'selected' : ''} style="background-color: var(--bg-primary); color: var(--color-text-primary);">Erledigt</option>
+          </select>
+          
+          <!-- Task Text -->
+          <div class="${textStyleClass}">
+            ${task.text}
+          </div>
+
+          <!-- Actions -->
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fa-solid fa-chevron-down chevron-icon"></i>
+            <button class="btn-delete-task">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Notes Pane -->
+        <div class="task-notes-pane">
+          <div class="task-notes-content">
+            <div class="task-notes-divider"></div>
+            <label class="task-notes-label">Notizen für diese Aufgabe</label>
+            <textarea class="task-notes-textarea" placeholder="Notizen für diese Aufgabe eingeben... (automatisches Speichern)">${task.notes || ''}</textarea>
+          </div>
+        </div>
       `;
 
-      // Checkbox click listener
-      row.querySelector('.task-checkbox').addEventListener('change', () => {
-        task.completed = !task.completed;
+      const header = card.querySelector('.task-header');
+      const select = card.querySelector('.task-status-select');
+      const deleteBtn = card.querySelector('.btn-delete-task');
+      const pane = card.querySelector('.task-notes-pane');
+      const textarea = card.querySelector('.task-notes-textarea');
+      const textDiv = card.querySelector('.task-text');
+
+      // 1. Status Change Listener
+      select.addEventListener('change', (e) => {
+        e.stopPropagation();
+        const newStatus = select.value;
+        task.status = newStatus;
+
+        // Update select color styling
+        select.className = `task-status-select status-${newStatus.replace('_', '-')}`;
+        
+        // Update task text decoration
+        if (newStatus === 'completed') {
+          textDiv.className = 'task-text completed';
+        } else {
+          textDiv.className = 'task-text';
+        }
+
         const currentData = getActiveProjectData();
         saveProjectData(currentData.tasks, projectNotesTextarea.value);
-        renderTasksList(currentData.tasks);
         updateProgressBar(currentData.tasks);
       });
 
-      // Delete click listener
-      row.querySelector('.btn-delete-task').addEventListener('click', () => {
+      select.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // 2. Expand/Collapse Toggle on Header Click
+      header.addEventListener('click', () => {
+        const isExpanded = card.classList.toggle('expanded');
+        if (isExpanded) {
+          pane.style.maxHeight = pane.scrollHeight + 'px';
+        } else {
+          pane.style.maxHeight = '0px';
+        }
+      });
+
+      // 3. Delete Task Click Listener
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const currentData = getActiveProjectData();
         const filteredTasks = currentData.tasks.filter(t => t.id !== task.id);
         saveProjectData(filteredTasks, projectNotesTextarea.value);
@@ -212,39 +363,55 @@ export function initCommandHub() {
         showToast('Aufgabe entfernt.', 'info');
       });
 
-      // Hover styling
-      row.addEventListener('mouseenter', () => {
-        row.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-        row.querySelector('.btn-delete-task').style.color = 'var(--color-danger)';
-      });
-      row.addEventListener('mouseleave', () => {
-        row.style.borderColor = 'var(--glass-border)';
-        row.querySelector('.btn-delete-task').style.color = 'var(--color-text-muted)';
+      // 4. Notes Textarea auto-save
+      textarea.addEventListener('input', () => {
+        task.notes = textarea.value;
+        const currentData = getActiveProjectData();
+        saveProjectData(currentData.tasks, projectNotesTextarea.value);
       });
 
-      projectTasksList.appendChild(row);
+      projectTasksList.appendChild(card);
     });
   }
 
   // Helper to extract active data
   function getActiveProjectData() {
     const dataKey = `project_data_${currentProjectId}`;
-    return JSON.parse(localStorage.getItem(dataKey) || '{"tasks": [], "notes": ""}');
+    return JSON.parse(localStorage.getItem(dataKey) || '{"tasks": [], "notes": "", "customProgress": null}');
+  }
+
+  // Helper to calculate progress percentage
+  function getProgressBarPercentage(data) {
+    if (data.customProgress !== null && data.customProgress !== undefined) {
+      return data.customProgress;
+    }
+    const tasks = data.tasks || [];
+    if (tasks.length === 0) return 0;
+    const completedCount = tasks.filter(t => t.status === 'completed').length;
+    return Math.round((completedCount / tasks.length) * 100);
   }
 
   // Update progress bar
   function updateProgressBar(tasks) {
-    if (tasks.length === 0) {
-      progressBar.style.width = '0%';
-      progressText.textContent = '0% (0/0)';
-      return;
-    }
-
-    const completedCount = tasks.filter(t => t.completed).length;
-    const percentage = Math.round((completedCount / tasks.length) * 100);
+    const data = getActiveProjectData();
+    const isManual = data.customProgress !== null && data.customProgress !== undefined;
+    const percentage = getProgressBarPercentage(data);
 
     progressBar.style.width = `${percentage}%`;
-    progressText.textContent = `${percentage}% (${completedCount}/${tasks.length})`;
+
+    const completedCount = tasks.filter(t => t.status === 'completed').length;
+    
+    if (isManual) {
+      progressText.textContent = `${percentage}% (manuell)`;
+      if (progressResetBtn) {
+        progressResetBtn.classList.remove('hidden');
+      }
+    } else {
+      progressText.textContent = `${percentage}% (${completedCount}/${tasks.length})`;
+      if (progressResetBtn) {
+        progressResetBtn.classList.add('hidden');
+      }
+    }
   }
 
   // Add Task submit handler
@@ -257,11 +424,12 @@ export function initCommandHub() {
 
     const currentData = getActiveProjectData();
     
-    // Add new task
+    // Add new task with updated schema (status, notes)
     const newTask = {
       id: `task_${Date.now()}`,
       text: taskText,
-      completed: false
+      status: 'planned',
+      notes: ''
     };
 
     currentData.tasks.push(newTask);

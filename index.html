@@ -610,9 +610,12 @@
 
             <!-- Progress Bar -->
             <div id="active-project-progress-container" class="hidden" style="width: 100%;">
-              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--color-text-secondary); margin-bottom: 0.4rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--color-text-secondary); margin-bottom: 0.4rem;">
                 <span>Fortschritt</span>
-                <span id="active-project-progress-text">0% (0/0)</span>
+                <div class="progress-interactive-wrapper">
+                  <button id="active-project-progress-reset" class="progress-reset-btn hidden">Auto</button>
+                  <span id="active-project-progress-text" class="progress-interactive-text" title="Klicken, um manuellen Wert einzugeben">0% (0/0)</span>
+                </div>
               </div>
               <div class="progress-bar-wrapper" style="height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; overflow: hidden; width: 100%;">
                 <div id="active-project-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)); border-radius: 3px; transition: var(--transition-smooth);"></div>
