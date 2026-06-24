@@ -57,6 +57,9 @@ The following specialized subagents are predefined for this workspace and can be
 3. **`cpp_compiler_check_agent`**:
    - **When to use**: When developing or debugging files in the C++ Tower Defense game (`c++ spiel/`) or embedded controls.
    - **Task**: Scan code for syntax errors, check compiler/linker compatibility, and verify modern C++ practices.
+4. **`web_navigator`**:
+   - **When to use**: When testing website navigation, UI components, responsive layout layout-bugs, visual regression, or verifying browser behaviors.
+   - **Task**: Automate local page actions via browser engines, take screenshots, check console/network logs, and run style layout diagnostic inspections.
 
 # Task Delegation & Overnight Runs
 

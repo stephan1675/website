@@ -346,9 +346,25 @@ export function initCommandHub() {
       header.addEventListener('click', () => {
         const isExpanded = card.classList.toggle('expanded');
         if (isExpanded) {
-          pane.style.maxHeight = pane.scrollHeight + 'px';
+          const contentHeight = pane.firstElementChild ? pane.firstElementChild.scrollHeight : 140;
+          pane.style.maxHeight = contentHeight + 'px';
+          
+          const onTransitionEnd = (e) => {
+            if (e.propertyName === 'max-height' && card.classList.contains('expanded')) {
+              pane.style.maxHeight = 'none';
+              pane.removeEventListener('transitionend', onTransitionEnd);
+            }
+          };
+          pane.addEventListener('transitionend', onTransitionEnd);
         } else {
-          pane.style.maxHeight = '0px';
+          if (pane.style.maxHeight === 'none') {
+            const contentHeight = pane.firstElementChild ? pane.firstElementChild.scrollHeight : 140;
+            pane.style.maxHeight = contentHeight + 'px';
+            pane.offsetHeight; // force reflow
+          }
+          setTimeout(() => {
+            pane.style.maxHeight = '0px';
+          }, 0);
         }
       });
 

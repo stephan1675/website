@@ -73,3 +73,17 @@ Der standardmäßige Python-Klassen-Webserver (`http.server.SimpleHTTPRequestHan
 ### Wie klappt es das nächste Mal besser?
 1. **Cache-Control im Server erzwingen**: Den HTTP-Handler des lokalen Servers so erweitern, dass er bei jedem Request `Cache-Control: no-store, no-cache, must-revalidate, max-age=0` sowie Pragma/Expires Header sendet. Dies garantiert, dass der Browser bei jedem Seitenaufruf im Entwicklungsmodus die neuesten Dateien lädt.
 2. **Aktives Hinweisen auf Hard-Reloads**: Falls Cache-Probleme vermutet werden, den Benutzer gezielt auf Tastaturkombinationen wie `Strg + F5` (Windows) oder `Cmd + Shift + R` (Mac) hinweisen.
+
+---
+
+## 6. Vorfall: Firefox-Layout-Kollaps bei CSS-Transitions mit max-height (24. Juni 2026)
+
+### Was ist passiert?
+In Firefox wurde die Notizen-Akkordeon-Textarea innerhalb einer Aufgabenkarte nicht korrekt gerendert. Das Akkordeon öffnete sich zwar visuell, aber die Textarea blieb auf eine Höhe von 0 kollabiert bzw. unsichtbar.
+
+### Wo lag die Schwierigkeit?
+Das Skript berechnete die Öffnungshöhe dynamisch mit `pane.style.maxHeight = pane.scrollHeight + 'px'`. In Firefox liefert `pane.scrollHeight` für ein Element, das mit `max-height: 0px` und `overflow: hidden` belegt ist, jedoch nicht immer die volle Höhe der Kinder, insbesondere wenn diese in flexiblen Containern liegen. Dadurch wurde die maximale Höhe zu gering bemessen, wodurch die Textarea abgeschnitten wurde.
+
+### Wie klappt es das nächste Mal besser?
+1. **Verwendung von inneren Referenz-Containern**: Wenn die Höhe eines Containers mit `max-height` animiert werden soll, misst man am besten das `scrollHeight` des unbeschränkten inneren Elements (z.B. `.task-notes-content` statt der äußeren `.task-notes-pane`).
+2. **Transitionend-Härtung**: Nach Abschluss der CSS-Transition sollte das `maxHeight` auf `'none'` zurückgesetzt werden. Dadurch kann sich das Element bei nachträglichen Inhaltsänderungen (z.B. Texteingabe) dynamisch anpassen und wird in keinem Browser dauerhaft künstlich beschnitten.
