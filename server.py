@@ -232,6 +232,13 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
 
 class LauncherHTTPHandler(http.server.SimpleHTTPRequestHandler):
     
+    def end_headers(self):
+        # Disable caching for static files to ensure updates are immediately visible
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
     # Custom GET overrides
     def do_GET(self):
         parsed_url = urllib.parse.urlparse(self.path)
