@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Master - Sleek To-Do Web App</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-color: #6366f1;
+      --accent-hover: #4f46e5;
+      --danger-color: #f43f5e;
+      --danger-hover: #e11d48;
+      --success-color: #10b981;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .app-header {
+      text-align: center;
+    }
+
+    .app-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .app-header .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      background-color: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .add-btn {
+      width: 100%;
+      background-color: var(--accent-color);
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .add-btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .add-btn:active {
+      transform: scale(0.98);
+    }
+
+    .todo-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .badge {
+      background-color: var(--card-border);
+      color: var(--text-primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .task-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .task-item {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s, opacity 0.2s, transform 0.2s;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .task-item.is-deleting {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    .task-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      gap: 1rem;
+    }
+
+    .task-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .task-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 0.5rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-icon:hover {
+      background-color: var(--card-border);
+      color: var(--text-primary);
+    }
+
+    .btn-delete:hover {
+      background-color: rgba(244, 63, 94, 0.15);
+      color: var(--danger-color);
+    }
+
+    /* Accordion Transition styles */
+    .details-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: rgba(15, 23, 42, 0.3);
+      border-top: 0px solid transparent;
+    }
+
+    .details-panel.is-active {
+      border-top: 1px solid var(--card-border);
+    }
+
+    .details-inner {
+      padding: 1rem 1.25rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .no-notes {
+      font-style: italic;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    /* Toggle Accordion indicator */
+    .btn-toggle svg {
+      transition: transform 0.3s;
+    }
+
+    .btn-toggle.is-active svg {
+      transform: rotate(180deg);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      border: 1px dashed var(--card-border);
+      border-radius: 8px;
+    }
+
+    /* Responsive Design Media Queries */
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+      
+      .card {
+        padding: 1.25rem;
+        border-radius: 8px;
+      }
+      
+      .app-header h1 {
+        font-size: 2rem;
+      }
+      
+      .task-main {
+        padding: 0.75rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>Task Master</h1>
+      <p class="subtitle">Streamline your daily flow</p>
+    </header>
+    
+    <main class="app-main">
+      <!-- Input Card -->
+      <section class="card input-card">
+        <form id="todo-form">
+          <div class="form-group">
+            <label for="todo-input">Task Title</label>
+            <input type="text" id="todo-input" class="task-input" placeholder="What needs to be done?" required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="task-notes">Notes (Optional)</label>
+            <textarea id="task-notes" placeholder="Add extra details, links, or subtasks..." rows="3"></textarea>
+          </div>
+          <button type="submit" id="add-btn" class="add-btn">Add Task</button>
+        </form>
+      </section>
+
+      <!-- Task List Card/Section -->
+      <section class="todo-section">
+        <div class="section-header">
+          <h2>Your Tasks</h2>
+          <span id="task-count" class="badge">0</span>
+        </div>
+        <ul id="task-list" class="task-list">
+          <!-- Tasks will be rendered here dynamically -->
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // State Management
+      let itemsList = [];
+
+      // DOM Elements
+      const todoForm = document.getElementById('todo-form');
+      const taskTitleInput = document.getElementById('todo-input');
+      const taskNotesInput = document.getElementById('task-notes');
+      const taskList = document.getElementById('task-list');
+      const taskCountBadge = document.getElementById('task-count');
+
+      // Local Storage Keys
+      const STORAGE_KEY = 'todo_tasks';
+
+      // Load tasks from localStorage
+      function loadTasks() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            itemsList = JSON.parse(stored);
+          }
+        } catch (error) {
+          console.error('Error loading tasks from localStorage:', error);
+          itemsList = [];
+        }
+      }
+
+      // Save tasks to localStorage
+      function saveTasks() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(itemsList));
+        } catch (error) {
+          console.error('Error saving tasks to localStorage:', error);
+        }
+      }
+
+      // Update the tasks count badge
+      function updateBadge() {
+        if (taskCountBadge) {
+          taskCountBadge.textContent = itemsList.length;
+        }
+      }
+
+      // Render the entire list of tasks
+      function renderTasks() {
+        if (!taskList) return;
+        taskList.innerHTML = '';
+
+        if (itemsList.length === 0) {
+          const emptyState = document.createElement('div');
+          emptyState.className = 'empty-state';
+          emptyState.textContent = 'No tasks left! Rest or add a new one.';
+          taskList.appendChild(emptyState);
+          updateBadge();
+          return;
+        }
+
+        itemsList.forEach(task => {
+          const taskElement = createTaskElement(task);
+          taskList.appendChild(taskElement);
+        });
+
+        updateBadge();
+      }
+
+      // Helper to build task item DOM element
+      function createTaskElement(task) {
+        const li = document.createElement('li');
+        li.className = 'task-item';
+        li.setAttribute('data-id', task.id);
+
+        const hasNotes = task.notes && task.notes.trim().length > 0;
+        const notesContent = hasNotes 
+          ? escapeHtml(task.notes) 
+          : '<span class="no-notes">No additional notes.</span>';
+
+        li.innerHTML = `
+          <div class="task-main">
+            <div class="task-content">
+              <span class="task-title">${escapeHtml(task.title)}</span>
+            </div>
+            <div class="task-actions">
+              <button class="btn-icon btn-toggle" aria-label="Toggle details">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+              <button class="btn-icon btn-delete" aria-label="Delete task">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"/>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="details-panel">
+            <div class="details-inner">${notesContent}</div>
+          </div>
+        `;
+
+        return li;
+      }
+
+      // Escaping helper to avoid XSS injections
+      function escapeHtml(unsafe) {
+        return unsafe
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // Smooth transition toggle accordion for Details
+      function toggleDetails(taskItem) {
+        const btnToggle = taskItem.querySelector('.btn-toggle');
+        const detailsPanel = taskItem.querySelector('.details-panel');
+        const detailsInner = taskItem.querySelector('.details-inner');
+
+        if (!btnToggle || !detailsPanel || !detailsInner) return;
+
+        // Clean up any existing active transition listeners
+        if (detailsPanel._transitionHandler) {
+          detailsPanel.removeEventListener('transitionend', detailsPanel._transitionHandler);
+          detailsPanel._transitionHandler = null;
+        }
+
+        const isCurrentlyExpanded = btnToggle.classList.contains('is-active');
+
+        if (isCurrentlyExpanded) {
+          // Collapse details
+          const currentHeight = detailsInner.scrollHeight;
+          detailsPanel.style.maxHeight = currentHeight + 'px';
+          detailsPanel.offsetHeight; // force reflow
+          
+          detailsPanel.style.maxHeight = '0px';
+          btnToggle.classList.remove('is-active');
+          detailsPanel.classList.remove('is-active');
+        } else {
+          // Expand details
+          btnToggle.classList.add('is-active');
+          detailsPanel.classList.add('is-active');
+
+          const innerHeight = detailsInner.scrollHeight;
+          detailsPanel.style.maxHeight = innerHeight + 'px';
+
+          const handleTransitionEnd = (e) => {
+            if (e.propertyName === 'max-height') {
+              detailsPanel.removeEventListener('transitionend', handleTransitionEnd);
+              detailsPanel._transitionHandler = null;
+              if (btnToggle.classList.contains('is-active')) {
+                detailsPanel.style.maxHeight = 'none';
+              }
+            }
+          };
+
+          detailsPanel._transitionHandler = handleTransitionEnd;
+          detailsPanel.addEventListener('transitionend', handleTransitionEnd);
+        }
+      }
+
+      // Add task submit handler
+      if (todoForm) {
+        todoForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const title = taskTitleInput.value.trim();
+          const notes = taskNotesInput.value.trim();
+
+          if (!title) return;
+
+          const newTask = {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+            title: title,
+            notes: notes
+          };
+
+          itemsList.push(newTask);
+          saveTasks();
+
+          // Render tasks or append new task element
+          // If tasks length was 1, we replace empty-state, so we re-render. Else, we append.
+          if (itemsList.length === 1) {
+            renderTasks();
+          } else if (taskList) {
+            // Remove empty-state if it somehow exists
+            const empty = taskList.querySelector('.empty-state');
+            if (empty) empty.remove();
+
+            const taskEl = createTaskElement(newTask);
+            taskList.appendChild(taskEl);
+            updateBadge();
+          }
+
+          // Reset inputs
+          taskTitleInput.value = '';
+          taskNotesInput.value = '';
+          taskTitleInput.focus();
+        });
+      }
+
+      // Delete task flow
+      function deleteTask(taskItem) {
+        const taskId = taskItem.getAttribute('data-id');
+        if (!taskId) return;
+
+        // Remove from array
+        itemsList = itemsList.filter(t => t.id !== taskId);
+        saveTasks();
+
+        // Animate deletion
+        taskItem.classList.add('is-deleting');
+        
+        // Wait for the transition to finish before removing element
+        taskItem.addEventListener('transitionend', function handleDelTransition(e) {
+          // Verify we only react to the main container's transition
+          if (e.propertyName === 'opacity') {
+            taskItem.removeEventListener('transitionend', handleDelTransition);
+            taskItem.remove();
+            
+            // Re-render to show empty state if we cleared all tasks
+            if (itemsList.length === 0) {
+              renderTasks();
+            } else {
+              updateBadge();
+            }
+          }
+        });
+      }
+
+      // Event delegation for toggle and delete actions
+      if (taskList) {
+        taskList.addEventListener('click', function (e) {
+          // Find closest buttons and target task items relative to them
+          const btnToggle = e.target.closest('.btn-toggle');
+          const btnDelete = e.target.closest('.btn-delete');
+
+          if (btnToggle) {
+            const taskItem = btnToggle.closest('.task-item');
+            if (taskItem) {
+              toggleDetails(taskItem);
+            }
+          } else if (btnDelete) {
+            const taskItem = btnDelete.closest('.task-item');
+            if (taskItem) {
+              deleteTask(taskItem);
+            }
+          }
+        });
+      }
+
+      // Init Load
+      loadTasks();
+      renderTasks();
+    })();
+  </script>
+</body>
+</html>

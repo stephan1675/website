@@ -26,3 +26,8 @@ Desktop.ini
 # Local User Database & Local E-mails
 users.json
 sent_emails/
+
+# Benchmark temporary folders
+tests/benchmark/sandbox/
+tests/benchmark/runs/
+
