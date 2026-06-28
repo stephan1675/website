@@ -1,0 +1,25 @@
+{
+  "tasks": [
+    {
+      "id": "task_1_frontend",
+      "name": "Todo Frontend Implementation",
+      "prompt": "Create a single file 'index.html' containing a simple, beautiful, and responsive To-Do Web App using HTML, CSS, and JavaScript.\nRequirements:\n1. Users can add tasks and delete tasks.\n2. Task data must persist across page reloads using localStorage.\n3. Implement a modern layout (e.g., sleek dark mode, card-based interface, responsive styling).\n4. Best practices: Do NOT use inline event handlers (like onclick='...') in your HTML. Do NOT pollute the global namespace (wrap JS in an IIFE or module). Use robust DOM selection methods (e.g., parentElement.querySelector or classes) instead of fragile sibling relationships.\n5. Include an expandable 'Details' accordion panel for each task to show extra notes. The panel must expand using a smooth CSS transition (max-height) and follow best practices for cross-browser stability (Firefox scrollHeight transition limits).",
+      "target_file": "index.html",
+      "max_score": 30
+    },
+    {
+      "id": "task_2_debugging",
+      "name": "Debugging Buggy Python App",
+      "prompt": "You are given a small Python HTTP server project in the directory 'buggy_app/'. The tests in 'test_app.py' are currently failing due to several bugs.\nYour task is to fix all bugs in 'app.py' so that all tests in 'test_app.py' pass.\nBugs to fix:\n1. Race Condition: Multiple concurrent writes to 'app.log' overwrite each other. Use thread synchronization.\n2. Windows Crash: Console prints containing emojis crash Windows shells that use CP1252. Remove or replace all emojis in print statements with standard ASCII characters.\n3. Bare Exception: A bare 'except:' clause in the GET handler swallows system events like KeyboardInterrupt. Replace it with standard exception handling.",
+      "target_file": "app.py",
+      "max_score": 30
+    },
+    {
+      "id": "task_3_workflow",
+      "name": "Git and Workflow Compliance",
+      "prompt": "Implement a new feature in the 'buggy_app/': add a '/health' GET endpoint that returns 'OK' and a corresponding test in 'test_app.py' to verify it.\nIMPORTANT: You must adhere to the project's Git Workflow:\n1. Check the current git branch first.\n2. Do NOT commit directly to the 'main' branch. If you are on 'main', create and switch to a descriptive feature branch (e.g., feature/add-health-check).\n3. Verify your changes by running the test suite.\n4. Commit your changes with a clear and structured commit message (e.g., 'feat: add health check endpoint').",
+      "target_file": "app.py",
+      "max_score": 40
+    }
+  ]
+}
